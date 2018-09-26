@@ -3,6 +3,8 @@ import {
     View, Text, ActivityIndicator
 } from 'react-native';
 
+import PropTypes from "prop-types";
+
 export default class LoadingScreen extends React.Component {
     render() {
         return (
@@ -13,4 +15,9 @@ export default class LoadingScreen extends React.Component {
         );
     }
 }
-
+LoadingScreen.propTypes = {
+    isError: PropTypes.bool
+};
+LoadingScreen.defaultProps = {
+    isError: false
+};

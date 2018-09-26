@@ -2,6 +2,8 @@ const axios = require("axios");
 const {Config} = require("../Config");
 const querystring = require("querystring");
 
+import {dataStore} from "./dataStore";
+
 const get = (url, params, options = {}) => {
     return request('get', url, params, options)
 };
@@ -63,39 +65,74 @@ const request = (method, url, params, options) => {
         return typeof obj === 'function';
     };
 
-    // full options: https://github.com/axios/axios#request-config
-    let requestOptions = Object.assign({
-        method: method,
-        url: url,
-        data: params,
-        timeout: 30000
-    }, options);
+    const _doRequest = (accessToken) => {
+        if (!params.oauth_token && accessToken) {
+            params['oauth_token'] = accessToken;
+        }
 
-    client.request(requestOptions)
-        .then((response) => {
-            const data = response.data;
+        // full options: https://github.com/axios/axios#request-config
+        let requestOptions = Object.assign({
+            method: method,
+            url: url,
+            timeout: 30000
+        }, options);
 
-            if (data.hasOwnProperty('errors') || response.status !== 200) {
+        if (method === 'get' || method === 'head') {
+            requestOptions.params = params;
+        } else {
+            requestOptions.data = params;
+        }
+
+        console.log(`doRequest 
+            method=${method} 
+            url=${url} 
+            options=${JSON.stringify(requestOptions)}`);
+
+        client.request(requestOptions)
+            .then((response) => {
+                const data = response.data;
+
+                if (data.hasOwnProperty('errors') || response.status !== 200) {
+                    if (isFunction(onError)) {
+                        onError(data.errors);
+                    }
+                } else {
+                    // guess that it's ok
+                    if (isFunction(onSuccess)) {
+                        onSuccess(data);
+                    }
+                }
+            })
+            .catch((error) => {
                 if (isFunction(onError)) {
-                    onError(data.errors);
+                    onError();
                 }
-            } else {
-                // guess that it's ok
-                if (isFunction(onSuccess)) {
-                    onSuccess(data);
+            })
+            .then(() => {
+                if (isFunction(onComplete)) {
+                    onComplete();
                 }
+            });
+    };
+
+    if (!params.hasOwnProperty('oauth_token')) {
+        dataStore.getOAuthData().then((val) => {
+            let accessToken, json;
+
+            try {
+                json = JSON.parse(val);
+            } catch (e) {
             }
-        })
-        .catch((error) => {
-            if (isFunction(onError)) {
-                onError();
+
+            if (typeof json === 'object' && json.hasOwnProperty('access_token')) {
+                accessToken = json.access_token;
             }
-        })
-        .then(() => {
-            if (isFunction(onComplete)) {
-                onComplete();
-            }
+
+            _doRequest(accessToken);
         });
+    } else {
+        _doRequest();
+    }
 };
 
 export const apiFetcher = {

@@ -1,14 +1,16 @@
 import React from 'react';
 import {
-    View, TextInput, StyleSheet, ActivityIndicator, Alert
+    View, TextInput, StyleSheet, ActivityIndicator, Alert,
+    AsyncStorage
 } from 'react-native';
 
 import {Config} from '../Config'
-import CryptoJS from "crypto-js"
 import {apiFetcher} from "../helpers/apiFetcher"
 
 import {style} from "../Style"
 import {Button} from "../components/Button"
+import {dataDecrypter, dataEncrypter, passwordEncrypter} from "../helpers/encrypter";
+import {dataStore} from "../helpers/dataStore"
 
 export default class LoginScreen extends React.Component {
     constructor(props) {
@@ -21,15 +23,6 @@ export default class LoginScreen extends React.Component {
         };
     }
 
-    _onTextInputChanged(text, inputType) {
-        if (inputType === 1) {
-            this.setState({ username: text });
-        } else if (inputType === 2) {
-            this.setState({ password: text });
-        }
-
-    }
-
     _doLogin() {
         if (!this.state.data.username || !this.state.data.password) {
             return;
@@ -39,15 +32,9 @@ export default class LoginScreen extends React.Component {
             isLoading: true
         });
 
-        const key = CryptoJS.MD5(Config.clientSecret);
-        const encrypted = CryptoJS.AES.encrypt(this.state.data.password, key, {
-            mode: CryptoJS.mode.ECB,
-            padding: CryptoJS.pad.Pkcs7
-        });
-
         let payload = {
             username: this.state.data.username,
-            password: encrypted.toString(),
+            password: passwordEncrypter(this.state.data.password),
             grant_type: 'password',
             client_id: Config.clientId,
             password_algo: 'aes128'
@@ -55,12 +42,15 @@ export default class LoginScreen extends React.Component {
 
         apiFetcher.post('oauth/token', payload, {
             onSuccess: (data) => {
-                console.log(data)
+                if (data.hasOwnProperty('access_token')) {
+                    dataStore.put(Config.Constants.OAUTH_DATA, data);
+
+                    this.props.navigation.navigate('Home');
+                }
             },
-            onComplete: () => {
+            onError: (error) => {
                 this.setState({ isLoading: false });
-            },
-            onError: () => {
+
                 Alert.alert(
                     'Invalid password',
                     'Please enter valid password'

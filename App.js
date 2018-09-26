@@ -18,7 +18,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import HomeScreen from "./src/screens/HomeScreen";
 import ForumScreen from "./src/screens/ForumScreen";
 import DrawerTrigger from './src/DrawerTrigger'
-import ThreadListScreen from "./src/screens/ThreadListScreen";
+import {ThreadListScreen} from "./src/screens/ThreadScreen";
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 

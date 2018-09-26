@@ -49,6 +49,7 @@ export default class RegisterScreen extends React.Component {
             <TextInput
                 placeholder={placeholder}
                 placeholderTextColor={style.input.placeholder.color}
+                editable={!this.state.isLoading}
                 secureTextEntry={secureTextEntry}
                 keyboardType={keyboardType}
                 onFocus={() => this.setState({ focusField: fieldId })}

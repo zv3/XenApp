@@ -48,7 +48,25 @@ const input = StyleSheet.create({
     }
 });
 
+const avatar = StyleSheet.create({
+    circle: {
+        width: 40,
+        height: 40,
+        resizeMode: 'contain',
+        borderRadius: 20
+    }
+});
+
+const link = StyleSheet.create({
+    default: {
+        fontSize: 13,
+        color: '#2577b1'
+    }
+});
+
 export const style = {
     button,
-    input
+    input,
+    avatar,
+    link
 };

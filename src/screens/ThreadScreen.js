@@ -5,10 +5,10 @@ import {
 } from 'react-native';
 import DrawerTrigger from "../DrawerTrigger";
 import LoadingScreen from "./LoadingScreen";
-import ThreadListItem from "../ThreadListItem";
+import {ThreadCard} from "../components/Card";
 
 
-export default class ThreadListScreen extends React.Component {
+class ThreadListScreen extends React.Component {
     static navigationOptions = ({navigation}) => {
         const { params } = navigation.state;
 
@@ -63,9 +63,13 @@ export default class ThreadListScreen extends React.Component {
                 <FlatList
                     data={this.state.dataSource}
                     keyExtractor={(item, index) => JSON.stringify(item.thread_id)}
-                    renderItem={({item}) => <ThreadListItem thread={item}/>}
+                    renderItem={({item}) => <ThreadCard thread={item}/>}
                 />
             </View>
         );
     }
+}
+
+export {
+    ThreadListScreen
 }
