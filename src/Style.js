@@ -64,9 +64,35 @@ const link = StyleSheet.create({
     }
 });
 
+const drawer = StyleSheet.create({
+    container: {
+        backgroundColor: 'rgb(245,245,245)',
+        flex: 1,
+        borderWidth: 0
+    },
+
+    header: {
+        backgroundColor: 'red',
+        height: 160,
+        padding: 15,
+        justifyContent:'flex-end'
+    },
+
+    item: {
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 15,
+        paddingRight: 15,
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center'
+    }
+});
+
 export const style = {
     button,
     input,
     avatar,
-    link
+    link,
+    drawer
 };

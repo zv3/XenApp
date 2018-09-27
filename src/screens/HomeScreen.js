@@ -5,36 +5,18 @@ import ButtonIcon from "../ButtonIcon";
 import {apiFetcher} from "../helpers/apiFetcher";
 import {ThreadCard} from "../components/Card"
 import {dataStore} from "../helpers/dataStore";
+import {objectStore} from "../data/objectStore";
+import Avatar from "../components/Avatar";
+import {Config} from "../Config";
 
 
 class HomeHeaderRight extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {};
-    }
-
-    componentDidMount() {
-        const _doFetchUser = () => {
-            apiFetcher.get('users/me', {}, {
-                onSuccess: (data) => {
-                    this.setState({ user: data.user });
-                }
-            });
+        this.state = {
+            user: objectStore.get(Config.Constants.VISITOR)
         };
-
-        dataStore.getOAuthData().then((value) => {
-            let json;
-            try {
-                json = JSON.parse(value);
-            } catch (e) {
-            }
-
-            if (json && json.hasOwnProperty('access_token')) {
-                _doFetchUser();
-            }
-        });
-
     }
 
     render() {
@@ -42,16 +24,15 @@ class HomeHeaderRight extends React.Component {
             const user = this.state.user;
 
             return (
-            <View>
-                <Image source={{ uri: user.links.avatar_small }}
-                       style={{ width: 25, height: 25, borderRadius: 12.5, marginRight: 10 }}/>
+            <View style={{ marginRight: 10 }}>
+                <Avatar url={user.links.avatar_small} size={25}/>
             </View>);
         }
 
         return (
             <View style={{ flex: 1, marginRight: 10, flexDirection: 'row' }}>
                 <ButtonIcon iconName="log-in" onPress={() => {
-                    this.props.navigation.navigate('Login');
+                    this.props.navigation.navigate(Config.Constants.SCREEN_LOGIN);
                 }} />
             </View>
         );

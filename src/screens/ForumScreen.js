@@ -4,9 +4,10 @@ import {
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Feather';
-import DrawerTrigger from "../DrawerTrigger";
 import LoadingScreen from "./LoadingScreen";
 import {apiFetcher} from "../helpers/apiFetcher";
+import {DrawerTrigger} from "../components/Drawer";
+import {Config} from "../Config";
 
 const style = StyleSheet.create({
    row: {
@@ -65,8 +66,8 @@ export default class ForumScreen extends React.Component {
         if (item.has_sub_elements) {
             this.props.navigation.dispatch(
                 NavigationActions.navigate({
-                    routeName: 'Forum',
-                    key: 'forum_nav_' + item.navigation_id,
+                    routeName: Config.Constants.SCREEN_FORUM,
+                    key: `forum_nav_${item.navigation_id}`,
                     params: {
                         parentId: item.navigation_id,
                         title: item.navigation_title
@@ -81,8 +82,8 @@ export default class ForumScreen extends React.Component {
             // load threads
             this.props.navigation.dispatch(
                 NavigationActions.navigate({
-                    routeName: 'ThreadList',
-                    key: 'forum_' + item.navigation_id,
+                    routeName: Config.Constants.SCREEN_THREAD_LIST,
+                    key: `forum_${item.navigation_id}`,
                     params: {
                         forum: item
                     }

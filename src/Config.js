@@ -6,6 +6,15 @@ export const Config = {
     previewMessageLength: 200,
 
     Constants: {
-        OAUTH_DATA: '_oAuthData'
-    }
+        OAUTH_DATA: '_oAuthData',
+        VISITOR: 'visitor',
+
+        SCREEN_HOME: 'Home',
+        SCREEN_LOGIN: 'Login',
+        SCREEN_REGISTER: 'Register',
+        SCREEN_FORUM: 'Forum',
+        SCREEN_THREAD_LIST: 'ThreadList'
+    },
+
+    defaultScreen: 'Home'
 };

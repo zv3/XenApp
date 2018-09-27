@@ -70,9 +70,9 @@ const request = (method, url, params, options) => {
     };
 
     const _doRequest = (accessToken) => {
-        // if (!params.oauth_token && accessToken) {
-        //     params['oauth_token'] = accessToken;
-        // }
+        if (!params.oauth_token && accessToken) {
+            params['oauth_token'] = accessToken;
+        }
 
         // full options: https://github.com/axios/axios#request-config
         let requestOptions = Object.assign({
@@ -106,7 +106,6 @@ const request = (method, url, params, options) => {
                         onSuccess(data);
                     }
                 }
-                console.log(response.data);
             })
             .catch((error) => {
                 if (isFunction(onError)) {

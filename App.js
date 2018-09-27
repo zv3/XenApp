@@ -13,40 +13,43 @@ import {
     createDrawerNavigator,
 } from 'react-navigation';
 
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from "react-native-vector-icons/Feather";
 
 import HomeScreen from "./src/screens/HomeScreen";
 import ForumScreen from "./src/screens/ForumScreen";
-import DrawerTrigger from './src/DrawerTrigger'
+import {DrawerMenuContent, DrawerTrigger} from './src/components/Drawer'
 import {ThreadListScreen} from "./src/screens/ThreadScreen";
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 import {dataStore} from "./src/helpers/dataStore";
 import LoadingScreen from "./src/screens/LoadingScreen";
 import {apiFetcher} from "./src/helpers/apiFetcher";
+import {objectStore} from "./src/data/objectStore";
+import {Config} from "./src/Config";
+
 
 const AuthenticateStack = createStackNavigator({
-    Login: LoginScreen,
-    Register: RegisterScreen
+    [Config.Constants.SCREEN_LOGIN]: LoginScreen,
+    [Config.Constants.SCREEN_REGISTER]: RegisterScreen
 }, {
-    initialRouteName: 'Login',
+    initialRouteName: Config.Constants.SCREEN_LOGIN,
     navigationOptions: {
         header: null
     }
 });
 
 const AppRootStack = createStackNavigator({
-    Home: {
+    [Config.Constants.SCREEN_HOME]: {
         screen: HomeScreen,
         navigationOptions: ({navigation}) => ({
             title: 'Home',
             headerLeft: <DrawerTrigger navigation={navigation} />
         })
     },
-    Forum: ForumScreen,
-    ThreadList: ThreadListScreen
+    [Config.Constants.SCREEN_FORUM]: ForumScreen,
+    [Config.Constants.SCREEN_THREAD_LIST]: ThreadListScreen
 }, {
-    initialRouteName: 'Home'
+    initialRouteName: Config.defaultScreen
 });
 
 const AppNavigator = createDrawerNavigator({
@@ -58,103 +61,6 @@ const AppNavigator = createDrawerNavigator({
     mode: Platform.OS === 'ios' ? 'modal' : 'card'
 });
 
-const style = StyleSheet.create({
-    drawer: {
-        backgroundColor: 'rgb(245,245,245)',
-        flex: 1,
-        borderWidth: 0
-    },
-
-    drawerHeader: {
-        backgroundColor: 'red',
-        height: 160,
-        padding: 15
-    },
-
-    drawerItem: {
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 15,
-        paddingRight: 15,
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center'
-    }
-});
-
-class DrawerMenuContent extends React.Component {
-    constructor(props) {
-        super(props)
-    }
-
-    _onPress(item) {
-        this.props.navigation.navigate(item.navigationId);
-    }
-
-    render() {
-        const navItems = [
-            {
-                title: 'Home',
-                key: 'home',
-                icon: 'home',
-                navigationId: 'Home'
-            },
-            {
-                title: 'Notifications',
-                key: 'notifications',
-                icon: 'bell',
-                navigationId: ''
-            },
-            {
-                title: 'Conversations',
-                key: 'conversations',
-                icon: 'inbox',
-                navigationId: 'Conversation'
-            },
-            {
-                title: 'Forums',
-                key: 'forums',
-                icon: 'folder',
-                navigationId: 'Forum'
-            },
-            {
-                title: 'Watched Content',
-                key: 'watched_content',
-                icon: 'bookmark',
-                navigationId: ''
-            },
-            {
-                title: 'Settings',
-                key: 'settings',
-                icon: 'settings',
-                navigationId: ''
-            }
-        ];
-
-        return (
-            <View style={style.drawer}>
-                <View style={style.drawerHeader}>
-                    <Text style={{ color: '#fff' }}>Header...</Text>
-                </View>
-
-                <FlatList
-                    data={navItems}
-                    renderItem={({item, separators}) => (
-                        <TouchableHighlight
-                            onPress={() => this._onPress(item)}
-                            underlayColor="rgb(237, 246, 253)">
-
-                            <View style={style.drawerItem}>
-                                <Icon name={item.icon} size={20} style={{ paddingRight: 20 }} />
-                                <Text style={{ fontSize: 16 }}>{item.title}</Text>
-                            </View>
-                        </TouchableHighlight>
-                    )}
-                />
-            </View>
-        );
-    }
-}
 
 export default class App extends React.Component {
     constructor(props) {
@@ -170,18 +76,25 @@ export default class App extends React.Component {
             {
                 method: 'GET',
                 uri: 'users/me'
-            },
-            {
-                method: 'GET',
-                uri: 'threads/recent'
             }
         ];
 
+        const doneFetch = () => {
+            this.setState({ isLoading: false })
+        };
+
         apiFetcher.post(`batch?oauth_token=${oAuthData.access_token}`, JSON.stringify(batchJson), {
             onSuccess: (data) => {
+                const userData = data["jobs"]["users/me"];
+                if (userData.hasOwnProperty('user')) {
+                    objectStore.set(Config.Constants.VISITOR, userData.user);
+                }
+
+                doneFetch();
             },
 
             onError: (error) => {
+                doneFetch();
             }
         });
     }

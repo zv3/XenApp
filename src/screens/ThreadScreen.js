@@ -3,9 +3,10 @@ import {
     View, Text, Alert,
     FlatList
 } from 'react-native';
-import DrawerTrigger from "../DrawerTrigger";
+
 import LoadingScreen from "./LoadingScreen";
 import {ThreadCard} from "../components/Card";
+import {DrawerTrigger} from "../components/Drawer";
 
 
 class ThreadListScreen extends React.Component {

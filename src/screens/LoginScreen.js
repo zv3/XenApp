@@ -11,6 +11,7 @@ import {style} from "../Style"
 import {Button} from "../components/Button"
 import {dataDecrypter, dataEncrypter, passwordEncrypter} from "../helpers/encrypter";
 import {dataStore} from "../helpers/dataStore"
+import {objectStore} from "../data/objectStore";
 
 export default class LoginScreen extends React.Component {
     constructor(props) {
@@ -44,8 +45,9 @@ export default class LoginScreen extends React.Component {
             onSuccess: (data) => {
                 if (data.hasOwnProperty('access_token')) {
                     dataStore.put(Config.Constants.OAUTH_DATA, data);
+                    objectStore.set(Config.Constants.OAUTH_DATA, data);
 
-                    this.props.navigation.navigate('Home');
+                    this.props.navigation.navigate(Config.Constants.SCREEN_HOME);
                 }
             },
             onError: (error) => {
@@ -60,7 +62,7 @@ export default class LoginScreen extends React.Component {
     }
 
     _goToRegister() {
-        this.props.navigation.navigate('Register');
+        this.props.navigation.navigate(Config.Constants.SCREEN_REGISTER);
     }
 
     _updateDataState(fieldId, value) {
