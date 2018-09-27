@@ -7,6 +7,7 @@ import {style} from "../Style"
 import {objectStore} from "../data/objectStore";
 import Avatar from "./Avatar";
 import {Config} from "../Config";
+import {simpleEventDispatcher} from "../events/simpleEventDispatcher";
 
 
 class DrawerTrigger extends React.Component {
@@ -48,6 +49,8 @@ class DrawerMenuContent extends React.Component {
         this.state = {
             user: objectStore.get(Config.Constants.VISITOR)
         };
+
+        this.subscribeId = 0;
     }
 
     _onPress(item) {
@@ -63,6 +66,18 @@ class DrawerMenuContent extends React.Component {
                 <Text style={{ color: '#fff', fontSize: 16, marginTop: 10, fontWeight: 'bold' }}>{user.username}</Text>
             </View>
         );
+    }
+
+    componentDidMount() {
+        simpleEventDispatcher.subscribe('logged', () => {
+            this.setState({
+                user: objectStore.get(Config.Constants.VISITOR)
+            });
+        });
+    }
+
+    componentWillUnmount() {
+        simpleEventDispatcher.unsubscribe('logged', this.subscribeId);
     }
 
     render() {

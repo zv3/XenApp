@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    View, Text, Alert,
+    View, Alert,
     FlatList
 } from 'react-native';
 

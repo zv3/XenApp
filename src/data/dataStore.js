@@ -1,5 +1,5 @@
 import {AsyncStorage} from "react-native"
-import {dataDecrypter} from "./encrypter";
+import {dataDecrypter} from "../helpers/encrypter";
 import {Config} from "../Config";
 
 const put = (name, value) => {

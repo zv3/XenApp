@@ -1,14 +1,13 @@
 import React from 'react';
-import {View, Alert, FlatList, Image} from 'react-native';
+import {View, Alert, FlatList} from 'react-native';
 import LoadingScreen from "./LoadingScreen";
 import ButtonIcon from "../ButtonIcon";
 import {apiFetcher} from "../helpers/apiFetcher";
 import {ThreadCard} from "../components/Card"
-import {dataStore} from "../helpers/dataStore";
 import {objectStore} from "../data/objectStore";
 import Avatar from "../components/Avatar";
 import {Config} from "../Config";
-
+import {simpleEventDispatcher} from "../events/simpleEventDispatcher";
 
 class HomeHeaderRight extends React.Component {
     constructor(props) {
@@ -17,6 +16,18 @@ class HomeHeaderRight extends React.Component {
         this.state = {
             user: objectStore.get(Config.Constants.VISITOR)
         };
+
+        this.subscribeId = 0;
+    }
+
+    componentDidMount() {
+        this.subscribeId = simpleEventDispatcher.subscribe('logged', () => {
+            this.setState({ user: objectStore.get(Config.Constants.VISITOR)});
+        });
+    }
+
+    componentWillUnmount() {
+        simpleEventDispatcher.unsubscribe('logged', this.subscribeId);
     }
 
     render() {

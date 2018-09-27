@@ -2,7 +2,8 @@ const axios = require("axios");
 const {Config} = require("../Config");
 const querystring = require("querystring");
 
-import {dataStore} from "./dataStore";
+import {dataStore} from "../data/dataStore";
+import {isPlainObject, isFunction} from "./funcs"
 
 const get = (url, params, options = {}) => {
     return request('get', url, params, options)
@@ -65,10 +66,6 @@ const request = (method, url, params, options) => {
         delete options.onComplete;
     }
 
-    const isFunction = (obj) => {
-        return typeof obj === 'function';
-    };
-
     const _doRequest = (accessToken) => {
         if (!params.oauth_token && accessToken) {
             params['oauth_token'] = accessToken;
@@ -96,14 +93,23 @@ const request = (method, url, params, options) => {
             .then((response) => {
                 const data = response.data;
 
-                if (data.hasOwnProperty('errors') || response.status !== 200) {
+                let hasError = false;
+                if (data.hasOwnProperty('errors')) {
+                    if (response.status !== 202) {
+                        hasError = true;
+                    }
+                } else if (response.status !== 200) {
+                    hasError = true;
+                }
+
+                if (hasError) {
                     if (isFunction(onError)) {
                         onError(data.errors);
                     }
                 } else {
                     // guess that it's ok
                     if (isFunction(onSuccess)) {
-                        onSuccess(data);
+                        onSuccess(data, response.status);
                     }
                 }
             })
@@ -128,7 +134,7 @@ const request = (method, url, params, options) => {
             } catch (e) {
             }
 
-            if (typeof json === 'object' && json.hasOwnProperty('access_token')) {
+            if (isPlainObject(json) && json.hasOwnProperty('access_token')) {
                 accessToken = json.access_token;
             }
 
