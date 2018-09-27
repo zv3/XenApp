@@ -31,7 +31,7 @@ const setOAuthData = (data) => {
     put(Config.Constants.OAUTH_DATA, data);
 };
 
-const getOAuthData = (callback) => {
+const getOAuthData = () => {
     return get(Config.Constants.OAUTH_DATA);
 };
 

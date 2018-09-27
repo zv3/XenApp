@@ -21,6 +21,9 @@ import DrawerTrigger from './src/DrawerTrigger'
 import {ThreadListScreen} from "./src/screens/ThreadScreen";
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
+import {dataStore} from "./src/helpers/dataStore";
+import LoadingScreen from "./src/screens/LoadingScreen";
+import {apiFetcher} from "./src/helpers/apiFetcher";
 
 const AuthenticateStack = createStackNavigator({
     Login: LoginScreen,
@@ -154,7 +157,60 @@ class DrawerMenuContent extends React.Component {
 }
 
 export default class App extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isLoading: true
+        };
+    }
+
+    _doFetchData(oAuthData) {
+        const batchJson = [
+            {
+                method: 'GET',
+                uri: 'users/me'
+            },
+            {
+                method: 'GET',
+                uri: 'threads/recent'
+            }
+        ];
+
+        apiFetcher.post(`batch?oauth_token=${oAuthData.access_token}`, JSON.stringify(batchJson), {
+            onSuccess: (data) => {
+            },
+
+            onError: (error) => {
+            }
+        });
+    }
+
+    componentDidMount() {
+        const doFetchData = async () => {
+            return await dataStore.getOAuthData();
+        };
+
+        doFetchData().then((val) => {
+            let json;
+            try {
+                json = JSON.parse(val);
+            } catch (e) {
+            }
+
+            if (json && json.hasOwnProperty('access_token')) {
+                this._doFetchData(json);
+            } else {
+                this.setState({ isLoading: false });
+            }
+        });
+    }
+
     render() {
+        if (this.state.isLoading) {
+            return (<LoadingScreen/>);
+        }
+
         return <AppNavigator />;
     }
 }
