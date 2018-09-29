@@ -12,6 +12,10 @@ const get = (name) => {
     return null;
 };
 
+const has = (name) => {
+    return data.hasOwnProperty(name);
+};
+
 export const objectStore = {
-    set, get
+    set, get, has
 };

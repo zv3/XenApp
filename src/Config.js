@@ -1,7 +1,7 @@
 export const Config = {
-    clientId: 'tp2aIn5wHz',
-    clientSecret: 'fMSNh67ZKsHPh2F',
-    baseUrl: 'http://xenforo2.local.tinhte.vn:20080/api/index.php',
+    clientId: 'QZd7Qf5cOA',
+    clientSecret: 'Py91n8bz885IETq',
+    baseUrl: 'http://xenforo2.local.tinhte.vn:20080',
 
     previewMessageLength: 200,
 
@@ -13,7 +13,14 @@ export const Config = {
         SCREEN_LOGIN: 'Login',
         SCREEN_REGISTER: 'Register',
         SCREEN_FORUM: 'Forum',
-        SCREEN_THREAD_LIST: 'ThreadList'
+
+        SCREEN_THREAD_LIST: 'ThreadList',
+        SCREEN_THREAD_DETAIL: 'ThreadDetail',
+
+
+        LOADING_STATE_BEGIN: 'begin',
+        LOADING_STATE_DONE: 'done',
+        LOADING_STATE_FAILED: 'failed'
     },
 
     defaultScreen: 'Home'

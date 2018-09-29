@@ -11,16 +11,19 @@ import {
 import HomeScreen from "./src/screens/HomeScreen";
 import ForumScreen from "./src/screens/ForumScreen";
 import {DrawerMenuContent, DrawerTrigger} from './src/components/Drawer'
-import {ThreadListScreen} from "./src/screens/ThreadScreen";
+
+import ThreadListScreen from "./src/screens/ThreadListScreen";
+import ThreadDetailScreen from "./src/screens/ThreadDetailScreen"
+
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 import {dataStore} from "./src/data/dataStore";
-import LoadingScreen from "./src/screens/LoadingScreen";
+import {LoadingSwitch} from "./src/screens/LoadingScreen";
 import {apiFetcher} from "./src/helpers/apiFetcher";
 import {objectStore} from "./src/data/objectStore";
 import {Config} from "./src/Config";
 import {isPlainObject} from "./src/helpers/funcs"
-import {simpleEventDispatcher} from "./src/events/simpleEventDispatcher";
+
 
 const AuthenticateStack = createStackNavigator({
     [Config.Constants.SCREEN_LOGIN]: LoginScreen,
@@ -41,7 +44,8 @@ const AppRootStack = createStackNavigator({
         })
     },
     [Config.Constants.SCREEN_FORUM]: ForumScreen,
-    [Config.Constants.SCREEN_THREAD_LIST]: ThreadListScreen
+    [Config.Constants.SCREEN_THREAD_LIST]: ThreadListScreen,
+    [Config.Constants.SCREEN_THREAD_DETAIL]: ThreadDetailScreen
 }, {
     initialRouteName: Config.defaultScreen
 });
@@ -61,7 +65,7 @@ export default class App extends React.Component {
         super(props);
 
         this.state = {
-            isLoading: true
+            loadState: Config.Constants.LOADING_STATE_BEGIN
         };
     }
 
@@ -74,7 +78,7 @@ export default class App extends React.Component {
         ];
 
         const doneFetch = () => {
-            this.setState({ isLoading: false })
+            this.setState({ loadState: Config.Constants.LOADING_STATE_DONE })
         };
 
         apiFetcher.post(`batch?oauth_token=${oAuthData.access_token}`, JSON.stringify(batchJson), {
@@ -98,6 +102,8 @@ export default class App extends React.Component {
             return await dataStore.getOAuthData();
         };
 
+        // dataStore.remove(Config.Constants.OAUTH_DATA);
+
         doFetchData().then((val) => {
             let json;
             try {
@@ -108,16 +114,13 @@ export default class App extends React.Component {
             if (isPlainObject(json) && json.hasOwnProperty('access_token')) {
                 this._doFetchData(json);
             } else {
-                this.setState({ isLoading: false });
+                this.setState({ loadState: Config.Constants.LOADING_STATE_DONE });
             }
         });
     }
 
     render() {
-        if (this.state.isLoading) {
-            return (<LoadingScreen/>);
-        }
-
-        return <AppNavigator />;
+        const finalView = (<AppNavigator />);
+        return <LoadingSwitch loadState={this.state.loadState} view={finalView}/>;
     }
 }

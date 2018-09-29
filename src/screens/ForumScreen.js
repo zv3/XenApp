@@ -4,10 +4,11 @@ import {
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Feather';
-import LoadingScreen from "./LoadingScreen";
+import LoadingScreen, {LoadingSwitch} from "./LoadingScreen";
 import {apiFetcher} from "../helpers/apiFetcher";
 import {DrawerTrigger} from "../components/Drawer";
 import {Config} from "../Config";
+import {isPlainObject} from "../helpers/funcs";
 
 const style = StyleSheet.create({
    row: {
@@ -40,7 +41,7 @@ export default class ForumScreen extends React.Component {
         super(props);
 
         this.state = {
-            isLoading: true
+            loadingState: Config.Constants.LOADING_STATE_BEGIN
         };
     }
 
@@ -53,11 +54,12 @@ export default class ForumScreen extends React.Component {
         return apiFetcher.get('navigation', {parent: parentId}, {
             onSuccess: (data) => {
                 this.setState({
-                    isLoading: false,
+                    loadingState: Config.Constants.LOADING_STATE_DONE,
                     dataSource: data.elements
                 });
             },
-            onError: () => {
+            onError: (errors) => {
+
             }
         })
     }
@@ -93,36 +95,34 @@ export default class ForumScreen extends React.Component {
     }
 
     render() {
-        if (this.state.isLoading) {
-            return (<LoadingScreen/>);
-        }
-
         let items = [];
-        for (let i = 0; i < this.state.dataSource.length; i++) {
-            let item = this.state.dataSource[i];
-            switch (item.navigation_type) {
-                case 'forum':
-                    item.navigation_title = item.forum_title;
-                    break;
-                case 'category':
-                    item.navigation_title = item.category_title;
-                    break;
-                case 'page':
-                    item.navigation_title = item.page_title;
-                    break;
-                case 'link-forum':
-                    item.navigation_title = item.link_forum_title;
-                    break;
-            }
+        if (isPlainObject(this.state.dataSource)) {
+            for (let i = 0; i < this.state.dataSource.length; i++) {
+                let item = this.state.dataSource[i];
+                switch (item.navigation_type) {
+                    case 'forum':
+                        item.navigation_title = item.forum_title;
+                        break;
+                    case 'category':
+                        item.navigation_title = item.category_title;
+                        break;
+                    case 'page':
+                        item.navigation_title = item.page_title;
+                        break;
+                    case 'link-forum':
+                        item.navigation_title = item.link_forum_title;
+                        break;
+                }
 
-            if (!item.hasOwnProperty('navigation_title')) {
-                continue;
-            }
+                if (!item.hasOwnProperty('navigation_title')) {
+                    continue;
+                }
 
-            items.push(item);
+                items.push(item);
+            }
         }
 
-        return (
+        const finalView = (
             <View style={{ flex: 1 }}>
                 <FlatList
                     data={items}
@@ -139,5 +139,7 @@ export default class ForumScreen extends React.Component {
                 />
             </View>
         );
+
+        return <LoadingSwitch loadState={this.state.loadingState} view={finalView}/>;
     }
 }

@@ -1,3 +1,5 @@
+import {objectStore} from "../data/objectStore";
+
 const axios = require("axios");
 const {Config} = require("../Config");
 const querystring = require("querystring");
@@ -67,14 +69,18 @@ const request = (method, url, params, options) => {
     }
 
     const _doRequest = (accessToken) => {
-        if (!params.oauth_token && accessToken) {
-            params['oauth_token'] = accessToken;
+        if (!params.oauth_token) {
+            if (accessToken) {
+                params['oauth_token'] = accessToken;
+            }
         }
+
+        let url_ = url.replace(/\?/g, '&');
 
         // full options: https://github.com/axios/axios#request-config
         let requestOptions = Object.assign({
             method: method,
-            url: url,
+            url: `api/index.php?${url_}`,
             timeout: 30000
         }, options);
 
@@ -86,7 +92,7 @@ const request = (method, url, params, options) => {
 
         console.log(`doRequest 
             method=${method} 
-            url=${url} 
+            url=${Config.baseUrl}/api/index.php?${url_} 
             options=${JSON.stringify(requestOptions)}`);
 
         client.request(requestOptions)
@@ -94,11 +100,13 @@ const request = (method, url, params, options) => {
                 const data = response.data;
 
                 let hasError = false;
-                if (data.hasOwnProperty('errors')) {
+                if (isPlainObject(data) && data.hasOwnProperty('errors')) {
                     if (response.status !== 202) {
                         hasError = true;
                     }
                 } else if (response.status !== 200) {
+                    hasError = true;
+                } else if (!isPlainObject(data)) {
                     hasError = true;
                 }
 

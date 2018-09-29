@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ButtonIcon from "../ButtonIcon";
+import {ButtonIcon} from "./Button";
 import {FlatList, Text, TouchableHighlight, View} from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import {style} from "../Style"
@@ -26,7 +26,6 @@ class DrawerTrigger extends React.Component {
             <ButtonIcon iconName={this.props.isBack ? 'chevron-left' : 'menu'}
                         iconColor="red"
                         iconSize={this.props.size}
-                        style={{marginLeft: 10}}
                         onPress={() => this._onPressed()}/>
         );
     }
@@ -123,6 +122,8 @@ class DrawerMenuContent extends React.Component {
         let userHeader;
         if (this.state.user) {
             userHeader = this._doRenderUser();
+        } else {
+            userHeader = (<View style={{ height: 120 }}></View>);
         }
 
         return (

@@ -1,9 +1,9 @@
 import React from 'react';
 import {View, Alert, FlatList} from 'react-native';
-import LoadingScreen from "./LoadingScreen";
-import ButtonIcon from "../ButtonIcon";
+import {LoadingSwitch} from "./LoadingScreen";
+import {ButtonIcon} from "../components/Button";
 import {apiFetcher} from "../helpers/apiFetcher";
-import {ThreadCard} from "../components/Card"
+import {CardSeparator, ThreadCard} from "../components/Card"
 import {objectStore} from "../data/objectStore";
 import Avatar from "../components/Avatar";
 import {Config} from "../Config";
@@ -41,7 +41,7 @@ class HomeHeaderRight extends React.Component {
         }
 
         return (
-            <View style={{ flex: 1, marginRight: 10, flexDirection: 'row' }}>
+            <View style={{ flex: 1, flexDirection: 'row' }}>
                 <ButtonIcon iconName="log-in" onPress={() => {
                     this.props.navigation.navigate(Config.Constants.SCREEN_LOGIN);
                 }} />
@@ -62,7 +62,7 @@ export default class HomeScreen extends React.Component {
         super(props);
 
         this.state = {
-            isLoading: true
+            loadingState: Config.Constants.LOADING_STATE_BEGIN
         };
     }
 
@@ -71,7 +71,7 @@ export default class HomeScreen extends React.Component {
             onSuccess: (data) => {
                 this.setState({
                     dataSource: data.results,
-                    isLoading: false
+                    loadingState: Config.Constants.LOADING_STATE_DONE
                 });
             },
             onError: () => {
@@ -80,20 +80,23 @@ export default class HomeScreen extends React.Component {
         });
     }
 
-    render() {
-        if (this.state.isLoading) {
-            return <LoadingScreen/>;
-        }
+    _doRefreshData() {
+    }
 
-        return (
+    render() {
+        const finalView = (
             <View style={{ flex: 1 }}>
                 <FlatList
                     data={this.state.dataSource}
                     keyExtractor={(item, index) => JSON.stringify(item.thread_id)}
-                    ItemSeparatorComponent={() => <View style={{ width:"100%", backgroundColor: 'rgb(245,245,245)', height: 10 }}>hi</View>}
-                    renderItem={({item}) => <ThreadCard thread={item}/>}
+                    ItemSeparatorComponent={() => <CardSeparator/>}
+                    renderItem={({item}) => <ThreadCard thread={item} navigation={this.props.navigation}/>}
                 />
             </View>
         );
+
+        return <LoadingSwitch loadState={this.state.loadingState}
+                              view={finalView}
+                              refreshFn={() => this._doRefreshData()}/>
     }
 }

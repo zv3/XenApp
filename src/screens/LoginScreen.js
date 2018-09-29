@@ -77,17 +77,19 @@ export default class LoginScreen extends React.Component {
                 }
             },
             onError: (errors) => {
-                this.setState({ isLoading: false });
-
                 let errorShown;
                 if (isPlainObject(errors)) {
                     errorShown = errors[0];
                 }
 
                 Alert.alert(
-                    'Invalid password',
+                    'An error occurred!',
                     errorShown ? errorShown : 'Please enter valid password'
                 );
+
+                setTimeout(() => {
+                    this.setState({ isLoading: false });
+                }, 2000);
             }
         });
     }
