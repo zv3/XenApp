@@ -8,6 +8,8 @@ import {Config} from "../Config";
 import DateRelative from "./DateRelative"
 import {NavigationActions} from "react-navigation"
 
+import HTMLView from 'react-native-htmlview';
+
 export const ACTION_TYPE = {
     LIKE: 'like',
     REPLY: 'reply',
@@ -187,7 +189,7 @@ class PostCard extends React.Component {
         const thread = this.props.thread,
               post = this.props.post,
               postBodyText = this.props.showFullText
-                  ? post.post_body_plain_text
+                  ? <HTMLView value={post.post_body_html}/>
                   : wordTrim(post.post_body_plain_text);
 
         let threadTitle;

@@ -123,9 +123,7 @@ const pageNav = {
 const replyBox = {
    container: {
        padding: 10,
-       backgroundColor: 'white',
-       // flexDirection: 'row',
-       // justifyContent: 'center'
+       backgroundColor: 'white'
    }
 };
 
