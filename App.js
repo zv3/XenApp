@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-    Platform
+    Platform,
+    SafeAreaView
 } from 'react-native';
 
 import {
@@ -120,7 +121,10 @@ export default class App extends React.Component {
     }
 
     render() {
-        const finalView = (<AppNavigator />);
+        const finalView = (
+            <AppNavigator />
+        );
+
         return <LoadingSwitch loadState={this.state.loadState} view={finalView}/>;
     }
 }

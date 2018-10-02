@@ -8,6 +8,7 @@ import {objectStore} from "../data/objectStore";
 import Avatar from "../components/Avatar";
 import {Config} from "../Config";
 import {simpleEventDispatcher} from "../events/simpleEventDispatcher";
+import {getOneTimeToken, handleDefaultErrors} from "../helpers/funcs";
 
 class HomeHeaderRight extends React.Component {
     constructor(props) {
@@ -67,15 +68,17 @@ export default class HomeScreen extends React.Component {
     }
 
     componentDidMount() {
-        return apiFetcher.get('threads/recent', {}, {
+        return apiFetcher.get('threads/recent', {
+            oauth_token: getOneTimeToken()
+        }, {
             onSuccess: (data) => {
                 this.setState({
                     dataSource: data.results,
                     loadingState: Config.Constants.LOADING_STATE_DONE
                 });
             },
-            onError: () => {
-                Alert.alert('Failed load data', 'Failed to load data. Please try again.');
+            onError: (errors) => {
+                handleDefaultErrors(errors);
             }
         });
     }

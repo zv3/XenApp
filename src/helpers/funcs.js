@@ -1,4 +1,6 @@
 import {Alert} from "react-native"
+import CryptoJs from "crypto-js";
+import {Config} from "../Config";
 
 const isPlainObject = (obj) => {
     if (obj === undefined || obj === null) {
@@ -18,7 +20,7 @@ const isFunction = (fn) => {
 
 const handleDefaultErrors = (errors, alertTitle = null) => {
     let errorShown;
-    if (isPlainObject(errors)) {
+    if (Array.isArray(errors)) {
         errorShown = errors[0];
     }
 
@@ -28,8 +30,21 @@ const handleDefaultErrors = (errors, alertTitle = null) => {
     );
 };
 
+const randomString = (length) => {
+    return Math.random().toString(36).substring(2, length + 2)
+        + Math.random().toString(36).substring(2, length + 2);
+};
+
+const getOneTimeToken = () => {
+    const ts = Date.now() + 30 * 60;
+    const once = CryptoJs.MD5(`0${ts}${randomString(16)}${Config.clientSecret}`).toString();
+    return `0,${ts},${once},${Config.clientId}`;
+};
+
 export {
     isPlainObject,
     isFunction,
-    handleDefaultErrors
+    handleDefaultErrors,
+    randomString,
+    getOneTimeToken
 };

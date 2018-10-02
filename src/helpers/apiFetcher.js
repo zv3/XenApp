@@ -1,11 +1,10 @@
-import {objectStore} from "../data/objectStore";
 
 const axios = require("axios");
 const {Config} = require("../Config");
 const querystring = require("querystring");
 
 import {dataStore} from "../data/dataStore";
-import {isPlainObject, isFunction} from "./funcs"
+import {isPlainObject, isFunction, randomString, getOneTimeToken} from "./funcs"
 
 const get = (url, params, options = {}) => {
     return request('get', url, params, options)
@@ -72,6 +71,8 @@ const request = (method, url, params, options) => {
         if (!params.oauth_token) {
             if (accessToken) {
                 params['oauth_token'] = accessToken;
+            } else {
+                params['oauth_token'] = getOneTimeToken();
             }
         }
 

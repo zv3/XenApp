@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-    View, Text, FlatList, TouchableHighlight, StyleSheet
+    View, Text, FlatList, TouchableHighlight, StyleSheet,
+    ScrollView
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Feather';
@@ -8,7 +9,9 @@ import LoadingScreen, {LoadingSwitch} from "./LoadingScreen";
 import {apiFetcher} from "../helpers/apiFetcher";
 import {DrawerTrigger} from "../components/Drawer";
 import {Config} from "../Config";
-import {isPlainObject} from "../helpers/funcs";
+import {handleDefaultErrors, isPlainObject} from "../helpers/funcs";
+import {CardSeparator, ThreadCard} from "../components/Card";
+import {ButtonIcon} from "../components/Button";
 
 const style = StyleSheet.create({
    row: {
@@ -27,12 +30,17 @@ const style = StyleSheet.create({
 export default class ForumScreen extends React.Component {
     static navigationOptions = ({navigation, navigationOptions}) => {
         const { params } = navigation.state;
-        const backButtonVisible = params ? true : false;
+        const backButtonVisible = !!params;
 
         return {
             title: params ? params.title : 'Forums',
             headerLeft: (
                 <DrawerTrigger isBack={backButtonVisible} navigation={navigation} />
+            ),
+            headerRight: (
+                <ButtonIcon iconName="home" onPress={() => (
+                    console.log(222)
+                )}/>
             )
         }
     };
@@ -46,20 +54,40 @@ export default class ForumScreen extends React.Component {
     }
 
     componentDidMount() {
-        let parentId = 0;
+        let parentId = 0, item, batchParams = [];
         if (this.props.navigation) {
             parentId = this.props.navigation.getParam('parentId', 0);
+            item = this.props.navigation.getParam('item');
         }
 
-        return apiFetcher.get('navigation', {parent: parentId}, {
+        batchParams.push({
+            method: 'GET',
+            uri: 'navigation',
+            params: {
+                parent: parentId
+            }
+        });
+
+        if (item && item.navigation_type === 'forum') {
+            batchParams.push({
+                method: 'GET',
+                uri: 'threads',
+                params: {
+                    forum_id: item.forum_id
+                }
+            });
+        }
+
+        return apiFetcher.post('batch', JSON.stringify(batchParams), {
             onSuccess: (data) => {
                 this.setState({
                     loadingState: Config.Constants.LOADING_STATE_DONE,
-                    dataSource: data.elements
+                    navDataSource: data.jobs.navigation.elements,
+                    threads: data.jobs.hasOwnProperty('threads') ? data.jobs.threads.threads : null
                 });
             },
             onError: (errors) => {
-
+                handleDefaultErrors(errors);
             }
         })
     }
@@ -72,7 +100,8 @@ export default class ForumScreen extends React.Component {
                     key: `forum_nav_${item.navigation_id}`,
                     params: {
                         parentId: item.navigation_id,
-                        title: item.navigation_title
+                        title: item.navigation_title,
+                        item: item
                     }
                 })
             );
@@ -94,11 +123,31 @@ export default class ForumScreen extends React.Component {
         }
     }
 
-    render() {
+    _doRenderHeader() {
+        if (!this.state.threads) {
+            return null;
+        }
+
+        const items = this._getRenderableItems();
+        if (items.length === 0) {
+            return null;
+        }
+
+        return (
+            <View style={{ flex: 1, paddingBottom: 20 }}>
+                {items.map((item, index) => (
+                    this._doRenderNavItem(item)
+                ))}
+            </View>
+        );
+    }
+
+    _getRenderableItems() {
         let items = [];
-        if (isPlainObject(this.state.dataSource)) {
-            for (let i = 0; i < this.state.dataSource.length; i++) {
-                let item = this.state.dataSource[i];
+
+        if (Array.isArray(this.state.navDataSource)) {
+            for (let i = 0; i < this.state.navDataSource.length; i++) {
+                let item = this.state.navDataSource[i];
                 switch (item.navigation_type) {
                     case 'forum':
                         item.navigation_title = item.forum_title;
@@ -122,24 +171,56 @@ export default class ForumScreen extends React.Component {
             }
         }
 
-        const finalView = (
+        return items;
+    }
+
+    _doRenderNavItem(item) {
+        return (
+            <TouchableHighlight onPress={() => this._onItemPressed(item)} key={JSON.stringify(item.navigation_id)}>
+                <View style={style.row}>
+                    <Icon name="folder" size={24} style={{ paddingRight: 15 }} />
+                    <Text style={style.text}>{item.navigation_title}</Text>
+                    <Icon name="chevron-right" size={24} />
+                </View>
+            </TouchableHighlight>
+        );
+    }
+
+    _doRenderNavList() {
+        return (
             <View style={{ flex: 1 }}>
                 <FlatList
-                    data={items}
+                    data={this._getRenderableItems()}
                     keyExtractor={(item, index) => JSON.stringify(item.navigation_id)}
-                    renderItem={({item}) => (
-                        <TouchableHighlight onPress={() => this._onItemPressed(item)}>
-                            <View style={style.row}>
-                                <Icon name="folder" size={24} style={{ paddingRight: 15 }} />
-                                <Text style={style.text}>{item.navigation_title}</Text>
-                                <Icon name="chevron-right" size={24} />
-                            </View>
-                        </TouchableHighlight>
-                    )}
+                    renderItem={({item}) => this._doRenderNavItem(item)}
                 />
             </View>
         );
+    }
 
-        return <LoadingSwitch loadState={this.state.loadingState} view={finalView}/>;
+    _doRenderMixedList() {
+        return (
+            <View style={{ flex: 1 }}>
+                <FlatList
+                    data={this.state.threads}
+                    ListHeaderComponent={this._doRenderHeader()}
+                    keyExtractor={(item, index) => JSON.stringify(item.thread_id)}
+                    ItemSeparatorComponent={() => <CardSeparator/>}
+                    renderItem={({item}) => <ThreadCard navigation={this.props.navigation}
+                                                        thread={item}/>}
+                />
+            </View>
+        );
+    }
+
+    render() {
+        let contentView;
+        if (this.state.navDataSource && this.state.threads) {
+            contentView = this._doRenderMixedList();
+        } else {
+            contentView = this._doRenderNavList();
+        }
+
+        return <LoadingSwitch loadState={this.state.loadingState} view={contentView}/>;
     }
 }

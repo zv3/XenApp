@@ -16,6 +16,10 @@ export const ACTION_TYPE = {
     SHARE: 'share'
 };
 
+const doRenderNode = (node, index, siblings, parent, defaultRenderer) => {
+    console.log(`${node.name} | ${index} | ${siblings}`)
+};
+
 class Card extends React.Component {
     render() {
         const defaultStyle = {
@@ -132,7 +136,7 @@ class ThreadCard extends React.Component {
     }
 }
 ThreadCard.propTypes = {
-    thread: PropTypes.object,
+    thread: PropTypes.object.isRequired,
     navigation: PropTypes.object.isRequired
 };
 
@@ -189,7 +193,7 @@ class PostCard extends React.Component {
         const thread = this.props.thread,
               post = this.props.post,
               postBodyText = this.props.showFullText
-                  ? <HTMLView value={post.post_body_html}/>
+                  ? <HTMLView value={post.post_body_html} renderNode={doRenderNode}/>
                   : wordTrim(post.post_body_plain_text);
 
         let threadTitle;
