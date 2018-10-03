@@ -68,7 +68,12 @@ const request = (method, url, params, options) => {
     }
 
     const _doRequest = (accessToken) => {
-        if (!params.oauth_token) {
+        if (url.indexOf('batch') === 0) {
+            if (url.indexOf('oauth_token') === -1) {
+                const token = accessToken ? accessToken : getOneTimeToken();
+                url = `${url}?oauth_token=${token}`;
+            }
+        } else if (!params.oauth_token) {
             if (accessToken) {
                 params['oauth_token'] = accessToken;
             } else {

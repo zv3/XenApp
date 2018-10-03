@@ -24,6 +24,7 @@ import {apiFetcher} from "./src/helpers/apiFetcher";
 import {objectStore} from "./src/data/objectStore";
 import {Config} from "./src/Config";
 import {isPlainObject} from "./src/helpers/funcs"
+import ThreadCreateScreen from "./src/screens/ThreadCreateScreen";
 
 
 const AuthenticateStack = createStackNavigator({
@@ -46,7 +47,8 @@ const AppRootStack = createStackNavigator({
     },
     [Config.Constants.SCREEN_FORUM]: ForumScreen,
     [Config.Constants.SCREEN_THREAD_LIST]: ThreadListScreen,
-    [Config.Constants.SCREEN_THREAD_DETAIL]: ThreadDetailScreen
+    [Config.Constants.SCREEN_THREAD_DETAIL]: ThreadDetailScreen,
+    [Config.Constants.SCREEN_THREAD_CREATE]: ThreadCreateScreen
 }, {
     initialRouteName: Config.defaultScreen
 });

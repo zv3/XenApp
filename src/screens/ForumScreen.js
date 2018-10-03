@@ -1,19 +1,19 @@
 import React from 'react';
 import {
-    View, Text, FlatList, TouchableHighlight, StyleSheet,
-    ScrollView
+    View, Text, FlatList, TouchableHighlight, StyleSheet
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Feather';
-import LoadingScreen, {LoadingSwitch} from "./LoadingScreen";
+import {LoadingSwitch} from "./LoadingScreen";
 import {apiFetcher} from "../helpers/apiFetcher";
 import {DrawerTrigger} from "../components/Drawer";
 import {Config} from "../Config";
 import {handleDefaultErrors, isPlainObject} from "../helpers/funcs";
 import {CardSeparator, ThreadCard} from "../components/Card";
 import {ButtonIcon} from "../components/Button";
+import {style} from "../Style"
 
-const style = StyleSheet.create({
+const forumStyle = StyleSheet.create({
    row: {
        flex: 1,
        flexDirection: 'row',
@@ -76,15 +76,32 @@ export default class ForumScreen extends React.Component {
                     forum_id: item.forum_id
                 }
             });
+
+            batchParams.push({
+                method: 'GET',
+                uri: `forums/${item.forum_id}`
+            });
         }
 
         return apiFetcher.post('batch', JSON.stringify(batchParams), {
             onSuccess: (data) => {
-                this.setState({
+                const stateData = {
                     loadingState: Config.Constants.LOADING_STATE_DONE,
-                    navDataSource: data.jobs.navigation.elements,
-                    threads: data.jobs.hasOwnProperty('threads') ? data.jobs.threads.threads : null
-                });
+                    navDataSource: data.jobs.navigation.elements
+                };
+
+                if (data.jobs.hasOwnProperty('threads')) {
+                    stateData.threads = data.jobs.threads.threads;
+                }
+
+                if (item
+                    && item.navigation_type === 'forum'
+                    && data.jobs.hasOwnProperty(`forums/${item.forum_id}`)
+                ) {
+                    stateData.forum = data.jobs[`forums/${item.forum_id}`].forum;
+                }
+
+                this.setState(stateData);
             },
             onError: (errors) => {
                 handleDefaultErrors(errors);
@@ -93,11 +110,11 @@ export default class ForumScreen extends React.Component {
     }
 
     _onItemPressed(item) {
-        if (item.has_sub_elements) {
+        // if (item.has_sub_elements) {
             this.props.navigation.dispatch(
                 NavigationActions.navigate({
                     routeName: Config.Constants.SCREEN_FORUM,
-                    key: `forum_nav_${item.navigation_id}`,
+                    key: `${Config.Constants.SCREEN_FORUM}_${item.navigation_id}`,
                     params: {
                         parentId: item.navigation_id,
                         title: item.navigation_title,
@@ -106,21 +123,35 @@ export default class ForumScreen extends React.Component {
                 })
             );
 
-            return;
-        }
+            // return;
+        // }
 
-        if (item.navigation_type === 'forum') {
-            // load threads
-            this.props.navigation.dispatch(
-                NavigationActions.navigate({
-                    routeName: Config.Constants.SCREEN_THREAD_LIST,
-                    key: `forum_${item.navigation_id}`,
-                    params: {
-                        forum: item
-                    }
-                })
-            );
-        }
+        // if (item.navigation_type === 'forum') {
+        //     // load threads
+        //     this.props.navigation.dispatch(
+        //         NavigationActions.navigate({
+        //             routeName: Config.Constants.SCREEN_THREAD_LIST,
+        //             key: `forum_${item.navigation_id}`,
+        //             params: {
+        //                 forum: item
+        //             }
+        //         })
+        //     );
+        // }
+    }
+
+    _onCreateThreadPressed() {
+        const forum = this.state.forum;
+
+        this.props.navigation.dispatch(
+            NavigationActions.navigate({
+                routeName: Config.Constants.SCREEN_THREAD_CREATE,
+                key: `${Config.Constants.SCREEN_THREAD_CREATE}_${forum.forum_id}`,
+                params: {
+                    forum: forum
+                }
+            })
+        );
     }
 
     _doRenderHeader() {
@@ -151,15 +182,19 @@ export default class ForumScreen extends React.Component {
                 switch (item.navigation_type) {
                     case 'forum':
                         item.navigation_title = item.forum_title;
+                        item.iconName = 'message-square';
                         break;
                     case 'category':
                         item.navigation_title = item.category_title;
+                        item.iconName = 'folder';
                         break;
                     case 'page':
                         item.navigation_title = item.page_title;
+                        item.iconName = 'external-link';
                         break;
                     case 'link-forum':
                         item.navigation_title = item.link_forum_title;
+                        item.iconName = 'external-link';
                         break;
                 }
 
@@ -177,9 +212,9 @@ export default class ForumScreen extends React.Component {
     _doRenderNavItem(item) {
         return (
             <TouchableHighlight onPress={() => this._onItemPressed(item)} key={JSON.stringify(item.navigation_id)}>
-                <View style={style.row}>
-                    <Icon name="folder" size={24} style={{ paddingRight: 15 }} />
-                    <Text style={style.text}>{item.navigation_title}</Text>
+                <View style={forumStyle.row}>
+                    <Icon name={item.iconName} size={24} style={{ paddingRight: 15 }} />
+                    <Text style={forumStyle.text}>{item.navigation_title}</Text>
                     <Icon name="chevron-right" size={24} />
                 </View>
             </TouchableHighlight>
@@ -199,6 +234,28 @@ export default class ForumScreen extends React.Component {
     }
 
     _doRenderMixedList() {
+        const forum = this.state.forum;
+        let createThreadButton = null;
+
+        if (isPlainObject(forum) && forum.permissions.create_thread) {
+            const buttonStyle = {
+                width: 40,
+                height: 40,
+                position: 'absolute',
+                bottom: 20,
+                right: 20,
+                borderRadius: 20,
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: 0
+            };
+            createThreadButton = <ButtonIcon iconName="plus"
+                                             iconSize={30}
+                                             type="primary"
+                                             onPress={() => this._onCreateThreadPressed()}
+                                             style={buttonStyle}/>;
+        }
+
         return (
             <View style={{ flex: 1 }}>
                 <FlatList
@@ -209,6 +266,7 @@ export default class ForumScreen extends React.Component {
                     renderItem={({item}) => <ThreadCard navigation={this.props.navigation}
                                                         thread={item}/>}
                 />
+                {createThreadButton}
             </View>
         );
     }

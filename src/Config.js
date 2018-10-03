@@ -16,6 +16,7 @@ export const Config = {
 
         SCREEN_THREAD_LIST: 'ThreadList',
         SCREEN_THREAD_DETAIL: 'ThreadDetail',
+        SCREEN_THREAD_CREATE: 'ThreadCreate',
 
 
         LOADING_STATE_BEGIN: 'begin',
