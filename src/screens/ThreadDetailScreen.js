@@ -1,140 +1,104 @@
-import React from "react";
-import {ButtonIcon} from "../components/Button";
-import {Config} from "../Config";
-import {apiFetcher} from "../helpers/apiFetcher";
+import React from "react"
+import {View, Text, FlatList} from "react-native"
+import BaseScreen, {LoadingState} from "./BaseScreen";
+import {fetcher} from "../utils/Fetcher";
+import PropTypes from "prop-types"
 import PageNav from "../components/PageNav";
-import {FlatList, View} from "react-native";
-import {ACTION_TYPE, CardSeparator, PostCard} from "../components/Card";
-import {LoadingSwitch} from "./LoadingScreen";
-import ReplyBox, {REPLY_STATE} from "../components/ReplyBox";
-import {handleDefaultErrors} from "../helpers/funcs";
+import PostCard, {PostCardSeparator} from "../components/PostCard";
+import ReplyBox from "../components/ReplyBox";
 
+export default class ThreadDetailScreen extends BaseScreen {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired
+    };
 
-class ThreadDetailScreen extends React.Component {
     static navigationOptions = ({navigation}) => {
-        const thread = navigation.getParam('thread');
+        const threadTitle = navigation.getParam('title');
 
         return {
-            title: thread.thread_title,
-            headerRight: (
-                <ButtonIcon iconName="bookmark" style={{marginRight: 10}}/>
-            )
-        }
+            title: threadTitle
+        };
     };
 
     constructor(props) {
         super(props);
 
         this.state = {
-            page: 1,
-            loadingState: Config.Constants.LOADING_STATE_BEGIN,
-            replyState: REPLY_STATE.NONE
+            ...this.state,
+            showPageNav: false
         };
-
-        this.quotePostId = 0;
     }
 
-    _doLoadPosts(page = 1) {
-        const thread = this.props.navigation.getParam('thread');
+    _doRenderItem(item) {
+        return <PostCard post={item}/>;
+    }
 
-        this.setState({
-            loadingState: Config.Constants.LOADING_STATE_BEGIN
-        });
+    _gotoPage(link, page) {
+    }
 
-        apiFetcher.get('posts', {
-            thread_id: thread.thread_id,
-            page: page
-        }, {
-            onSuccess: (data) => {
-                this.setState({
-                    loadingState: Config.Constants.LOADING_STATE_DONE,
-                    links: data.links,
-                    posts: data.posts
-                });
-            },
-            onError: () => {
-                this.setState({ loadingState: Config.Constants.LOADING_STATE_FAILED });
-            }
-        });
+    _doRenderPageNav() {
+        if (!this.state.showPageNav || !this.state.links) {
+            return null;
+        }
+
+        return <PageNav links={this.state.links}
+                        gotoPage={(link, page) => this._gotoPage(link, page)}/>
+    }
+
+    _doReply(message) {
+        this.refs.ReplyBox.clear();
+    }
+
+    _doRenderReplyBox() {
+        return <ReplyBox ref="ReplyBox" onSubmit={(message) => this._doReply(message)}/>
+    }
+
+    _doRender() {
+        return (
+            <View style={{ flex: 1, paddingBottom: 60 }}>
+                <FlatList renderItem={({item}) => this._doRenderItem(item)}
+                          data={this.state.posts}
+                          ItemSeparatorComponent={() => PostCardSeparator()}
+                          keyExtractor={(item, index) => JSON.stringify(item.post_id)}
+                          maxToRenderPerBatch={4}/>
+                {this._doRenderPageNav()}
+                {this._doRenderReplyBox()}
+            </View>
+        );
     }
 
     componentDidMount() {
-        this._doLoadPosts();
-    }
+        const threadId = this.props.navigation.getParam('threadId');
+        if (!threadId) {
+            throw new Error('Must be pass threadId into navigation params!');
+        }
 
-    _gotoPage(page) {
-        this._doLoadPosts(page);
-    }
-
-    _doReply(text) {
-        const thread = this.props.navigation.getParam('thread');
-        this.setState({ replyState: REPLY_STATE.SENDING });
-
-        apiFetcher.post('posts', {
-            thread_id: thread.thread_id,
-            post_body: text
-        }, {
-            onSuccess: (data) => {
-                this.setState(prevState => ({
-                   ...prevState,
-                   posts: [
-                       ...prevState.posts,
-                       data.post
-                   ]
-                }));
-
-                this.refs.postList.scrollToEnd();
-                this.refs.replyBox.clear();
+        const batchParams = [
+            {
+                uri: `threads/${threadId}`,
+                method: 'GET'
             },
-            onError: (errors) => {
-                handleDefaultErrors(errors);
-
-                setTimeout(() => {
-                    this.setState({ replyState: REPLY_STATE.NONE });
-                }, 2000);
+            {
+                uri: 'posts',
+                method: 'GET',
+                params: {
+                    thread_id: threadId
+                }
             }
-        });
-    }
+        ];
 
-    _onAction(type, post) {
-        if (type === ACTION_TYPE.REPLY) {
-            // quote an post.
-            this.quotePostId = post.post_id;
-        }
-    }
+        fetcher.post('batch', { body: batchParams })
+            .then((response) => {
+                this._setLoadingState(LoadingState.Done);
 
-    render() {
-        let finalView;
-        if (this.state.loadingState === Config.Constants.LOADING_STATE_DONE) {
-            let pageNav, replyBox;
-            if (this.state.links) {
-                pageNav = <PageNav maxPages={this.state.links.pages}
-                                   currentPage={this.state.links.page}
-                                   gotoPage={(page) => this._gotoPage(page)}/>;
-            }
-
-            replyBox = (<ReplyBox
-                                ref="replyBox"
-                                onReply={(text) => this._doReply(text)}
-                                replyState={this.state.replyState}/>);
-
-            finalView = (
-                <View style={{ flex: 1 }}>
-                    <FlatList data={this.state.posts}
-                              ref="postList"
-                              keyExtractor={(item, index) => JSON.stringify(item.post_id)}
-                              ItemSeparatorComponent={() => <CardSeparator/>}
-                              renderItem={({item}) => <PostCard post={item} onAction={(type, post) => this._onAction(type, post)}/>}/>
-
-                    {pageNav}
-                    {replyBox}
-                </View>
-            );
-        }
-
-        return <LoadingSwitch loadState={this.state.loadingState}
-                              view={finalView}/>
+                this.setState({
+                    thread: response.jobs[`threads/${threadId}`].thread,
+                    posts: response.jobs.posts.posts,
+                    links: response.jobs.posts.links
+                });
+            })
+            .catch((error) => {
+                this._setLoadingState(LoadingState.Error);
+            });
     }
 }
-
-export default ThreadDetailScreen

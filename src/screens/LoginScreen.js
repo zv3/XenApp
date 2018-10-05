@@ -1,186 +1,177 @@
-import React from 'react';
-import {
-    View, TextInput, StyleSheet, ActivityIndicator, Alert,
-    Text
-} from 'react-native';
-
-import {Config} from '../Config'
-import {apiFetcher} from "../helpers/apiFetcher"
-
-import {style} from "../Style"
-import {Button} from "../components/Button"
-import {dataDecrypter, dataEncrypter, passwordEncrypter} from "../helpers/encrypter";
-import {dataStore} from "../data/dataStore"
-import {objectStore} from "../data/objectStore";
-import {isPlainObject} from "../helpers/funcs";
-import {simpleEventDispatcher} from "../events/simpleEventDispatcher";
+import React from "react"
+import {View, AsyncStorage, TextInput,StyleSheet, ActivityIndicator} from "react-native"
+import {Button} from "../components/Button";
+import {passwordEncrypter} from "../utils/Encrypter";
+import {CLIENT_ID} from "../Config";
+import {fetcher} from "../utils/Fetcher";
+import SnackBar from "../components/SnackBar";
+import {NavigationActions} from "react-navigation"
 
 export default class LoginScreen extends React.Component {
-    constructor(props) {
-        super(props);
+    static navigationOptions = ({navigation}) => {
+        return {
+            title: 'Login'
+        }
+    };
 
-        this.state = {
-            focusField: '',
-            data: {},
-            isLoading: false,
-            isTfaVerify: false
-        };
+    state = {
+        data: {},
+        isSubmitting: false
+    };
+
+    _onChangeText(name, value) {
+        this.setState(prevState => ({
+            ...prevState,
+            data: {
+                ...prevState.data,
+                    [name]: value
+            }
+        }));
+    }
+
+    _doRenderField(name, placeholder) {
+        let secureTextEntry = false, keyboardType = 'default';
+        if (name.indexOf('password') === 0) {
+            secureTextEntry = true;
+        }
+
+        return <TextInput
+            editable={!this.state.isSubmitting}
+            style={styles.input}
+            secureTextEntry={secureTextEntry}
+            keyboardType={keyboardType}
+            onChangeText={(text) => this._onChangeText(name, text)}
+            placeholder={placeholder}/>
     }
 
     _doLogin() {
-        if (!this.state.data.username || !this.state.data.password) {
-            return;
-        }
-
         this.setState({
-            isLoading: true
+            isSubmitting: true
         });
+
+        if (this.refs.SnackBar) {
+            this.refs.SnackBar.hide();
+        }
 
         let payload = {
             username: this.state.data.username,
             password: passwordEncrypter(this.state.data.password),
             grant_type: 'password',
-            client_id: Config.clientId,
+            client_id: CLIENT_ID,
             password_algo: 'aes128'
         };
 
-        if (this.state.data.code) {
-            payload['code'] = this.state.data.code;
-            payload['tfa_provider'] = 'totp';
-        }
+        fetcher.post('oauth/token', { body: payload })
+            .then((response) => {
+                if (response.hasOwnProperty('access_token')) {
+                    // login access.
+                    let oauthData = {
+                        accessToken: response.access_token,
+                        expiresAt: Date.now() + response.expires_in * 1000,
+                        refreshToken: response.refresh_token,
+                        userId: response.user_id
+                    };
 
-        const _doFetchUser = async (accessToken) => {
-            await apiFetcher.get(`users/me?oauth_token=${accessToken}`, {}, {
-                onSuccess: (data) => {
-                    objectStore.set(Config.Constants.VISITOR, data.user);
-                    simpleEventDispatcher.fire('logged');
-                }
-            });
-        };
+                    AsyncStorage.setItem('oauthData', JSON.stringify(oauthData));
 
-        apiFetcher.post('oauth/token', payload, {
-            onSuccess: (data, statusCode) => {
-                if (data.hasOwnProperty('access_token')) {
-                    dataStore.put(Config.Constants.OAUTH_DATA, data);
-                    objectStore.set(Config.Constants.OAUTH_DATA, data);
-
-                    _doFetchUser(data.access_token);
-
-                    this.props.navigation.navigate(Config.Constants.SCREEN_HOME);
+                    this.props.navigation.dispatch(
+                        NavigationActions.navigate({
+                            routeName: 'Home',
+                            key: `home_${oauthData.userId}`
+                        })
+                    );
 
                     return;
                 }
 
-                if (statusCode === 202) {
-                    // required TFA to login.
-                    this.setState({ isTfaVerify: true, isLoading: false });
-                }
-            },
-            onError: (errors) => {
-                let errorShown;
-                if (isPlainObject(errors)) {
-                    errorShown = errors[0];
-                }
-
-                Alert.alert(
-                    'An error occurred!',
-                    errorShown ? errorShown : 'Please enter valid password'
-                );
+                this.setState({
+                    isSubmitting: false
+                });
+            })
+            .catch((error) => {
+                this.refs.SnackBar.show(error[0]);
 
                 setTimeout(() => {
-                    this.setState({ isLoading: false });
+                    this.setState({
+                        isSubmitting: false
+                    });
                 }, 2000);
-            }
-        });
+            })
     }
-
-    _goToRegister() {
-        this.props.navigation.navigate(Config.Constants.SCREEN_REGISTER);
-    }
-
-    _updateDataState(fieldId, value) {
-        this.setState(prevState => ({
-            ...prevState,
-            data: {
-                ...prevState.data,
-                [fieldId]: value
-            }
-        }));
-    }
-
-    _doRenderField(fieldId, placeholder, autoFocus = false) {
-        let secureTextEntry = false, keyboardType = 'default';
-        if (fieldId.indexOf('password') === 0) {
-            secureTextEntry = true;
-        }
-
-        let inputFocusStyle;
-        if (this.state.focusField === fieldId) {
-            inputFocusStyle = style.input.focus;
-        }
-
-        return (
-            <TextInput
-                placeholder={placeholder}
-                placeholderTextColor={style.input.placeholder.color}
-                secureTextEntry={secureTextEntry}
-                editable={!this.state.isLoading}
-                keyboardType={keyboardType}
-                autoFocus={autoFocus}
-                onFocus={() => this.setState({ focusField: fieldId })}
-                onChangeText={(text) => this._updateDataState(fieldId, text)}
-                style={[style.input.normal, inputFocusStyle]}
-            />
-        );
-    }
-
 
     render() {
-        let loadingIndicator;
-        if (this.state.isLoading) {
-            loadingIndicator = <ActivityIndicator/>;
+        let isDisabled = true, buttonLoading;
+        if (this.state.data.username && this.state.data.password) {
+            isDisabled = false;
         }
 
-        const containerStyle = StyleSheet.create({
-            container: {
-                paddingLeft: 15,
-                paddingRight: 15,
-                paddingTop: 230,
-                paddingBottom: 30
-            }
-        });
-
-        if (this.state.isTfaVerify) {
-            return (
-                <View style={containerStyle.container}>
-                    <Text style={{ textAlign: 'center', fontSize: 15, fontWeight: 'bold' }}>Two-step verification required</Text>
-                    <Text style={{ textAlign: 'center', marginTop: 20, marginBottom: 10 }}>Please enter the verification code generated by the app on your phone.</Text>
-
-                    {this._doRenderField('code', 'Verification Code', true)}
-
-                    <Button text="CONFIRM"
-                            disabled={this.state.isLoading}
-                            iconView={loadingIndicator}
-                            onPress={() => this._doLogin()}/>
-                </View>
-            );
+        if (this.state.isSubmitting) {
+            isDisabled = true;
+            buttonLoading = <ActivityIndicator color="white"
+                                               style={{ marginRight: 10 }}/>;
         }
 
         return (
-            <View style={containerStyle.container}>
-                {this._doRenderField('username', 'User Name or Email', true)}
+            <View style={styles.container}>
+                {this._doRenderField('username', 'Username or Email')}
                 {this._doRenderField('password', 'Password')}
-
-                <Button text="LOG IN"
-                        disabled={this.state.isLoading}
-                        iconView={loadingIndicator}
-                        onPress={() => this._doLogin()}/>
-
-                <Button text="Don't have an account?"
-                        type="default"
-                        style={{ marginTop: 10 }}
-                        onPress={() => this._goToRegister()} />
+                <Button text="LOGIN"
+                        disabled={isDisabled}
+                        textProps={{ style: styles.buttonText }}
+                        onPress={() => this._doLogin()}
+                        iconView={buttonLoading}
+                        style={[styles.submit, {opacity: isDisabled ? 0.4 : 1}]}/>
+                <SnackBar text="" ref="SnackBar" />
             </View>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+         flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingLeft: 20,
+        paddingRight: 20
+    },
+
+    input: {
+        width: '100%',
+        marginBottom: 10,
+        padding: 10,
+
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(0,0,0,.1)',
+
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(0,0,0,.1)',
+
+        borderLeftWidth: 1,
+        borderLeftColor: 'rgba(0,0,0,.1)',
+
+        borderRightWidth: 1,
+        borderRightColor: 'rgba(0,0,0,.1)',
+
+        color: 'red',
+        fontSize: 18,
+        backgroundColor: '#FFF',
+
+        borderRadius: 4
+    },
+
+    submit: {
+        backgroundColor: '#ff4081',
+        width: '100%',
+        padding: 5,
+        borderRadius: 4,
+        marginTop: 10,
+        flexDirection: 'row',
+        justifyContent: 'center'
+    },
+
+    buttonText: {
+        color: '#FFF',
+        fontSize: 16
+    }
+});

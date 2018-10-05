@@ -1,16 +1,21 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react"
+import {View, TouchableHighlight, FlatList, Text, StyleSheet} from "react-native";
+import Icon from "react-native-vector-icons/Feather"
+import PropTypes from "prop-types"
 import {ButtonIcon} from "./Button";
-import {FlatList, Text, TouchableHighlight, View} from "react-native";
-import Icon from "react-native-vector-icons/Feather";
-import {style} from "../Style"
-import {objectStore} from "../data/objectStore";
-import Avatar from "./Avatar";
-import {Config} from "../Config";
-import {simpleEventDispatcher} from "../events/simpleEventDispatcher";
-
 
 class DrawerTrigger extends React.Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired,
+        isBack: PropTypes.bool,
+        iconSize: PropTypes.number
+    };
+
+    static defaultProps = {
+        iconSize: 25,
+        isBack: false
+    };
+
     _onPressed() {
         if (this.props.isBack) {
             this.props.navigation.goBack();
@@ -20,36 +25,27 @@ class DrawerTrigger extends React.Component {
     }
 
     render() {
-        const styles = this.props.style ? this.props.style : {};
-
         return (
             <ButtonIcon iconName={this.props.isBack ? 'chevron-left' : 'menu'}
                         iconColor="red"
-                        iconSize={this.props.size}
+                        iconSize={this.props.iconSize}
+                        style={{ marginLeft: 10 }}
                         onPress={() => this._onPressed()}/>
         );
     }
 }
-DrawerTrigger.propTypes = {
-    size: PropTypes.number,
-    isBack: PropTypes.bool,
-    navigation: PropTypes.object
-};
-
-DrawerTrigger.defaultProps = {
-    size: 25,
-    isBack: false
-};
 
 class DrawerMenuContent extends React.Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired
+    };
+
     constructor(props) {
         super(props);
 
         this.state = {
-            user: objectStore.get(Config.Constants.VISITOR)
+            user: null
         };
-
-        this.subscribeId = 0;
     }
 
     _onPress(item) {
@@ -57,26 +53,11 @@ class DrawerMenuContent extends React.Component {
     }
 
     _doRenderUser() {
-        const user = this.state.user;
-
         return (
-            <View style={style.drawer.header}>
-                <Avatar url={user.links.avatar} size={60}/>
+            <View style={styles.header}>
                 <Text style={{ color: '#fff', fontSize: 16, marginTop: 10, fontWeight: 'bold' }}>{user.username}</Text>
             </View>
         );
-    }
-
-    componentDidMount() {
-        simpleEventDispatcher.subscribe('logged', () => {
-            this.setState({
-                user: objectStore.get(Config.Constants.VISITOR)
-            });
-        });
-    }
-
-    componentWillUnmount() {
-        simpleEventDispatcher.unsubscribe('logged', this.subscribeId);
     }
 
     render() {
@@ -85,7 +66,7 @@ class DrawerMenuContent extends React.Component {
                 title: 'Home',
                 key: 'home',
                 icon: 'home',
-                navigationId: Config.Constants.SCREEN_HOME
+                navigationId: 'Home'
             },
             {
                 title: 'Notifications',
@@ -103,7 +84,7 @@ class DrawerMenuContent extends React.Component {
                 title: 'Forums',
                 key: 'forums',
                 icon: 'folder',
-                navigationId: Config.Constants.SCREEN_FORUM
+                navigationId: 'Forum'
             },
             {
                 title: 'Watched Content',
@@ -123,11 +104,11 @@ class DrawerMenuContent extends React.Component {
         if (this.state.user) {
             userHeader = this._doRenderUser();
         } else {
-            userHeader = (<View style={{ height: 120 }}></View>);
+            userHeader = (<View style={{ height: 120 }}/>);
         }
 
         return (
-            <View style={style.drawer.container}>
+            <View style={styles.container}>
                 {userHeader}
                 <FlatList
                     data={navItems}
@@ -136,7 +117,7 @@ class DrawerMenuContent extends React.Component {
                             onPress={() => this._onPress(item)}
                             underlayColor="rgb(237, 246, 253)">
 
-                            <View style={style.drawer.item}>
+                            <View style={styles.item}>
                                 <Icon name={item.icon} size={20} style={{ paddingRight: 20 }} />
                                 <Text style={{ fontSize: 16 }}>{item.title}</Text>
                             </View>
@@ -148,5 +129,29 @@ class DrawerMenuContent extends React.Component {
     }
 }
 
-
 export {DrawerTrigger, DrawerMenuContent};
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: 'rgb(245,245,245)',
+        flex: 1,
+        borderWidth: 0
+    },
+
+    header: {
+        backgroundColor: 'red',
+        height: 160,
+        padding: 15,
+        justifyContent:'flex-end'
+    },
+
+    item: {
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 15,
+        paddingRight: 15,
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center'
+    }
+});

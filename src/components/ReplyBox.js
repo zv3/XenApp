@@ -1,101 +1,114 @@
 import React from "react"
-import {View, TextInput, Dimensions, Text, KeyboardAvoidingView} from "react-native"
-import {style} from "../Style"
-import {Button} from "./Button"
+import {View, Text, StyleSheet, Dimensions, TextInput} from "react-native"
+import {ButtonIcon} from "./Button"
 import PropTypes from "prop-types"
 
-export const REPLY_STATE = {
-    NONE: 'none',
-    SENDING: 'sending',
-    RESET: 'reset'
-};
+export default class ReplyBox extends React.Component {
+    state = {
+        message: '',
+        quoteUser: '',
+        isSubmitting: false
+    };
 
-class ReplyBox extends React.Component {
-    constructor(props) {
-        super(props);
+    static propTypes = {
+        onSubmit: PropTypes.func.isRequired
+    };
 
-        this.state = {
-            text: ''
-        };
+    setMessage(message) {
+        this.setState({ message: message });
     }
 
     clear() {
-        this.refs.input.clear();
-        this.setState({ text: '' });
-    }
-
-    _doReply() {
-        if (this.state.text.length > 0) {
-            this.props.onReply(this.state.text);
-        }
-    }
-
-    _onChangeText(text) {
-        const textTrimmed = text.replace(/^(\s+|\n)|(\s+|\n)$/g, '');
         this.setState({
-            text: textTrimmed
+            message: '',
+            isSubmitting: false
         });
     }
 
-    render() {
-        const inputStyle = {
-            borderTopWidth: 1,
-            borderTopColor: 'rgba(0,0,0,.1)',
-            borderLeftWidth: 1,
-            borderLeftColor: 'rgba(0,0,0,.1)',
-            borderRightWidth: 1,
-            borderRightColor: 'rgba(0,0,0,.1)',
-            borderRadius: 4,
-            paddingLeft: 10,
-            paddingRight: 10,
-
-            paddingTop: 5,
-            paddingBottom: 5,
-
-            width: Dimensions.get('window').width - 80 - 20
-        };
-
-        const buttonStyle = {
-            padding: 0,
-            height: 35,
-            width: 80,
-            backgroundColor: 'transparent'
-        };
-
-        let inputEditable, buttonDisable, inputValue = this.state.text;
-        if (this.state.text.length > 0) {
-            buttonDisable = this.props.replyState === REPLY_STATE.SENDING;
-        } else {
-            buttonDisable = true;
+    message() {
+        if (!this.state.message) {
+            return '';
         }
 
-        inputEditable = this.props.replyState !== REPLY_STATE.SENDING;
+        return this.state.message.replace(/^(\n|\s+)|(\n|\s+)$/g, '');
+    }
+
+    _doSubmit() {
+        const message = this.message();
+        if (message.length === 0) {
+            return;
+        }
+
+        this.setState({
+            isSubmitting: true
+        });
+
+        this.props.onSubmit(message);
+    }
+
+    _doRenderQuoteText() {
+    }
+
+    render() {
+        const isDisabled = this.message().length === 0 || this.state.isSubmitting;
+
+        let iconColor = 'white', buttonStyle;
+        if (isDisabled) {
+            iconColor = 'rgba(0,0,0,.26)';
+            buttonStyle = {
+                backgroundColor: 'rgba(0,0,0,.12)'
+            };
+        }
 
         return (
-            <View style={style.replyBox.container}>
-                <Text>You are replying Nobita</Text>
-                <View style={{ flexDirection: 'row' }}>
-                    <TextInput
-                        ref="input"
-                        style={[style.input.normal, inputStyle]}
-                        placeholder="Reply"
-                        multiline={true}
-                        editable={inputEditable}
-                        value={inputValue}
-                        onChangeText={(text) => this._onChangeText(text)}
-                        placeholderTextColor={style.input.placeholder.color}/>
-                    <Button text="Reply" type="default"
-                            style={buttonStyle}
-                            disabled={buttonDisable}
-                            onPress={() => this._doReply()}/>
-                </View>
+            <View style={styles.container}>
+                <TextInput style={styles.input}
+                           multiline={true}
+                           editable={!this.state.isSubmitting}
+                           onChangeText={(message) => this.setMessage(message)}
+                           value={this.state.message}
+                           placeholder="Enter an message..."/>
+                <ButtonIcon iconName="send"
+                            iconColor={iconColor}
+                            iconSize={20}
+                            disabled={isDisabled}
+                            onPress={() => this._doSubmit()}
+                            style={[styles.sendButton, buttonStyle]}/>
             </View>
         );
     }
 }
-ReplyBox.propTypes = {
-    onReply: PropTypes.func.isRequired,
-    replyState: PropTypes.string.isRequired
-};
 
-export default ReplyBox
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: 'white',
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        padding: 10,
+        borderTopWidth: 1,
+        borderTopColor: '#e7e7e7'
+    },
+
+    input: {
+        paddingTop: 5,
+        paddingBottom: 5
+    },
+
+    sendButton: {
+        backgroundColor: '#ff4081',
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 1, height: 1.5},
+        shadowOpacity: 0.12,
+
+        position: 'absolute',
+        top: -15,
+        right: 15
+    }
+});

@@ -1,78 +1,90 @@
 import React from "react"
-import {View, Text} from "react-native"
-
+import {View, Text, StyleSheet, Dimensions, Animated, LayoutAnimation} from "react-native"
 import PropTypes from "prop-types"
 import {ButtonIcon} from "./Button";
-import {style} from "../Style"
 
-class PageNav extends React.Component {
-    _calcPage(event) {
-        switch (event) {
-            case 'first':
-                if (this.props.currentPage > 1) {
-                    this.props.gotoPage(1);
-                }
+export default class PageNav extends React.Component {
+    static propTypes = {
+        links: PropTypes.object.isRequired,
+        gotoPage: PropTypes.func.isRequired
+    };
+
+    state = {
+        offsetY: 20
+    };
+
+    _onItemPressed(iconName) {
+        const links = this.props.links;
+
+        switch (iconName) {
+            case 'chevrons-left':
+                this.props.gotoPage(links.prev, 1);
                 break;
-            case 'prev':
-                const prevPage = Math.max(1, this.props.currentPage - 1);
-                if (prevPage !== this.props.currentPage) {
-                    this.props.gotoPage(prevPage);
-                }
+            case 'chevron-left':
+                this.props.gotoPage(links.prev, links.page - 1);
                 break;
-            case 'next':
-                const nextPage = Math.min(this.props.maxPages, this.props.currentPage + 1);
-                if (nextPage !== this.props.currentPage) {
-                    this.props.gotoPage(nextPage);
-                }
+            case 'chevron-right':
+                this.props.gotoPage(links.next, links.page + 1);
                 break;
-            case 'last':
-                if (this.props.currentPage !== this.props.maxPages) {
-                    this.props.gotoPage(this.props.maxPages);
-                }
+            case 'chevrons-right':
+                this.props.gotoPage(links.next, links.pages);
                 break;
         }
     }
 
-    render() {
-        if (this.props.maxPages < 2) {
-            return null;
-        }
+    _doRenderButton(iconName, disabled = false) {
+        return <ButtonIcon iconName={iconName}
+                           disabled={disabled}
+                           iconColor={disabled ? '#888888' : 'rgba(255, 255, 255, 0.88)'}
+                           onPress={() => this._onItemPressed(iconName)}/>;
+    }
 
-        const iconStyle = {
-            padding: 0,
-            backgroundColor: 'transparent'
-        };
+    show() {
+        LayoutAnimation.easeInEaseOut();
+        this.setState({
+            offsetY: 20
+        });
+    }
+
+    hide() {
+        this.setState({
+            offsetY: -35
+        });
+    }
+
+    render() {
+        const links = this.props.links;
 
         return (
-            <View style={style.pageNav.container}>
-                <ButtonIcon iconName="chevrons-left"
-                            onPress={() => this._calcPage('first')}
-                            disabled={this.props.currentPage === 1}
-                            style={iconStyle}
-                            iconColor="white"/>
-                <ButtonIcon iconName="chevron-left"
-                            onPress={() => this._calcPage('prev')}
-                            style={iconStyle}
-                            iconColor="white"/>
-                <Text style={style.pageNav.text}>{this.props.currentPage} / {this.props.maxPages}</Text>
-                <ButtonIcon iconName="chevron-right"
-                            onPress={() => this._calcPage('next')}
-                            style={iconStyle}
-                            iconColor="white"/>
-                <ButtonIcon iconName="chevrons-right"
-                            onPress={() => this._calcPage('last')}
-                            disabled={this.props.currentPage === this.props.maxPages}
-                            style={iconStyle}
-                            iconColor="white"/>
+            <View style={[styles.container, {bottom: this.state.offsetY}]}>
+                {this._doRenderButton('chevrons-left', links.page === 1)}
+                {this._doRenderButton('chevron-left', links.page === 1)}
+                <Text style={styles.text}>{this.props.links.page} / {this.props.links.pages}</Text>
+                {this._doRenderButton('chevron-right', links.page === links.pages)}
+                {this._doRenderButton('chevrons-right', links.page === links.pages)}
             </View>
         );
     }
 }
 
-PageNav.propTypes = {
-    maxPages: PropTypes.number.isRequired,
-    currentPage: PropTypes.number.isRequired,
-    gotoPage: PropTypes.func.isRequired
-};
-
-export default PageNav;
+const styles = StyleSheet.create({
+    container: {
+        position: 'absolute',
+        width: 200,
+        height: 35,
+        backgroundColor: '#131313',
+        // bottom: -35,
+        borderRadius: 4,
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        left: (Dimensions.get('window').width - 220)/2,
+        paddingLeft: 10,
+        paddingRight: 10
+    },
+    text: {
+        fontSize: 17,
+        color: 'rgba(255, 255, 255, 0.88)'
+    }
+});

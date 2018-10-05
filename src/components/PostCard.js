@@ -1,0 +1,129 @@
+import React from "react"
+import {View, Text, StyleSheet, Image} from "react-native"
+import PropTypes from "prop-types"
+import HTMLView from "react-native-htmlview"
+import {ButtonIcon} from "./Button";
+
+export const PostCardSeparator = () => {
+    return <View style={{ with: '100%', height: 10, backgroundColor: '#ececec' }}/>
+};
+
+export default class PostCard extends React.Component {
+    static propTypes = {
+        post: PropTypes.object.isRequired
+    };
+
+    _doRenderHeader() {
+        const post = this.props.post;
+
+        return (
+            <View style={styles.header}>
+                <Image source={{ uri: post.links.poster_avatar }} style={styles.avatar}/>
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.user}>{post.poster_username}</Text>
+                    <Text>{post.post_create_date}</Text>
+                </View>
+            </View>
+        );
+    }
+
+    _doRenderBody() {
+        const post = this.props.post;
+        return (
+            <View style={styles.body}>
+                <HTMLView value={post.post_body_html} paragraphBreak=""/>
+            </View>
+        );
+    }
+
+    _doRenderFooter() {
+        const post = this.props.post;
+
+        const textProps = {
+            style: {
+                fontSize: 16
+            }
+        };
+
+        const renderButton = (icon, text, disabled = false) => {
+            return <ButtonIcon iconName="thumbs-up" text="Like"
+                               iconSize={18}
+                               disabled={disabled}
+                               style={styles.footerButton}
+                               textProps={textProps}/>
+        };
+
+        return (
+            <View style={styles.footer}>
+                {renderButton('thumbs-up', 'Like', !post.permissions.like)}
+                {renderButton('message-square', 'Reply', !post.permissions.reply)}
+                {renderButton('share', 'Share')}
+            </View>
+        );
+    }
+
+    render() {
+        return (
+            <View style={styles.container}>
+                {this._doRenderHeader()}
+                {this._doRenderBody()}
+                {this._doRenderFooter()}
+            </View>
+        );
+    }
+}
+
+const styles = StyleSheet.create({
+   container: {
+        flex: 1,
+        backgroundColor: 'white'
+   },
+
+    header: {
+        flex:1,
+        flexDirection: 'row',
+        backgroundColor: '#f5f5f5',
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#d8d8d8',
+        borderTopWidth: 1,
+        borderTopColor: '#d8d8d8'
+    },
+
+    body: {
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#d8d8d8'
+    },
+
+    footer: {
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#d8d8d8',
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+
+    footerButton: {
+       flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
+    avatar: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        resizeMode: 'contain',
+        marginRight: 10
+    },
+
+    user: {
+       fontSize: 16,
+        fontWeight: 'bold',
+        color: '#2577b1'
+    }
+});

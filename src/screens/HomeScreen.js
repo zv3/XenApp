@@ -1,61 +1,53 @@
-import React from 'react';
-import {View, Alert, FlatList} from 'react-native';
-import {LoadingSwitch} from "./LoadingScreen";
+import React from "react"
+import {View, AsyncStorage, FlatList} from "react-native"
+import {fetcher} from "../utils/Fetcher";
+import {DrawerTrigger} from "../components/Drawer";
 import {ButtonIcon} from "../components/Button";
-import {apiFetcher} from "../helpers/apiFetcher";
-import {CardSeparator, ThreadCard} from "../components/Card"
-import {objectStore} from "../data/objectStore";
-import Avatar from "../components/Avatar";
-import {Config} from "../Config";
-import {simpleEventDispatcher} from "../events/simpleEventDispatcher";
-import {getOneTimeToken, handleDefaultErrors} from "../helpers/funcs";
+import {oneTimeToken} from "../utils/Token";
+import BaseScreen, {LoadingState} from "./BaseScreen";
+import ThreadRow, {ThreadRowSeparator} from "../components/ThreadRow";
+import PageNav from "../components/PageNav";
 
 class HomeHeaderRight extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            user: objectStore.get(Config.Constants.VISITOR)
+            accessToken: null
         };
-
-        this.subscribeId = 0;
     }
 
     componentDidMount() {
-        this.subscribeId = simpleEventDispatcher.subscribe('logged', () => {
-            this.setState({ user: objectStore.get(Config.Constants.VISITOR)});
-        });
-    }
-
-    componentWillUnmount() {
-        simpleEventDispatcher.unsubscribe('logged', this.subscribeId);
+        AsyncStorage.getItem('oauthData')
+            .then((data) => {
+                console.log(data)
+            })
+            .catch((error) => {
+                // need login.
+            })
     }
 
     render() {
-        if (this.state.user) {
-            const user = this.state.user;
-
-            return (
-            <View style={{ marginRight: 10 }}>
-                <Avatar url={user.links.avatar_small} size={25}/>
-            </View>);
+        if (this.state.accessToken === null) {
+            return null;
         }
 
         return (
-            <View style={{ flex: 1, flexDirection: 'row' }}>
+            <View style={{ flex: 1, flexDirection: 'row', marginRight: 10 }}>
                 <ButtonIcon iconName="log-in" onPress={() => {
-                    this.props.navigation.navigate(Config.Constants.SCREEN_LOGIN);
+                    this.props.navigation.navigate('Login');
                 }} />
             </View>
         );
     }
 }
 
-export default class HomeScreen extends React.Component {
+export default class HomeScreen extends BaseScreen {
     static navigationOptions = ({navigation}) => {
         return {
             title: 'Home',
-            headerRight: (<HomeHeaderRight navigation={navigation}/>)
+            headerRight: (<HomeHeaderRight navigation={navigation}/>),
+            headerLeft: (<DrawerTrigger navigation={navigation}/>)
         };
     };
 
@@ -63,43 +55,81 @@ export default class HomeScreen extends React.Component {
         super(props);
 
         this.state = {
-            loadingState: Config.Constants.LOADING_STATE_BEGIN
+            ...this.state,
+            results: [],
+            showPageNav: false
         };
     }
 
     componentDidMount() {
-        return apiFetcher.get('threads/recent', {
-            oauth_token: getOneTimeToken()
-        }, {
-            onSuccess: (data) => {
-                this.setState({
-                    dataSource: data.results,
-                    loadingState: Config.Constants.LOADING_STATE_DONE
-                });
-            },
-            onError: (errors) => {
-                handleDefaultErrors(errors);
+        const batchParams = [
+            {
+                method: 'GET',
+                uri: 'threads/recent'
             }
+        ];
+
+        fetcher.post(`batch&oauth_token=${oneTimeToken()}`, {
+            body: JSON.stringify(batchParams)
+        }).then((response) => {
+            this._setLoadingState(LoadingState.Done);
+
+            const results = response.jobs['threads/recent'];
+
+            this.setState({
+                results: results.results,
+                links: results.links,
+                showPageNav: true
+            });
+        }).catch((error) => {
+            this._setLoadingState(LoadingState.Error);
         });
     }
 
-    _doRefreshData() {
+    _gotoPage(link, page) {
+        this._setLoadingState(LoadingState.Begin);
+        fetcher.get(link, {
+            query: {
+                page: page
+            }}
+        ).then((response) => {
+            this._setLoadingState(LoadingState.Done);
+
+            this.setState(prevState => ({
+                ...prevState,
+                results: response.data,
+                links: response.links
+            }));
+        }).catch((error) => {
+            this._setLoadingState(LoadingState.Error);
+        });
     }
 
-    render() {
-        const finalView = (
-            <View style={{ flex: 1 }}>
-                <FlatList
-                    data={this.state.dataSource}
-                    keyExtractor={(item, index) => JSON.stringify(item.thread_id)}
-                    ItemSeparatorComponent={() => <CardSeparator/>}
-                    renderItem={({item}) => <ThreadCard thread={item} navigation={this.props.navigation}/>}
-                />
+    _doRenderPageNav() {
+        if (!this.state.showPageNav || !this.state.links) {
+            return null;
+        }
+
+        return <PageNav ref="PageNav" links={this.state.links} gotoPage={(link, page) => this._gotoPage(link, page)}/>;
+    }
+
+    _doTogglePageNav(show) {
+        show
+            ? this.refs.PageNav.show()
+            : this.refs.PageNav.hide();
+    }
+
+    _doRender() {
+        return (
+            <View>
+                <FlatList renderItem={({item}) => <ThreadRow thread={item} navigation={this.props.navigation}/>}
+                          data={this.state.results}
+                          onMomentumScrollBegin={() => this._doTogglePageNav(false)}
+                          onMomentumScrollEnd={() => this._doTogglePageNav(true)}
+                          ItemSeparatorComponent={() => ThreadRowSeparator()}
+                          keyExtractor={(item, index) => JSON.stringify(item.thread_id)}/>
+                {this._doRenderPageNav()}
             </View>
         );
-
-        return <LoadingSwitch loadState={this.state.loadingState}
-                              view={finalView}
-                              refreshFn={() => this._doRefreshData()}/>
     }
 }
