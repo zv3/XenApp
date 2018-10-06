@@ -14,7 +14,8 @@ class DrawerTrigger extends React.Component {
     static propTypes = {
         navigation: PropTypes.object.isRequired,
         isBack: PropTypes.bool,
-        iconSize: PropTypes.number
+        iconSize: PropTypes.number,
+        style: PropTypes.object
     };
 
     static defaultProps = {
@@ -38,7 +39,7 @@ class DrawerTrigger extends React.Component {
                 iconName={this.props.isBack ? 'chevron-left' : 'menu'}
                 iconColor="red"
                 iconSize={this.props.iconSize}
-                style={defaultStyle}
+                style={[defaultStyle, this.props.style]}
                 onPress={() => this._onPressed()}
             />
         );

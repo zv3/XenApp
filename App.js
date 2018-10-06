@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, View, Text, ActivityIndicator, StyleSheet, AsyncStorage} from 'react-native';
+import {Platform, View, Text, ActivityIndicator, StyleSheet} from 'react-native';
 
 import {
     createStackNavigator,
@@ -19,11 +19,13 @@ import ThreadDetailScreen from "./src/screens/ThreadDetailScreen";
 import LoginScreen from "./src/screens/LoginScreen";
 import {fetcher} from "./src/utils/Fetcher";
 import {CLIENT_ID, CLIENT_SECRET} from "./src/Config";
-import {getOAuthData, saveToken, Token} from "./src/utils/Token";
+import {Token} from "./src/utils/Token";
+import ForumScreen from "./src/screens/ForumScreen";
 
 const AppRootStack = createStackNavigator({
     Home: HomeScreen,
     ThreadDetail: ThreadDetailScreen,
+    Forum: ForumScreen,
 
 
     // oauth screens
@@ -64,7 +66,7 @@ export default class App extends Component<Props> {
             }).then((response) => {
                 Token.saveToken(response);
                 loadDone();
-            }).catch((errors) => {
+            }).catch(() => {
                 loadDone();
             });
         };
@@ -79,7 +81,7 @@ export default class App extends Component<Props> {
                     loadDone();
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 loadDone();
             });
     }
