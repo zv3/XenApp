@@ -1,7 +1,7 @@
-import React from "react"
-import {TouchableOpacity, Text} from "react-native"
-import PropTypes from "prop-types"
-import Icon from "react-native-vector-icons/Feather"
+import React from 'react';
+import { TouchableOpacity, Text } from 'react-native';
+import PropTypes from 'prop-types';
+import Icon from 'react-native-vector-icons/Feather';
 
 class Button extends React.Component {
     static propTypes = {
@@ -22,7 +22,11 @@ class Button extends React.Component {
         let textView;
 
         if (this.props.text && this.props.text.length > 0) {
-            textView = (<Text style={{ fontSize: 18 }} {...this.props.textProps}>{this.props.text}</Text>);
+            textView = (
+                <Text style={{ fontSize: 18 }} {...this.props.textProps}>
+                    {this.props.text}
+                </Text>
+            );
         }
 
         return (
@@ -53,7 +57,7 @@ class ButtonIcon extends React.Component {
     render() {
         let iconStyle;
         if (this.props.text) {
-            iconStyle = {marginRight: 5};
+            iconStyle = { marginRight: 5 };
         }
 
         // const _style = getButtonStyle(this.props.type, this.props.disabled),
@@ -70,15 +74,17 @@ class ButtonIcon extends React.Component {
         //     }
         // }
 
-        const iconView = (<Icon name={this.props.iconName}
-                                style={iconStyle}
-                                color={this.props.iconColor}
-                                size={this.props.iconSize} />);
+        const iconView = (
+            <Icon
+                name={this.props.iconName}
+                style={iconStyle}
+                color={this.props.iconColor}
+                size={this.props.iconSize}
+            />
+        );
 
-        return <Button {...this.props} iconView={iconView}/>;
+        return <Button {...this.props} iconView={iconView} />;
     }
 }
 
-export {
-    Button, ButtonIcon
-};
+export { Button, ButtonIcon };

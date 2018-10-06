@@ -1,6 +1,12 @@
-import React from "react"
-import {View, Text, StyleSheet, Dimensions, LayoutAnimation} from "react-native"
-import PropTypes from "prop-types"
+import React from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Dimensions,
+    LayoutAnimation
+} from 'react-native';
+import PropTypes from 'prop-types';
 
 export default class SnackBar extends React.Component {
     constructor(props) {
@@ -56,7 +62,9 @@ export default class SnackBar extends React.Component {
     render() {
         return (
             <View style={[styles.container, { bottom: this.state.offsetY }]}>
-                <Text style={{ color: '#fff', textAlign: 'center' }}>{this.state.text}</Text>
+                <Text style={{ color: '#fff', textAlign: 'center' }}>
+                    {this.state.text}
+                </Text>
             </View>
         );
     }
@@ -71,7 +79,7 @@ const styles = StyleSheet.create({
 
         shadowColor: '#000',
         shadowOpacity: 0.12,
-        shadowOffset: { width: 0, height: -1},
+        shadowOffset: { width: 0, height: -1 },
         width: Dimensions.get('window').width - 60,
 
         position: 'absolute'

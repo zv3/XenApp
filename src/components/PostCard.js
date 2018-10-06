@@ -1,11 +1,15 @@
-import React from "react"
-import {View, Text, StyleSheet, Image} from "react-native"
-import PropTypes from "prop-types"
-import HTMLView from "react-native-htmlview"
-import {ButtonIcon} from "./Button";
+import React from 'react';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import PropTypes from 'prop-types';
+import HTMLView from 'react-native-htmlview';
+import { ButtonIcon } from './Button';
 
 export const PostCardSeparator = () => {
-    return <View style={{ with: '100%', height: 10, backgroundColor: '#ececec' }}/>
+    return (
+        <View
+            style={{ with: '100%', height: 10, backgroundColor: '#ececec' }}
+        />
+    );
 };
 
 export default class PostCard extends React.Component {
@@ -18,7 +22,10 @@ export default class PostCard extends React.Component {
 
         return (
             <View style={styles.header}>
-                <Image source={{ uri: post.links.poster_avatar }} style={styles.avatar}/>
+                <Image
+                    source={{ uri: post.links.poster_avatar }}
+                    style={styles.avatar}
+                />
                 <View style={{ flex: 1 }}>
                     <Text style={styles.user}>{post.poster_username}</Text>
                     <Text>{post.post_create_date}</Text>
@@ -31,7 +38,7 @@ export default class PostCard extends React.Component {
         const post = this.props.post;
         return (
             <View style={styles.body}>
-                <HTMLView value={post.post_body_html} paragraphBreak=""/>
+                <HTMLView value={post.post_body_html} paragraphBreak="" />
             </View>
         );
     }
@@ -46,17 +53,26 @@ export default class PostCard extends React.Component {
         };
 
         const renderButton = (icon, text, disabled = false) => {
-            return <ButtonIcon iconName={icon} text={text}
-                               iconSize={18}
-                               disabled={disabled}
-                               style={styles.footerButton}
-                               textProps={textProps}/>
+            return (
+                <ButtonIcon
+                    iconName={icon}
+                    text={text}
+                    iconSize={18}
+                    disabled={disabled}
+                    style={styles.footerButton}
+                    textProps={textProps}
+                />
+            );
         };
 
         return (
             <View style={styles.footer}>
                 {renderButton('thumbs-up', 'Like', !post.permissions.like)}
-                {renderButton('message-square', 'Reply', !post.permissions.reply)}
+                {renderButton(
+                    'message-square',
+                    'Reply',
+                    !post.permissions.reply
+                )}
                 {renderButton('share', 'Share')}
             </View>
         );
@@ -74,13 +90,13 @@ export default class PostCard extends React.Component {
 }
 
 const styles = StyleSheet.create({
-   container: {
+    container: {
         flex: 1,
         backgroundColor: 'white'
-   },
+    },
 
     header: {
-        flex:1,
+        flex: 1,
         flexDirection: 'row',
         backgroundColor: '#f5f5f5',
         padding: 10,
@@ -107,7 +123,7 @@ const styles = StyleSheet.create({
     },
 
     footerButton: {
-       flex: 1,
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center'
@@ -122,7 +138,7 @@ const styles = StyleSheet.create({
     },
 
     user: {
-       fontSize: 16,
+        fontSize: 16,
         fontWeight: 'bold',
         color: '#2577b1'
     }

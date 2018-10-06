@@ -1,18 +1,18 @@
-import React from "react"
-import {View, Text, FlatList} from "react-native"
-import BaseScreen, {LoadingState} from "./BaseScreen";
-import {fetcher} from "../utils/Fetcher";
-import PropTypes from "prop-types"
-import PageNav from "../components/PageNav";
-import PostCard, {PostCardSeparator} from "../components/PostCard";
-import ReplyBox from "../components/ReplyBox";
+import React from 'react';
+import { View, Text, FlatList } from 'react-native';
+import BaseScreen, { LoadingState } from './BaseScreen';
+import { fetcher } from '../utils/Fetcher';
+import PropTypes from 'prop-types';
+import PageNav from '../components/PageNav';
+import PostCard, { PostCardSeparator } from '../components/PostCard';
+import ReplyBox from '../components/ReplyBox';
 
 export default class ThreadDetailScreen extends BaseScreen {
     static propTypes = {
         navigation: PropTypes.object.isRequired
     };
 
-    static navigationOptions = ({navigation}) => {
+    static navigationOptions = ({ navigation }) => {
         const threadTitle = navigation.getParam('title');
 
         return {
@@ -30,19 +30,22 @@ export default class ThreadDetailScreen extends BaseScreen {
     }
 
     _doRenderItem(item) {
-        return <PostCard post={item}/>;
+        return <PostCard post={item} />;
     }
 
-    _gotoPage(link, page) {
-    }
+    _gotoPage(link, page) {}
 
     _doRenderPageNav() {
         if (!this.state.showPageNav || !this.state.links) {
             return null;
         }
 
-        return <PageNav links={this.state.links}
-                        gotoPage={(link, page) => this._gotoPage(link, page)}/>
+        return (
+            <PageNav
+                links={this.state.links}
+                gotoPage={(link, page) => this._gotoPage(link, page)}
+            />
+        );
     }
 
     _doReply(message) {
@@ -50,17 +53,24 @@ export default class ThreadDetailScreen extends BaseScreen {
     }
 
     _doRenderReplyBox() {
-        return <ReplyBox ref="ReplyBox" onSubmit={(message) => this._doReply(message)}/>
+        return (
+            <ReplyBox
+                ref="ReplyBox"
+                onSubmit={(message) => this._doReply(message)}
+            />
+        );
     }
 
     _doRender() {
         return (
             <View style={{ flex: 1, paddingBottom: 60 }}>
-                <FlatList renderItem={({item}) => this._doRenderItem(item)}
-                          data={this.state.posts}
-                          ItemSeparatorComponent={() => PostCardSeparator()}
-                          keyExtractor={(item, index) => JSON.stringify(item.post_id)}
-                          maxToRenderPerBatch={4}/>
+                <FlatList
+                    renderItem={({ item }) => this._doRenderItem(item)}
+                    data={this.state.posts}
+                    ItemSeparatorComponent={() => PostCardSeparator()}
+                    keyExtractor={(item, index) => JSON.stringify(item.post_id)}
+                    maxToRenderPerBatch={4}
+                />
                 {this._doRenderPageNav()}
                 {this._doRenderReplyBox()}
             </View>
@@ -87,7 +97,8 @@ export default class ThreadDetailScreen extends BaseScreen {
             }
         ];
 
-        fetcher.post('batch', { body: JSON.stringify(batchParams) })
+        fetcher
+            .post('batch', { body: JSON.stringify(batchParams) })
             .then((response) => {
                 this._setLoadingState(LoadingState.Done);
 

@@ -1,6 +1,6 @@
-import querystring from "querystring";
-import {BASE_URL} from "../Config";
-import {Token} from "./Token";
+import querystring from 'querystring';
+import { BASE_URL } from '../Config';
+import { Token } from './Token';
 
 const get = (uri, options = {}) => {
     return request('GET', uri, options);
@@ -16,13 +16,17 @@ const del = (uri, options = {}) => {
 };
 
 const request = (method, uri, options) => {
-    let config = Object.assign({}, {
-        method: method,
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    }, options);
+    let config = Object.assign(
+        {},
+        {
+            method: method,
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        },
+        options
+    );
     if (!config.hasOwnProperty('cache')) {
         config.cache = 'default';
     }
@@ -57,7 +61,7 @@ const request = (method, uri, options) => {
     } else {
         if (uri.indexOf('batch') === 0) {
             if (uri.indexOf('oauth_token=') === -1) {
-                uri = `${uri}&oauth_token=${Token.accessToken()}`
+                uri = `${uri}&oauth_token=${Token.accessToken()}`;
             }
         }
 
@@ -79,19 +83,20 @@ const request = (method, uri, options) => {
     }
 
     return new Promise((resolve, reject) => {
-         const timeoutId = setTimeout(() => {
+        const timeoutId = setTimeout(() => {
             exceeded = true;
 
             reject(['Request time out']);
-         }, timeout);
+        }, timeout);
 
-         fetch(uri, config)
-             .then((response) => response.json())
-             .then((response) => {
+        fetch(uri, config)
+            .then((response) => response.json())
+            .then((response) => {
                 clearTimeout(timeoutId);
 
-                if (response.hasOwnProperty('errors')
-                    && response.status === 'error'
+                if (
+                    response.hasOwnProperty('errors') &&
+                    response.status === 'error'
                 ) {
                     reject(response.errors);
 
@@ -103,17 +108,20 @@ const request = (method, uri, options) => {
                 } else {
                     resolve(response);
                 }
-             })
-             .catch((error) => {
-                 if (exceeded) {
-                     return;
-                 }
+            })
+            .catch((error) => {
+                if (exceeded) {
+                    return;
+                }
 
-                 reject(error);
-             });
+                reject(error);
+            });
     });
 };
 
 export const fetcher = {
-    get, post, put, del
+    get,
+    post,
+    put,
+    del
 };

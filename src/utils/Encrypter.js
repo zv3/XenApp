@@ -1,5 +1,5 @@
-import CryptoJS from "crypto-js"
-import {CLIENT_SECRET} from "../Config";
+import CryptoJS from 'crypto-js';
+import { CLIENT_SECRET } from '../Config';
 
 const passwordEncrypter = (password) => {
     const key = CryptoJS.MD5(CLIENT_SECRET);
@@ -11,6 +11,4 @@ const passwordEncrypter = (password) => {
     return encrypted.toString();
 };
 
-export {
-    passwordEncrypter
-}
+export { passwordEncrypter };

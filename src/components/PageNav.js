@@ -1,7 +1,14 @@
-import React from "react"
-import {View, Text, StyleSheet, Dimensions, Animated, LayoutAnimation} from "react-native"
-import PropTypes from "prop-types"
-import {ButtonIcon} from "./Button";
+import React from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Dimensions,
+    Animated,
+    LayoutAnimation
+} from 'react-native';
+import PropTypes from 'prop-types';
+import { ButtonIcon } from './Button';
 
 export default class PageNav extends React.Component {
     static propTypes = {
@@ -33,10 +40,14 @@ export default class PageNav extends React.Component {
     }
 
     _doRenderButton(iconName, disabled = false) {
-        return <ButtonIcon iconName={iconName}
-                           disabled={disabled}
-                           iconColor={disabled ? '#888888' : 'rgba(255, 255, 255, 0.88)'}
-                           onPress={() => this._onItemPressed(iconName)}/>;
+        return (
+            <ButtonIcon
+                iconName={iconName}
+                disabled={disabled}
+                iconColor={disabled ? '#888888' : 'rgba(255, 255, 255, 0.88)'}
+                onPress={() => this._onItemPressed(iconName)}
+            />
+        );
     }
 
     show() {
@@ -56,12 +67,20 @@ export default class PageNav extends React.Component {
         const links = this.props.links;
 
         return (
-            <View style={[styles.container, {bottom: this.state.offsetY}]}>
+            <View style={[styles.container, { bottom: this.state.offsetY }]}>
                 {this._doRenderButton('chevrons-left', links.page === 1)}
                 {this._doRenderButton('chevron-left', links.page === 1)}
-                <Text style={styles.text}>{this.props.links.page} / {this.props.links.pages}</Text>
-                {this._doRenderButton('chevron-right', links.page === links.pages)}
-                {this._doRenderButton('chevrons-right', links.page === links.pages)}
+                <Text style={styles.text}>
+                    {this.props.links.page} / {this.props.links.pages}
+                </Text>
+                {this._doRenderButton(
+                    'chevron-right',
+                    links.page === links.pages
+                )}
+                {this._doRenderButton(
+                    'chevrons-right',
+                    links.page === links.pages
+                )}
             </View>
         );
     }
@@ -79,7 +98,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        left: (Dimensions.get('window').width - 220)/2,
+        left: (Dimensions.get('window').width - 220) / 2,
         paddingLeft: 10,
         paddingRight: 10
     },

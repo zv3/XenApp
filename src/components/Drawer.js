@@ -1,8 +1,14 @@
-import React from "react"
-import {View, TouchableHighlight, FlatList, Text, StyleSheet} from "react-native";
-import Icon from "react-native-vector-icons/Feather"
-import PropTypes from "prop-types"
-import {ButtonIcon} from "./Button";
+import React from 'react';
+import {
+    View,
+    TouchableHighlight,
+    FlatList,
+    Text,
+    StyleSheet
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Feather';
+import PropTypes from 'prop-types';
+import { ButtonIcon } from './Button';
 
 class DrawerTrigger extends React.Component {
     static propTypes = {
@@ -26,11 +32,13 @@ class DrawerTrigger extends React.Component {
 
     render() {
         return (
-            <ButtonIcon iconName={this.props.isBack ? 'chevron-left' : 'menu'}
-                        iconColor="red"
-                        iconSize={this.props.iconSize}
-                        style={{ marginLeft: 10 }}
-                        onPress={() => this._onPressed()}/>
+            <ButtonIcon
+                iconName={this.props.isBack ? 'chevron-left' : 'menu'}
+                iconColor="red"
+                iconSize={this.props.iconSize}
+                style={{ marginLeft: 10 }}
+                onPress={() => this._onPressed()}
+            />
         );
     }
 }
@@ -55,7 +63,15 @@ class DrawerMenuContent extends React.Component {
     _doRenderUser() {
         return (
             <View style={styles.header}>
-                <Text style={{ color: '#fff', fontSize: 16, marginTop: 10, fontWeight: 'bold' }}>{user.username}</Text>
+                <Text
+                    style={{
+                        color: '#fff',
+                        fontSize: 16,
+                        marginTop: 10,
+                        fontWeight: 'bold'
+                    }}>
+                    {user.username}
+                </Text>
             </View>
         );
     }
@@ -104,7 +120,7 @@ class DrawerMenuContent extends React.Component {
         if (this.state.user) {
             userHeader = this._doRenderUser();
         } else {
-            userHeader = (<View style={{ height: 120 }}/>);
+            userHeader = <View style={{ height: 120 }} />;
         }
 
         return (
@@ -112,14 +128,19 @@ class DrawerMenuContent extends React.Component {
                 {userHeader}
                 <FlatList
                     data={navItems}
-                    renderItem={({item, separators}) => (
+                    renderItem={({ item, separators }) => (
                         <TouchableHighlight
                             onPress={() => this._onPress(item)}
                             underlayColor="rgb(237, 246, 253)">
-
                             <View style={styles.item}>
-                                <Icon name={item.icon} size={20} style={{ paddingRight: 20 }} />
-                                <Text style={{ fontSize: 16 }}>{item.title}</Text>
+                                <Icon
+                                    name={item.icon}
+                                    size={20}
+                                    style={{ paddingRight: 20 }}
+                                />
+                                <Text style={{ fontSize: 16 }}>
+                                    {item.title}
+                                </Text>
                             </View>
                         </TouchableHighlight>
                     )}
@@ -129,7 +150,7 @@ class DrawerMenuContent extends React.Component {
     }
 }
 
-export {DrawerTrigger, DrawerMenuContent};
+export { DrawerTrigger, DrawerMenuContent };
 
 const styles = StyleSheet.create({
     container: {
@@ -142,7 +163,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'red',
         height: 160,
         padding: 15,
-        justifyContent:'flex-end'
+        justifyContent: 'flex-end'
     },
 
     item: {

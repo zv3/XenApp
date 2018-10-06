@@ -1,14 +1,16 @@
-import CryptoJs from "crypto-js";
-import {randomString} from "./Random"
-import {CLIENT_ID, CLIENT_SECRET} from "../Config";
-import {AsyncStorage} from "react-native";
+import CryptoJs from 'crypto-js';
+import { randomString } from './Random';
+import { CLIENT_ID, CLIENT_SECRET } from '../Config';
+import { AsyncStorage } from 'react-native';
 
 let oAuthData_ = null;
 
 const oneTimeToken = () => {
     const ts = Date.now() + 30 * 60;
 
-    const once = CryptoJs.MD5(`0${ts}${randomString(16)}${CLIENT_SECRET}`).toString();
+    const once = CryptoJs.MD5(
+        `0${ts}${randomString(16)}${CLIENT_SECRET}`
+    ).toString();
     return `0,${ts},${once},${CLIENT_ID}`;
 };
 
@@ -44,8 +46,7 @@ const getOAuthData = () => {
                 let oAuthDataJson;
                 try {
                     oAuthDataJson = JSON.parse(data);
-                } catch (e) {
-                }
+                } catch (e) {}
 
                 if (!oAuthDataJson) {
                     reject('Invalid oauth data');
@@ -57,7 +58,7 @@ const getOAuthData = () => {
             })
             .catch((error) => {
                 reject(error);
-            })
+            });
     });
 };
 
@@ -66,6 +67,8 @@ const setOAuthData = (oAuthData) => {
 };
 
 export const Token = {
-    oneTimeToken, accessToken, saveToken,
+    oneTimeToken,
+    accessToken,
+    saveToken,
     getOAuthData
 };

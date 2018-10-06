@@ -1,10 +1,20 @@
-import React from "react"
-import {View, Text, StyleSheet, Image, TouchableHighlight} from "react-native"
-import {NavigationActions} from "react-navigation"
-import PropTypes from "prop-types"
+import React from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Image,
+    TouchableHighlight
+} from 'react-native';
+import { NavigationActions } from 'react-navigation';
+import PropTypes from 'prop-types';
 
 export const ThreadRowSeparator = () => {
-    return <View style={{ width: '100%', height: 1, backgroundColor: '#e7e7e7' }}/>;
+    return (
+        <View
+            style={{ width: '100%', height: 1, backgroundColor: '#e7e7e7' }}
+        />
+    );
 };
 
 export default class ThreadRow extends React.Component {
@@ -21,7 +31,11 @@ export default class ThreadRow extends React.Component {
             message = `${message.substr(0, 150)}...`;
         }
 
-        return <Text style={{ fontSize: 14, flexWrap: 'wrap', color: '#505050' }}>{message}</Text>;
+        return (
+            <Text style={{ fontSize: 14, flexWrap: 'wrap', color: '#505050' }}>
+                {message}
+            </Text>
+        );
     }
 
     _doRenderMeta() {
@@ -29,7 +43,9 @@ export default class ThreadRow extends React.Component {
 
         return (
             <View style={{ paddingTop: 10 }}>
-                <Text style={{ fontSize: 14, color: '#8c8c8c' }}>{thread.creator_username}</Text>
+                <Text style={{ fontSize: 14, color: '#8c8c8c' }}>
+                    {thread.creator_username}
+                </Text>
             </View>
         );
     }
@@ -51,11 +67,18 @@ export default class ThreadRow extends React.Component {
         const thread = this.props.thread;
 
         return (
-            <TouchableHighlight onPress={() => this._onItemPress()} underlayColor="red">
+            <TouchableHighlight
+                onPress={() => this._onItemPress()}
+                underlayColor="red">
                 <View style={styles.container}>
-                    <Image source={{ uri: thread.links.first_poster_avatar }} style={styles.avatar}/>
+                    <Image
+                        source={{ uri: thread.links.first_poster_avatar }}
+                        style={styles.avatar}
+                    />
                     <View style={{ width: 0, flexGrow: 1, flex: 1 }}>
-                        <Text style={styles.title} numberOfLines={3}>{thread.thread_title}</Text>
+                        <Text style={styles.title} numberOfLines={3}>
+                            {thread.thread_title}
+                        </Text>
                         {this._doRenderPreview()}
                         {this._doRenderMeta()}
                     </View>

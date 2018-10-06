@@ -1,5 +1,5 @@
-import React from "react"
-import {View, ActivityIndicator, Text} from "react-native"
+import React from 'react';
+import { View, ActivityIndicator, Text } from 'react-native';
 
 export const LoadingState = Object.freeze({
     Begin: 0,
@@ -31,14 +31,26 @@ export default class BaseScreen extends React.Component {
     render() {
         if (this.state.loadingState === LoadingState.Begin) {
             return (
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                    <ActivityIndicator/>
-                    <Text style={{ marginTop: 10, fontSize: 18 }}>Loading data...</Text>
+                <View
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                    <ActivityIndicator />
+                    <Text style={{ marginTop: 10, fontSize: 18 }}>
+                        Loading data...
+                    </Text>
                 </View>
             );
         } else if (this.state.loadingState === LoadingState.Error) {
             return (
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <View
+                    style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
                     <Text>Whoops! Something went wrong. Please try again.</Text>
                 </View>
             );

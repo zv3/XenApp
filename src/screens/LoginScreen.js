@@ -1,18 +1,24 @@
-import React from "react"
-import {View, AsyncStorage, TextInput,StyleSheet, ActivityIndicator} from "react-native"
-import {Button} from "../components/Button";
-import {passwordEncrypter} from "../utils/Encrypter";
-import {CLIENT_ID} from "../Config";
-import {fetcher} from "../utils/Fetcher";
-import SnackBar from "../components/SnackBar";
-import {NavigationActions} from "react-navigation"
-import {saveToken, Token} from "../utils/Token";
+import React from 'react';
+import {
+    View,
+    AsyncStorage,
+    TextInput,
+    StyleSheet,
+    ActivityIndicator
+} from 'react-native';
+import { Button } from '../components/Button';
+import { passwordEncrypter } from '../utils/Encrypter';
+import { CLIENT_ID } from '../Config';
+import { fetcher } from '../utils/Fetcher';
+import SnackBar from '../components/SnackBar';
+import { NavigationActions } from 'react-navigation';
+import { saveToken, Token } from '../utils/Token';
 
 export default class LoginScreen extends React.Component {
-    static navigationOptions = ({navigation}) => {
+    static navigationOptions = ({ navigation }) => {
         return {
             title: 'Login'
-        }
+        };
     };
 
     state = {
@@ -21,28 +27,32 @@ export default class LoginScreen extends React.Component {
     };
 
     _onChangeText(name, value) {
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
             ...prevState,
             data: {
                 ...prevState.data,
-                    [name]: value
+                [name]: value
             }
         }));
     }
 
     _doRenderField(name, placeholder) {
-        let secureTextEntry = false, keyboardType = 'default';
+        let secureTextEntry = false,
+            keyboardType = 'default';
         if (name.indexOf('password') === 0) {
             secureTextEntry = true;
         }
 
-        return <TextInput
-            editable={!this.state.isSubmitting}
-            style={styles.input}
-            secureTextEntry={secureTextEntry}
-            keyboardType={keyboardType}
-            onChangeText={(text) => this._onChangeText(name, text)}
-            placeholder={placeholder}/>
+        return (
+            <TextInput
+                editable={!this.state.isSubmitting}
+                style={styles.input}
+                secureTextEntry={secureTextEntry}
+                keyboardType={keyboardType}
+                onChangeText={(text) => this._onChangeText(name, text)}
+                placeholder={placeholder}
+            />
+        );
     }
 
     _doLogin() {
@@ -62,7 +72,8 @@ export default class LoginScreen extends React.Component {
             password_algo: 'aes128'
         };
 
-        fetcher.post('oauth/token', { body: payload })
+        fetcher
+            .post('oauth/token', { body: payload })
             .then((response) => {
                 if (response.hasOwnProperty('access_token')) {
                     // login access.
@@ -91,31 +102,35 @@ export default class LoginScreen extends React.Component {
                         isSubmitting: false
                     });
                 }, 2000);
-            })
+            });
     }
 
     render() {
-        let isDisabled = true, buttonLoading;
+        let isDisabled = true,
+            buttonLoading;
         if (this.state.data.username && this.state.data.password) {
             isDisabled = false;
         }
 
         if (this.state.isSubmitting) {
             isDisabled = true;
-            buttonLoading = <ActivityIndicator color="white"
-                                               style={{ marginRight: 10 }}/>;
+            buttonLoading = (
+                <ActivityIndicator color="white" style={{ marginRight: 10 }} />
+            );
         }
 
         return (
             <View style={styles.container}>
                 {this._doRenderField('username', 'Username or Email')}
                 {this._doRenderField('password', 'Password')}
-                <Button text="LOGIN"
-                        disabled={isDisabled}
-                        textProps={{ style: styles.buttonText }}
-                        onPress={() => this._doLogin()}
-                        iconView={buttonLoading}
-                        style={[styles.submit, {opacity: isDisabled ? 0.4 : 1}]}/>
+                <Button
+                    text="LOGIN"
+                    disabled={isDisabled}
+                    textProps={{ style: styles.buttonText }}
+                    onPress={() => this._doLogin()}
+                    iconView={buttonLoading}
+                    style={[styles.submit, { opacity: isDisabled ? 0.4 : 1 }]}
+                />
                 <SnackBar text="" ref="SnackBar" />
             </View>
         );
@@ -124,7 +139,7 @@ export default class LoginScreen extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-         flex: 1,
+        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         paddingLeft: 20,

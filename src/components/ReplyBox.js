@@ -1,7 +1,7 @@
-import React from "react"
-import {View, Text, StyleSheet, Dimensions, TextInput} from "react-native"
-import {ButtonIcon} from "./Button"
-import PropTypes from "prop-types"
+import React from 'react';
+import { View, Text, StyleSheet, Dimensions, TextInput } from 'react-native';
+import { ButtonIcon } from './Button';
+import PropTypes from 'prop-types';
 
 export default class ReplyBox extends React.Component {
     state = {
@@ -46,13 +46,14 @@ export default class ReplyBox extends React.Component {
         this.props.onSubmit(message);
     }
 
-    _doRenderQuoteText() {
-    }
+    _doRenderQuoteText() {}
 
     render() {
-        const isDisabled = this.message().length === 0 || this.state.isSubmitting;
+        const isDisabled =
+            this.message().length === 0 || this.state.isSubmitting;
 
-        let iconColor = 'white', buttonStyle;
+        let iconColor = 'white',
+            buttonStyle;
         if (isDisabled) {
             iconColor = 'rgba(0,0,0,.26)';
             buttonStyle = {
@@ -62,18 +63,22 @@ export default class ReplyBox extends React.Component {
 
         return (
             <View style={styles.container}>
-                <TextInput style={styles.input}
-                           multiline={true}
-                           editable={!this.state.isSubmitting}
-                           onChangeText={(message) => this.setMessage(message)}
-                           value={this.state.message}
-                           placeholder="Enter an message..."/>
-                <ButtonIcon iconName="send"
-                            iconColor={iconColor}
-                            iconSize={20}
-                            disabled={isDisabled}
-                            onPress={() => this._doSubmit()}
-                            style={[styles.sendButton, buttonStyle]}/>
+                <TextInput
+                    style={styles.input}
+                    multiline={true}
+                    editable={!this.state.isSubmitting}
+                    onChangeText={(message) => this.setMessage(message)}
+                    value={this.state.message}
+                    placeholder="Enter an message..."
+                />
+                <ButtonIcon
+                    iconName="send"
+                    iconColor={iconColor}
+                    iconSize={20}
+                    disabled={isDisabled}
+                    onPress={() => this._doSubmit()}
+                    style={[styles.sendButton, buttonStyle]}
+                />
             </View>
         );
     }
@@ -104,7 +109,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         shadowColor: '#000',
-        shadowOffset: { width: 1, height: 1.5},
+        shadowOffset: { width: 1, height: 1.5 },
         shadowOpacity: 0.12,
 
         position: 'absolute',
