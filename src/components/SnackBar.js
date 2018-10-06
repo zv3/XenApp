@@ -72,11 +72,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#323232',
         justifyContent: 'center',
         padding: 10,
-        borderRadius: 4,
-
-        shadowColor: '#000',
-        shadowOpacity: 0.12,
-        shadowOffset: { width: 0, height: -1 },
         width: Dimensions.get('window').width,
 
         position: 'absolute'

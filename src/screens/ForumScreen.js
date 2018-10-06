@@ -169,17 +169,17 @@ export default class ForumScreen extends BaseScreen {
     }
 
     _onCreateThreadPressed() {
-        // const forum = this.state.forum;
-        //
-        // this.props.navigation.dispatch(
-        //     NavigationActions.navigate({
-        //         routeName: Config.Constants.SCREEN_THREAD_CREATE,
-        //         key: `${Config.Constants.SCREEN_THREAD_CREATE}_${forum.forum_id}`,
-        //         params: {
-        //             forum: forum
-        //         }
-        //     })
-        // );
+        const forum = this.state.forum;
+
+        this.props.navigation.dispatch(
+            NavigationActions.navigate({
+                routeName: 'ThreadCreate',
+                key: `ThreadCreate_${forum.forum_id}`,
+                params: {
+                    forum: forum
+                }
+            })
+        );
     }
 
     _doRenderHeader() {

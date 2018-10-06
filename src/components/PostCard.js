@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import PropTypes from 'prop-types';
-import HTMLView from 'react-native-htmlview';
 import { ButtonIcon } from './Button';
+import Renderer from "bbcode-react-native-view";
 
 export const PostCardSeparator = () => {
     return <View style={styles.separator} />;
@@ -34,7 +34,7 @@ export default class PostCard extends React.Component {
         const post = this.props.post;
         return (
             <View style={styles.body}>
-                <HTMLView value={post.post_body_html} paragraphBreak="" />
+                <Renderer content={post.post_body}/>
             </View>
         );
     }

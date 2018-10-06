@@ -21,11 +21,13 @@ import {fetcher} from "./src/utils/Fetcher";
 import {CLIENT_ID, CLIENT_SECRET} from "./src/Config";
 import {Token} from "./src/utils/Token";
 import ForumScreen from "./src/screens/ForumScreen";
+import ThreadCreateScreen from "./src/screens/ThreadCreateScreen";
 
 const AppRootStack = createStackNavigator({
     Home: HomeScreen,
     ThreadDetail: ThreadDetailScreen,
     Forum: ForumScreen,
+    ThreadCreate: ThreadCreateScreen,
 
 
     // oauth screens

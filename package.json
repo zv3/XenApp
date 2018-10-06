@@ -9,12 +9,12 @@
     "android": "react-native run-android --port=19000"
   },
   "dependencies": {
+    "bbcode-react-native-view": "git+https://github.com/luutruong/bbcode-react-native-view.git",
     "crypto-js": "^3.1.9-1",
     "prop-types": "^15.6.2",
     "querystring": "^0.2.0",
     "react": "16.5.0",
     "react-native": "0.57.1",
-    "react-native-htmlview": "^0.13.0",
     "react-native-vector-icons": "^6.0.0",
     "react-navigation": "^2.17.0"
   },
