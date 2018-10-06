@@ -5,11 +5,7 @@ import HTMLView from 'react-native-htmlview';
 import { ButtonIcon } from './Button';
 
 export const PostCardSeparator = () => {
-    return (
-        <View
-            style={{ with: '100%', height: 10, backgroundColor: '#ececec' }}
-        />
-    );
+    return <View style={styles.separator} />;
 };
 
 export default class PostCard extends React.Component {
@@ -26,7 +22,7 @@ export default class PostCard extends React.Component {
                     source={{ uri: post.links.poster_avatar }}
                     style={styles.avatar}
                 />
-                <View style={{ flex: 1 }}>
+                <View>
                     <Text style={styles.user}>{post.poster_username}</Text>
                     <Text>{post.post_create_date}</Text>
                 </View>
@@ -141,5 +137,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#2577b1'
+    },
+
+    separator: {
+        with: '100%',
+        height: 10,
+        backgroundColor: '#ececec'
     }
 });

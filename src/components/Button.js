@@ -21,9 +21,11 @@ class Button extends React.Component {
     render() {
         let textView;
 
+        const defaultTextSize = { fontSize: 18 };
+
         if (this.props.text && this.props.text.length > 0) {
             textView = (
-                <Text style={{ fontSize: 18 }} {...this.props.textProps}>
+                <Text style={defaultTextSize} {...this.props.textProps}>
                     {this.props.text}
                 </Text>
             );

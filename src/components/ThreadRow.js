@@ -10,11 +10,7 @@ import { NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 
 export const ThreadRowSeparator = () => {
-    return (
-        <View
-            style={{ width: '100%', height: 1, backgroundColor: '#e7e7e7' }}
-        />
-    );
+    return <View style={styles.separator} />;
 };
 
 export default class ThreadRow extends React.Component {
@@ -31,21 +27,24 @@ export default class ThreadRow extends React.Component {
             message = `${message.substr(0, 150)}...`;
         }
 
-        return (
-            <Text style={{ fontSize: 14, flexWrap: 'wrap', color: '#505050' }}>
-                {message}
-            </Text>
-        );
+        return <Text style={styles.bodyText}>{message}</Text>;
     }
 
     _doRenderMeta() {
         const thread = this.props.thread;
+        const style = {
+            container: {
+                paddingTop: 10,
+                text: {
+                    fontSize: 14,
+                    color: '#8c8c8c'
+                }
+            }
+        };
 
         return (
-            <View style={{ paddingTop: 10 }}>
-                <Text style={{ fontSize: 14, color: '#8c8c8c' }}>
-                    {thread.creator_username}
-                </Text>
+            <View style={style.container}>
+                <Text style={style.text}>{thread.creator_username}</Text>
             </View>
         );
     }
@@ -75,7 +74,7 @@ export default class ThreadRow extends React.Component {
                         source={{ uri: thread.links.first_poster_avatar }}
                         style={styles.avatar}
                     />
-                    <View style={{ width: 0, flexGrow: 1, flex: 1 }}>
+                    <View style={styles.body}>
                         <Text style={styles.title} numberOfLines={3}>
                             {thread.thread_title}
                         </Text>
@@ -106,5 +105,23 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#2577b1'
+    },
+
+    body: {
+        width: 0,
+        flexGrow: 1,
+        flex: 1
+    },
+
+    bodyText: {
+        fontSize: 14,
+        flexWrap: 'wrap',
+        color: '#505050'
+    },
+
+    separator: {
+        width: '100%',
+        height: 1,
+        backgroundColor: '#e7e7e7'
     }
 });

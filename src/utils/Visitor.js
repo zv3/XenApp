@@ -22,7 +22,7 @@ const getVisitor = () => {
                             reject(error);
                         });
                 })
-                .catch((error) => {
+                .catch(() => {
                     reject('Invalid oauth data');
                 });
         } else {

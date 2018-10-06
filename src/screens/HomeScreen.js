@@ -8,8 +8,13 @@ import BaseScreen, { LoadingState } from './BaseScreen';
 import ThreadRow, { ThreadRowSeparator } from '../components/ThreadRow';
 import PageNav from '../components/PageNav';
 import { Visitor } from '../utils/Visitor';
+import PropTypes from 'prop-types';
 
 class HomeHeaderRight extends React.Component {
+    static propTypes = {
+        navigation: PropTypes.object.isRequired
+    };
+
     constructor(props) {
         super(props);
 
@@ -23,7 +28,7 @@ class HomeHeaderRight extends React.Component {
             .then((visitor) => {
                 this.setState({ visitor: visitor });
             })
-            .catch((error) => {
+            .catch(() => {
                 this.setState({ visitor: false });
             });
     }
@@ -33,23 +38,34 @@ class HomeHeaderRight extends React.Component {
             this.state.visitor !== null &&
             typeof this.state.visitor === 'object'
         ) {
+            const viewStyle = {
+                container: {
+                    marginRight: 10
+                },
+                avatar: {
+                    width: 28,
+                    height: 28,
+                    borderRadius: 14,
+                    resizeMode: 'contain'
+                }
+            };
+
             return (
-                <View style={{ marginRight: 10 }}>
+                <View style={viewStyle.container}>
                     <Image
                         source={{ uri: this.state.visitor.links.avatar_small }}
-                        style={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: 14,
-                            resizeMode: 'contain'
-                        }}
+                        style={viewStyle.avatar}
                     />
                 </View>
             );
         } else if (this.state.visitor === false) {
+            const loginStyle = {
+                flex: 1,
+                flexDirection: 'row',
+                marginRight: 10
+            };
             return (
-                <View
-                    style={{ flex: 1, flexDirection: 'row', marginRight: 10 }}>
+                <View style={loginStyle}>
                     <ButtonIcon
                         iconName="log-in"
                         onPress={() => {
@@ -81,6 +97,8 @@ export default class HomeScreen extends BaseScreen {
             results: [],
             showPageNav: false
         };
+
+        this._pageNav = null;
     }
 
     componentDidMount() {
@@ -106,7 +124,7 @@ export default class HomeScreen extends BaseScreen {
                     showPageNav: true
                 });
             })
-            .catch((error) => {
+            .catch(() => {
                 this._setLoadingState(LoadingState.Error);
             });
     }
@@ -128,7 +146,7 @@ export default class HomeScreen extends BaseScreen {
                     links: response.links
                 }));
             })
-            .catch((error) => {
+            .catch(() => {
                 this._setLoadingState(LoadingState.Error);
             });
     }
@@ -140,7 +158,7 @@ export default class HomeScreen extends BaseScreen {
 
         return (
             <PageNav
-                ref="PageNav"
+                ref={(c) => (this._pageNav = c)}
                 links={this.state.links}
                 gotoPage={(link, page) => this._gotoPage(link, page)}
             />
@@ -148,7 +166,11 @@ export default class HomeScreen extends BaseScreen {
     }
 
     _doTogglePageNav(show) {
-        show ? this.refs.PageNav.show() : this.refs.PageNav.hide();
+        if (this._pageNav === null) {
+            return;
+        }
+
+        show ? this._pageNav.show() : this._pageNav.hide();
     }
 
     _doRender() {
@@ -165,9 +187,7 @@ export default class HomeScreen extends BaseScreen {
                     onMomentumScrollBegin={() => this._doTogglePageNav(false)}
                     onMomentumScrollEnd={() => this._doTogglePageNav(true)}
                     ItemSeparatorComponent={() => ThreadRowSeparator()}
-                    keyExtractor={(item, index) =>
-                        JSON.stringify(item.thread_id)
-                    }
+                    keyExtractor={(item) => JSON.stringify(item.thread_id)}
                 />
                 {this._doRenderPageNav()}
             </View>

@@ -29,28 +29,28 @@ export default class BaseScreen extends React.Component {
     }
 
     render() {
+        const style = {
+            loading: {
+                marginTop: 10,
+                fontSize: 18
+            },
+            container: {
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center'
+            }
+        };
+
         if (this.state.loadingState === LoadingState.Begin) {
             return (
-                <View
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
+                <View style={style.container}>
                     <ActivityIndicator />
-                    <Text style={{ marginTop: 10, fontSize: 18 }}>
-                        Loading data...
-                    </Text>
+                    <Text style={style.loading}>Loading data...</Text>
                 </View>
             );
         } else if (this.state.loadingState === LoadingState.Error) {
             return (
-                <View
-                    style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
+                <View style={style.container}>
                     <Text>Whoops! Something went wrong. Please try again.</Text>
                 </View>
             );

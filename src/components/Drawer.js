@@ -31,12 +31,14 @@ class DrawerTrigger extends React.Component {
     }
 
     render() {
+        const defaultStyle = { marginLeft: 10 };
+
         return (
             <ButtonIcon
                 iconName={this.props.isBack ? 'chevron-left' : 'menu'}
                 iconColor="red"
                 iconSize={this.props.iconSize}
-                style={{ marginLeft: 10 }}
+                style={defaultStyle}
                 onPress={() => this._onPressed()}
             />
         );
@@ -61,17 +63,16 @@ class DrawerMenuContent extends React.Component {
     }
 
     _doRenderUser() {
+        const defaultUserStyle = {
+            color: '#fff',
+            fontSize: 16,
+            marginTop: 10,
+            fontWeight: 'bold'
+        };
+
         return (
             <View style={styles.header}>
-                <Text
-                    style={{
-                        color: '#fff',
-                        fontSize: 16,
-                        marginTop: 10,
-                        fontWeight: 'bold'
-                    }}>
-                    {user.username}
-                </Text>
+                <Text style={defaultUserStyle}>{this.state.user.username}</Text>
             </View>
         );
     }
@@ -120,15 +121,22 @@ class DrawerMenuContent extends React.Component {
         if (this.state.user) {
             userHeader = this._doRenderUser();
         } else {
-            userHeader = <View style={{ height: 120 }} />;
+            userHeader = null;
         }
+
+        const iconStyle = {
+            paddingRight: 20
+        };
+        const textStyle = {
+            fontSize: 16
+        };
 
         return (
             <View style={styles.container}>
                 {userHeader}
                 <FlatList
                     data={navItems}
-                    renderItem={({ item, separators }) => (
+                    renderItem={({ item }) => (
                         <TouchableHighlight
                             onPress={() => this._onPress(item)}
                             underlayColor="rgb(237, 246, 253)">
@@ -136,11 +144,9 @@ class DrawerMenuContent extends React.Component {
                                 <Icon
                                     name={item.icon}
                                     size={20}
-                                    style={{ paddingRight: 20 }}
+                                    style={iconStyle}
                                 />
-                                <Text style={{ fontSize: 16 }}>
-                                    {item.title}
-                                </Text>
+                                <Text style={textStyle}>{item.title}</Text>
                             </View>
                         </TouchableHighlight>
                     )}

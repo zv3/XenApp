@@ -46,7 +46,9 @@ const getOAuthData = () => {
                 let oAuthDataJson;
                 try {
                     oAuthDataJson = JSON.parse(data);
-                } catch (e) {}
+                } catch (e) {
+                    oAuthDataJson = false;
+                }
 
                 if (!oAuthDataJson) {
                     reject('Invalid oauth data');

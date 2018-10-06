@@ -1,30 +1,35 @@
 import React from 'react';
-import {
-    View,
-    AsyncStorage,
-    TextInput,
-    StyleSheet,
-    ActivityIndicator
-} from 'react-native';
+import { View, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
 import { Button } from '../components/Button';
 import { passwordEncrypter } from '../utils/Encrypter';
 import { CLIENT_ID } from '../Config';
 import { fetcher } from '../utils/Fetcher';
 import SnackBar from '../components/SnackBar';
 import { NavigationActions } from 'react-navigation';
-import { saveToken, Token } from '../utils/Token';
+import { Token } from '../utils/Token';
+import PropTypes from 'prop-types';
 
 export default class LoginScreen extends React.Component {
-    static navigationOptions = ({ navigation }) => {
+    static navigationOptions = () => {
         return {
             title: 'Login'
         };
     };
 
-    state = {
-        data: {},
-        isSubmitting: false
+    static propTypes = {
+        navigation: PropTypes.object.isRequired
     };
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            data: {},
+            isSubmitting: false
+        };
+
+        this._snackBar = null;
+    }
 
     _onChangeText(name, value) {
         this.setState((prevState) => ({
@@ -60,8 +65,8 @@ export default class LoginScreen extends React.Component {
             isSubmitting: true
         });
 
-        if (this.refs.SnackBar) {
-            this.refs.SnackBar.hide();
+        if (this._snackBar !== null) {
+            this._snackBar.hide();
         }
 
         let payload = {
@@ -95,7 +100,9 @@ export default class LoginScreen extends React.Component {
                 });
             })
             .catch((error) => {
-                this.refs.SnackBar.show(error[0]);
+                if (this._snackBar !== null) {
+                    this._snackBar.show(error[0]);
+                }
 
                 setTimeout(() => {
                     this.setState({
@@ -114,10 +121,15 @@ export default class LoginScreen extends React.Component {
 
         if (this.state.isSubmitting) {
             isDisabled = true;
+            const activityStyle = { marginRight: 10 };
             buttonLoading = (
-                <ActivityIndicator color="white" style={{ marginRight: 10 }} />
+                <ActivityIndicator color="white" style={activityStyle} />
             );
         }
+
+        const buttonStyle = {
+            opacity: isDisabled ? 0.4 : 1
+        };
 
         return (
             <View style={styles.container}>
@@ -129,9 +141,12 @@ export default class LoginScreen extends React.Component {
                     textProps={{ style: styles.buttonText }}
                     onPress={() => this._doLogin()}
                     iconView={buttonLoading}
-                    style={[styles.submit, { opacity: isDisabled ? 0.4 : 1 }]}
+                    style={[styles.submit, buttonStyle]}
                 />
-                <SnackBar text="" ref="SnackBar" />
+                <SnackBar
+                    text=""
+                    ref={(component) => (this._snackBar = component)}
+                />
             </View>
         );
     }

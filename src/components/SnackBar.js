@@ -6,7 +6,6 @@ import {
     Dimensions,
     LayoutAnimation
 } from 'react-native';
-import PropTypes from 'prop-types';
 
 export default class SnackBar extends React.Component {
     constructor(props) {
@@ -41,7 +40,7 @@ export default class SnackBar extends React.Component {
         this.autoCloseId = setTimeout(() => {
             this.autoCloseId = 0;
             this.hide();
-        }, 3 * 1000);
+        }, duration * 1000);
     }
 
     hide() {
@@ -62,9 +61,7 @@ export default class SnackBar extends React.Component {
     render() {
         return (
             <View style={[styles.container, { bottom: this.state.offsetY }]}>
-                <Text style={{ color: '#fff', textAlign: 'center' }}>
-                    {this.state.text}
-                </Text>
+                <Text style={styles.text}>{this.state.text}</Text>
             </View>
         );
     }
@@ -80,8 +77,13 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOpacity: 0.12,
         shadowOffset: { width: 0, height: -1 },
-        width: Dimensions.get('window').width - 60,
+        width: Dimensions.get('window').width,
 
         position: 'absolute'
+    },
+
+    text: {
+        color: '#fff',
+        textAlign: 'center'
     }
 });

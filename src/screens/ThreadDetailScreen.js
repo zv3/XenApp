@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, FlatList } from 'react-native';
+import { View, FlatList, StyleSheet } from 'react-native';
 import BaseScreen, { LoadingState } from './BaseScreen';
 import { fetcher } from '../utils/Fetcher';
 import PropTypes from 'prop-types';
@@ -27,13 +27,15 @@ export default class ThreadDetailScreen extends BaseScreen {
             ...this.state,
             showPageNav: false
         };
+
+        this._replyBox = null;
     }
 
     _doRenderItem(item) {
         return <PostCard post={item} />;
     }
 
-    _gotoPage(link, page) {}
+    _gotoPage(/*link, page*/) {}
 
     _doRenderPageNav() {
         if (!this.state.showPageNav || !this.state.links) {
@@ -48,14 +50,16 @@ export default class ThreadDetailScreen extends BaseScreen {
         );
     }
 
-    _doReply(message) {
-        this.refs.ReplyBox.clear();
+    _doReply(/*message*/) {
+        if (this._replyBox !== null) {
+            this._replyBox.clear();
+        }
     }
 
     _doRenderReplyBox() {
         return (
             <ReplyBox
-                ref="ReplyBox"
+                ref={(component) => (this._replyBox = component)}
                 onSubmit={(message) => this._doReply(message)}
             />
         );
@@ -63,12 +67,12 @@ export default class ThreadDetailScreen extends BaseScreen {
 
     _doRender() {
         return (
-            <View style={{ flex: 1, paddingBottom: 60 }}>
+            <View style={styles.container}>
                 <FlatList
                     renderItem={({ item }) => this._doRenderItem(item)}
                     data={this.state.posts}
                     ItemSeparatorComponent={() => PostCardSeparator()}
-                    keyExtractor={(item, index) => JSON.stringify(item.post_id)}
+                    keyExtractor={(item) => JSON.stringify(item.post_id)}
                     maxToRenderPerBatch={4}
                 />
                 {this._doRenderPageNav()}
@@ -108,8 +112,15 @@ export default class ThreadDetailScreen extends BaseScreen {
                     links: response.jobs.posts.links
                 });
             })
-            .catch((error) => {
+            .catch(() => {
                 this._setLoadingState(LoadingState.Error);
             });
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        paddingBottom: 60
+    }
+});
