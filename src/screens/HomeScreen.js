@@ -1,44 +1,52 @@
 import React from "react"
-import {View, AsyncStorage, FlatList} from "react-native"
+import {View, FlatList, Image} from "react-native"
 import {fetcher} from "../utils/Fetcher";
 import {DrawerTrigger} from "../components/Drawer";
 import {ButtonIcon} from "../components/Button";
-import {oneTimeToken} from "../utils/Token";
+import {Token} from "../utils/Token";
 import BaseScreen, {LoadingState} from "./BaseScreen";
 import ThreadRow, {ThreadRowSeparator} from "../components/ThreadRow";
 import PageNav from "../components/PageNav";
+import {Visitor} from "../utils/Visitor";
 
 class HomeHeaderRight extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            accessToken: null
+            visitor: null
         };
     }
 
     componentDidMount() {
-        AsyncStorage.getItem('oauthData')
-            .then((data) => {
-                console.log(data)
+        Visitor.getVisitor()
+            .then((visitor) => {
+                this.setState({ visitor: visitor });
             })
             .catch((error) => {
-                // need login.
+                this.setState({ visitor: false });
             })
     }
 
     render() {
-        if (this.state.accessToken === null) {
-            return null;
+        if (this.state.visitor !== null && typeof this.state.visitor === 'object') {
+            return (
+                <View style={{ marginRight: 10 }}>
+                    <Image source={{ uri: this.state.visitor.links.avatar_small }}
+                           style={{ width: 28, height: 28, borderRadius: 14, resizeMode: 'contain' }}/>
+                </View>
+            );
+        } else if (this.state.visitor === false) {
+            return (
+                <View style={{ flex: 1, flexDirection: 'row', marginRight: 10 }}>
+                    <ButtonIcon iconName="log-in" onPress={() => {
+                        this.props.navigation.navigate('Login');
+                    }} />
+                </View>
+            );
         }
 
-        return (
-            <View style={{ flex: 1, flexDirection: 'row', marginRight: 10 }}>
-                <ButtonIcon iconName="log-in" onPress={() => {
-                    this.props.navigation.navigate('Login');
-                }} />
-            </View>
-        );
+        return null;
     }
 }
 
@@ -69,7 +77,7 @@ export default class HomeScreen extends BaseScreen {
             }
         ];
 
-        fetcher.post(`batch&oauth_token=${oneTimeToken()}`, {
+        fetcher.post(`batch&oauth_token=${Token.oneTimeToken()}`, {
             body: JSON.stringify(batchParams)
         }).then((response) => {
             this._setLoadingState(LoadingState.Done);

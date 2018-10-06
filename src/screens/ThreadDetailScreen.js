@@ -87,7 +87,7 @@ export default class ThreadDetailScreen extends BaseScreen {
             }
         ];
 
-        fetcher.post('batch', { body: batchParams })
+        fetcher.post('batch', { body: JSON.stringify(batchParams) })
             .then((response) => {
                 this._setLoadingState(LoadingState.Done);
 

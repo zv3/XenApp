@@ -1,6 +1,6 @@
 import querystring from "querystring";
 import {BASE_URL} from "../Config";
-import {accessToken} from "./Token";
+import {Token} from "./Token";
 
 const get = (uri, options = {}) => {
     return request('GET', uri, options);
@@ -29,7 +29,7 @@ const request = (method, uri, options) => {
 
     const appendAccessToken = (object) => {
         if (!object.hasOwnProperty('oauth_token')) {
-            object.oauth_token = accessToken();
+            object.oauth_token = Token.accessToken();
         }
 
         return object;
@@ -55,15 +55,14 @@ const request = (method, uri, options) => {
             uri = `${uri}&${querystring.stringify(query)}`;
         }
     } else {
-        if (typeof config.body === 'object') {
-            if (uri.indexOf('batch') === 0) {
-                if (uri.indexOf('oauth_token=') === -1) {
-                    uri = `${uri}&${accessToken()}`
-                }
-            } else {
-                config.body = appendAccessToken(config.body);
+        if (uri.indexOf('batch') === 0) {
+            if (uri.indexOf('oauth_token=') === -1) {
+                uri = `${uri}&oauth_token=${Token.accessToken()}`
             }
+        }
 
+        if (typeof config.body === 'object') {
+            config.body = appendAccessToken(config.body);
             config.body = querystring.stringify(config.body);
         }
     }

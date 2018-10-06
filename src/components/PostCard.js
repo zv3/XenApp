@@ -46,7 +46,7 @@ export default class PostCard extends React.Component {
         };
 
         const renderButton = (icon, text, disabled = false) => {
-            return <ButtonIcon iconName="thumbs-up" text="Like"
+            return <ButtonIcon iconName={icon} text={text}
                                iconSize={18}
                                disabled={disabled}
                                style={styles.footerButton}

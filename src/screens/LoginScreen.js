@@ -6,6 +6,7 @@ import {CLIENT_ID} from "../Config";
 import {fetcher} from "../utils/Fetcher";
 import SnackBar from "../components/SnackBar";
 import {NavigationActions} from "react-navigation"
+import {saveToken, Token} from "../utils/Token";
 
 export default class LoginScreen extends React.Component {
     static navigationOptions = ({navigation}) => {
@@ -65,19 +66,13 @@ export default class LoginScreen extends React.Component {
             .then((response) => {
                 if (response.hasOwnProperty('access_token')) {
                     // login access.
-                    let oauthData = {
-                        accessToken: response.access_token,
-                        expiresAt: Date.now() + response.expires_in * 1000,
-                        refreshToken: response.refresh_token,
-                        userId: response.user_id
-                    };
 
-                    AsyncStorage.setItem('oauthData', JSON.stringify(oauthData));
+                    Token.saveToken(response);
 
                     this.props.navigation.dispatch(
                         NavigationActions.navigate({
                             routeName: 'Home',
-                            key: `home_${oauthData.userId}`
+                            key: `home_${response.user_id}`
                         })
                     );
 

@@ -17,6 +17,9 @@ import HomeScreen from "./src/screens/HomeScreen";
 import {DrawerMenuContent} from "./src/components/Drawer"
 import ThreadDetailScreen from "./src/screens/ThreadDetailScreen";
 import LoginScreen from "./src/screens/LoginScreen";
+import {fetcher} from "./src/utils/Fetcher";
+import {CLIENT_ID, CLIENT_SECRET} from "./src/Config";
+import {getOAuthData, saveToken, Token} from "./src/utils/Token";
 
 const AppRootStack = createStackNavigator({
     Home: HomeScreen,
@@ -48,23 +51,33 @@ export default class App extends Component<Props> {
             this.setState({ isLoading: false })
         };
 
-        AsyncStorage.getItem('oauthData')
-            .then((data) => {
-                // TODO: Refresh token?
-                let oauthData;
+        const refreshToken = (oAuthData) => {
+            const payload = {
+                grant_type: 'refresh_token',
+                client_id: CLIENT_ID,
+                client_secret: CLIENT_SECRET,
+                refresh_token: oAuthData.refreshToken
+            };
 
-                try {
-                    oauthData = JSON.parse(data);
-                } catch (e) {
-                }
+            fetcher.post('oauth/token', {
+                body: payload
+            }).then((response) => {
+                Token.saveToken(response);
+                loadDone();
+            }).catch((errors) => {
+                loadDone();
+            });
+        };
 
-                if (!oauthData) {
+        Token.getOAuthData()
+            .then((oauthData) => {
+                const aMinuteMS = 60 * 1000;
+                if (!oauthData.expiresAt || (oauthData.expiresAt - Date.now()) < aMinuteMS) {
+                    // Need refresh token
+                    refreshToken(oauthData);
+                } else {
                     loadDone();
-
-                    return;
                 }
-
-                Object.freeze()
             })
             .catch((error) => {
                 loadDone();
