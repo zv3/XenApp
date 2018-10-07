@@ -1,0 +1,3 @@
+export const CLIENT_ID = "XGDbREwbnKFyuLeD";
+export const CLIENT_SECRET = "L2zNuqVzWt5oTIBEBZ5d7qLIjYZedO1V";
+export const BASE_URL = "https://nobita.me";

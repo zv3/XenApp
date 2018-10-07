@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import PropTypes from 'prop-types';
 import { ButtonIcon } from './Button';
-import Renderer from "bbcode-react-native-view";
+import Renderer from './../bbcode/Renderer';
 
 export const PostCardSeparator = () => {
     return <View style={styles.separator} />;

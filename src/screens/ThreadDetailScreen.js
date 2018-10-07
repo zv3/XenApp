@@ -73,7 +73,8 @@ export default class ThreadDetailScreen extends BaseScreen {
                     data={this.state.posts}
                     ItemSeparatorComponent={() => PostCardSeparator()}
                     keyExtractor={(item) => JSON.stringify(item.post_id)}
-                    maxToRenderPerBatch={4}
+                    maxToRenderPerBatch={1}
+                    initialNumToRender={1}
                 />
                 {this._doRenderPageNav()}
                 {this._doRenderReplyBox()}
@@ -121,6 +122,6 @@ export default class ThreadDetailScreen extends BaseScreen {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingBottom: 60
+        // paddingBottom: 60
     }
 });
