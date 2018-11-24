@@ -20,47 +20,7 @@ export default class LoginScreen extends React.Component {
         navigation: PropTypes.object.isRequired
     };
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            data: {},
-            isSubmitting: false
-        };
-
-        this._snackBar = null;
-    }
-
-    _onChangeText(name, value) {
-        this.setState((prevState) => ({
-            ...prevState,
-            data: {
-                ...prevState.data,
-                [name]: value
-            }
-        }));
-    }
-
-    _doRenderField(name, placeholder) {
-        let secureTextEntry = false,
-            keyboardType = 'default';
-        if (name.indexOf('password') === 0) {
-            secureTextEntry = true;
-        }
-
-        return (
-            <TextInput
-                editable={!this.state.isSubmitting}
-                style={styles.input}
-                secureTextEntry={secureTextEntry}
-                keyboardType={keyboardType}
-                onChangeText={(text) => this._onChangeText(name, text)}
-                placeholder={placeholder}
-            />
-        );
-    }
-
-    _doLogin() {
+    _doLogin = () => {
         this.setState({
             isSubmitting: true
         });
@@ -110,39 +70,66 @@ export default class LoginScreen extends React.Component {
                     });
                 }, 2000);
             });
+    };
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            data: {},
+            isSubmitting: false
+        };
+
+        this._snackBar = null;
+    }
+
+    _onChangeText(name, value) {
+        this.setState((prevState) => ({
+            ...prevState,
+            data: {
+                ...prevState.data,
+                [name]: value
+            }
+        }));
+    }
+
+    _doRenderField(name, placeholder) {
+        let secureTextEntry = false,
+            keyboardType = 'default';
+        if (name.indexOf('password') === 0) {
+            secureTextEntry = true;
+        }
+
+        return (
+            <TextInput
+                editable={!this.state.isSubmitting}
+                style={styles.input}
+                secureTextEntry={secureTextEntry}
+                keyboardType={keyboardType}
+                onChangeText={(text) => this._onChangeText(name, text)}
+                placeholder={placeholder}
+            />
+        );
     }
 
     render() {
-        let isDisabled = true,
-            buttonLoading;
+        let isDisabled = true;
         if (this.state.data.username && this.state.data.password) {
             isDisabled = false;
         }
-
-        if (this.state.isSubmitting) {
-            isDisabled = true;
-            const activityStyle = { marginRight: 10 };
-            buttonLoading = (
-                <ActivityIndicator color="white" style={activityStyle} />
-            );
-        }
-
-        const buttonStyle = {
-            opacity: isDisabled ? 0.4 : 1
-        };
 
         return (
             <View style={styles.container}>
                 {this._doRenderField('username', 'Username or Email')}
                 {this._doRenderField('password', 'Password')}
                 <Button
-                    text="LOGIN"
+                    title="Login"
                     disabled={isDisabled}
-                    textProps={{ style: styles.buttonText }}
-                    onPress={() => this._doLogin()}
-                    iconView={buttonLoading}
-                    style={[styles.submit, buttonStyle]}
-                />
+                    onPress={this._doLogin}>
+                    {this.state.isSubmitting && (
+                        <ActivityIndicator color="white" />
+                    )}
+                </Button>
                 <SnackBar
                     text=""
                     ref={(component) => (this._snackBar = component)}
@@ -183,20 +170,5 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF',
 
         borderRadius: 4
-    },
-
-    submit: {
-        backgroundColor: '#ff4081',
-        width: '100%',
-        padding: 5,
-        borderRadius: 4,
-        marginTop: 10,
-        flexDirection: 'row',
-        justifyContent: 'center'
-    },
-
-    buttonText: {
-        color: '#FFF',
-        fontSize: 16
     }
 });

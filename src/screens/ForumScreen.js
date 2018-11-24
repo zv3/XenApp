@@ -77,7 +77,7 @@ export default class ForumScreen extends BaseScreen {
         }
 
         return fetcher
-            .post('batch', { body: JSON.stringify(batchParams) })
+            .post('batch', JSON.stringify(batchParams))
             .then((response) => {
                 const navItems = response.jobs.navigation.elements;
 

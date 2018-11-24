@@ -45,7 +45,7 @@ export default class BaseScreen extends React.Component {
             return (
                 <View style={style.container}>
                     <ActivityIndicator />
-                    <Text style={style.loading}>Loading data...</Text>
+                    <Text style={style.loading}>Loading...</Text>
                 </View>
             );
         } else if (this.state.loadingState === LoadingState.Error) {

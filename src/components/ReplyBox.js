@@ -11,7 +11,8 @@ export default class ReplyBox extends React.Component {
     };
 
     static propTypes = {
-        onSubmit: PropTypes.func.isRequired
+        onSubmit: PropTypes.func.isRequired,
+        style: PropTypes.object
     };
 
     setMessage(message) {
@@ -33,7 +34,7 @@ export default class ReplyBox extends React.Component {
         return this.state.message.replace(/^(\n|\s+)|(\n|\s+)$/g, '');
     }
 
-    _doSubmit() {
+    _doSubmit = () => {
         const message = this.message();
         if (message.length === 0) {
             return;
@@ -44,7 +45,7 @@ export default class ReplyBox extends React.Component {
         });
 
         this.props.onSubmit(message);
-    }
+    };
 
     _doRenderQuoteText() {}
 
@@ -52,17 +53,8 @@ export default class ReplyBox extends React.Component {
         const isDisabled =
             this.message().length === 0 || this.state.isSubmitting;
 
-        let iconColor = 'white',
-            buttonStyle;
-        if (isDisabled) {
-            iconColor = 'rgba(0,0,0,.26)';
-            buttonStyle = {
-                backgroundColor: 'rgba(0,0,0,.12)'
-            };
-        }
-
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, this.props.style]}>
                 <TextInput
                     style={styles.input}
                     multiline={true}
@@ -71,14 +63,16 @@ export default class ReplyBox extends React.Component {
                     value={this.state.message}
                     placeholder="Enter an message..."
                 />
-                <ButtonIcon
-                    iconName="send"
-                    iconColor={iconColor}
-                    iconSize={20}
-                    disabled={isDisabled}
-                    onPress={() => this._doSubmit()}
-                    style={[styles.sendButton, buttonStyle]}
-                />
+                <View style={styles.submit}>
+                    <ButtonIcon
+                        iconName="send"
+                        iconSize={20}
+                        iconColor={'#FFF'}
+                        disabled={isDisabled}
+                        onPress={this._doSubmit}
+                        style={styles.sendButton}
+                    />
+                </View>
             </View>
         );
     }
@@ -86,11 +80,8 @@ export default class ReplyBox extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexDirection: 'row',
         backgroundColor: 'white',
-        position: 'absolute',
-        bottom: 0,
-        width: '100%',
         padding: 10,
         borderTopWidth: 1,
         borderTopColor: '#e7e7e7'
@@ -98,7 +89,14 @@ const styles = StyleSheet.create({
 
     input: {
         paddingTop: 5,
-        paddingBottom: 5
+        paddingBottom: 5,
+        flexGrow: 1
+    },
+
+    submit: {
+        position: 'absolute',
+        top: -15,
+        right: 10
     },
 
     sendButton: {
@@ -110,10 +108,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 1, height: 1.5 },
-        shadowOpacity: 0.12,
-
-        position: 'absolute',
-        top: -15,
-        right: 15
+        shadowOpacity: 0.12
     }
 });

@@ -1,13 +1,13 @@
-import React from "react"
-import {View, StyleSheet, TextInput, CameraRoll} from "react-native"
-import {Button} from "../components/Button";
-import SnackBar from "../components/SnackBar";
+import React from 'react';
+import { View, StyleSheet, TextInput } from 'react-native';
+import { Button } from '../components/Button';
+import SnackBar from '../components/SnackBar';
 
 export default class ThreadCreateScreen extends React.Component {
-    static navigationOptions = ({ navigation }) => {
-        return  {
+    static navigationOptions = () => {
+        return {
             title: 'Create new thread'
-        }
+        };
     };
 
     constructor(props) {
@@ -31,19 +31,19 @@ export default class ThreadCreateScreen extends React.Component {
     }
 
     _doRenderTextField(name, label) {
-        return <TextInput
-            editable={true}
-            style={styles.input}
-            placeholder={label}
-            onTextChange={(text) => this._setFieldValue(name, text)}/>
+        return (
+            <TextInput
+                editable={true}
+                style={styles.input}
+                placeholder={label}
+                onTextChange={(text) => this._setFieldValue(name, text)}
+            />
+        );
     }
 
-    _doSave() {
-    }
+    _doSave() {}
 
-    _doAttachFiles() {
-
-    }
+    _doAttachFiles() {}
 
     render() {
         return (
@@ -51,8 +51,7 @@ export default class ThreadCreateScreen extends React.Component {
                 {this._doRenderTextField('thread_title', 'Thread Title')}
                 {this._doRenderTextField('thread_body', 'Content')}
 
-                <Button text="Attach files"
-                        onPress={this._doAttachFiles}/>
+                <Button text="Attach files" onPress={this._doAttachFiles} />
 
                 <Button
                     text="SAVE"

@@ -2,18 +2,16 @@ import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import PropTypes from 'prop-types';
 import { ButtonIcon } from './Button';
-import Renderer from './../bbcode/Renderer';
+import HTML from 'react-native-render-html';
 
-export const PostCardSeparator = () => {
-    return <View style={styles.separator} />;
-};
+export const PostCardSeparator = () => <View style={styles.separator} />;
 
 export default class PostCard extends React.Component {
     static propTypes = {
         post: PropTypes.object.isRequired
     };
 
-    _doRenderHeader() {
+    _doRenderHeader = () => {
         const post = this.props.post;
 
         return (
@@ -28,35 +26,28 @@ export default class PostCard extends React.Component {
                 </View>
             </View>
         );
-    }
+    };
 
-    _doRenderBody() {
+    _doRenderBody = () => {
         const post = this.props.post;
         return (
             <View style={styles.body}>
-                <Renderer content={post.post_body}/>
+                <HTML html={post.post_body_html} />
             </View>
         );
-    }
+    };
 
-    _doRenderFooter() {
-        const post = this.props.post;
-
-        const textProps = {
-            style: {
-                fontSize: 16
-            }
-        };
+    _doRenderFooter = () => {
+        const { post } = this.props;
 
         const renderButton = (icon, text, disabled = false) => {
             return (
                 <ButtonIcon
                     iconName={icon}
-                    text={text}
+                    title={text}
                     iconSize={18}
                     disabled={disabled}
                     style={styles.footerButton}
-                    textProps={textProps}
                 />
             );
         };
@@ -72,6 +63,10 @@ export default class PostCard extends React.Component {
                 {renderButton('share', 'Share')}
             </View>
         );
+    };
+
+    shouldComponentUpdate(nextProps): boolean {
+        return nextProps.post.post_id !== this.props.post.post_id;
     }
 
     render() {
@@ -112,14 +107,12 @@ const styles = StyleSheet.create({
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#d8d8d8',
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between'
     },
 
     footerButton: {
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center'

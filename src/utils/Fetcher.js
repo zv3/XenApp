@@ -1,121 +1,110 @@
 import querystring from 'querystring';
 import { BASE_URL } from '../Config';
 import { Token } from './Token';
+import axios from 'axios';
 
-const get = (uri, options = {}) => {
-    return request('GET', uri, options);
-};
-const post = (uri, options) => {
-    return request('POST', uri, options);
-};
-const put = (uri, options) => {
-    return request('PUT', uri, options);
-};
-const del = (uri, options = {}) => {
-    return request('DELETE', uri, options);
-};
-
-const request = (method, uri, options) => {
-    let config = Object.assign(
+const get = (uri, params: any, options: ?Object) => {
+    const opts = Object.assign(
         {},
         {
-            method: method,
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
+            params: params
         },
         options
     );
-    if (!config.hasOwnProperty('cache')) {
-        config.cache = 'default';
+
+    return request('GET', uri, opts);
+};
+const post = (uri, data: any, options: ?Object) => {
+    const opts = Object.assign({}, { data: data }, options);
+
+    return request('POST', uri, opts);
+};
+const put = (uri, data: any, options: ?Object) => {
+    const opts = Object.assign({}, { data: data }, options);
+    return request('PUT', uri, opts);
+};
+const del = (uri, data: any, options: ?Object) => {
+    const opts = Object.assign({}, { data: data }, options);
+
+    return request('DELETE', uri, opts);
+};
+
+const request = (method: String, uri: String, options: Object) => {
+    const opts = Object.assign(
+        {
+            baseURL: BASE_URL,
+            method: method,
+            timeout: 10000,
+            params: {},
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            paramsSerializer: function(params) {
+                return querystring.stringify(params);
+            },
+            validateStatus: function(status) {
+                return status >= 200 && status < 404;
+            },
+            onCancelSetup: null
+        },
+        options
+    );
+
+    const methodUpper = method.toUpperCase();
+    if (
+        typeof opts.data === 'object' &&
+        (methodUpper === 'POST' ||
+            methodUpper === 'PUT' ||
+            methodUpper === 'DELETE')
+    ) {
+        opts.data = querystring.stringify(opts.data);
     }
 
-    const appendAccessToken = (object) => {
-        if (!object.hasOwnProperty('oauth_token')) {
-            object.oauth_token = Token.accessToken();
-        }
-
-        return object;
-    };
-
-    if (config.method === 'GET' || config.method === 'HEAD') {
-        let query;
-        if (config.hasOwnProperty('body')) {
-            query = config.body;
-            delete config.body;
-        } else if (config.hasOwnProperty('query')) {
-            query = config.query;
-            delete config.query;
-        }
-
-        if (query === null || (query && typeof query !== 'object')) {
-            throw new Error('Query must be an object.');
-        }
-
-        if (query) {
-            appendAccessToken(query);
-
-            uri = `${uri}&${querystring.stringify(query)}`;
-        }
-    } else {
-        if (uri.indexOf('batch') === 0) {
-            if (uri.indexOf('oauth_token=') === -1) {
-                uri = `${uri}&oauth_token=${Token.accessToken()}`;
-            }
-        }
-
-        if (typeof config.body === 'object') {
-            config.body = appendAccessToken(config.body);
-            config.body = querystring.stringify(config.body);
-        }
-    }
-
-    let timeout = 30000; // 30 seconds
-    if (config.hasOwnProperty('timeout')) {
-        timeout = config.timeout;
-        delete config.timeout;
-    }
-
-    let exceeded = false;
-    if (uri.indexOf('http') !== 0) {
-        uri = `${BASE_URL}/api/index.php?${uri}`;
+    let onCancelSetup = null;
+    if (opts.onCancelSetup) {
+        onCancelSetup = opts.onCancelSetup;
+        delete opts.onCancelSetup;
     }
 
     return new Promise((resolve, reject) => {
-        const timeoutId = setTimeout(() => {
-            exceeded = true;
+        Token.get().then((token) => {
+            if (!opts.params.oauth_token) {
+                opts.params.oauth_token = token;
+            }
 
-            reject(['Request time out']);
-        }, timeout);
+            opts.url = `api/index.php?${uri}`;
 
-        fetch(uri, config)
-            .then((response) => response.json())
-            .then((response) => {
-                clearTimeout(timeoutId);
+            const CancelToken = axios.CancelToken;
+            const source = CancelToken.source();
 
-                if (
-                    response.hasOwnProperty('errors') &&
-                    response.status === 'error'
-                ) {
-                    reject(response.errors);
+            if (typeof onCancelSetup === 'function') {
+                onCancelSetup(source);
+            }
 
-                    return;
-                }
-
-                if (exceeded) {
-                    reject(['Request time out']);
-                } else {
-                    resolve(response);
-                }
-            })
-            .catch((error) => {
-                if (exceeded) {
-                    return;
-                }
-
-                reject(error);
+            const instance = axios.create({
+                cancelToken: source.token
             });
+
+            instance
+                .request(opts)
+                .then((response) => {
+                    const data = response.data;
+                    if (
+                        data.hasOwnProperty('status') &&
+                        data.status === 'error'
+                    ) {
+                        reject(new Error(data.message));
+                    } else {
+                        resolve(data);
+                    }
+                })
+                .catch((error) => {
+                    axios.isCancel(error)
+                        ? reject(new Error('Request cancelled'))
+                        : reject(error);
+                });
+        });
     });
 };
 

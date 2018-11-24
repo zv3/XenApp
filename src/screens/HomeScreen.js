@@ -3,7 +3,6 @@ import { View, FlatList, Image } from 'react-native';
 import { fetcher } from '../utils/Fetcher';
 import { DrawerTrigger } from '../components/Drawer';
 import { ButtonIcon } from '../components/Button';
-import { Token } from '../utils/Token';
 import BaseScreen, { LoadingState } from './BaseScreen';
 import ThreadRow, { ThreadRowSeparator } from '../components/ThreadRow';
 import PageNav from '../components/PageNav';
@@ -110,9 +109,7 @@ export default class HomeScreen extends BaseScreen {
         ];
 
         fetcher
-            .post(`batch&oauth_token=${Token.oneTimeToken()}`, {
-                body: JSON.stringify(batchParams)
-            })
+            .post('batch', JSON.stringify(batchParams))
             .then((response) => {
                 this._setLoadingState(LoadingState.Done);
 

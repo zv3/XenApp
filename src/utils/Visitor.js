@@ -5,26 +5,22 @@ let visitorObject = null;
 
 const getVisitor = () => {
     return new Promise((resolve, reject) => {
+        const onFailed = () => reject(new Error('Invalid oauth data'));
+
         if (visitorObject === null) {
             Token.getOAuthData()
                 .then((data) => {
                     fetcher
                         .get('users/me', {
-                            query: {
-                                oauth_token: data.accessToken
-                            }
+                            oauth_token: data.accessToken
                         })
                         .then((data) => {
                             visitorObject = Object.freeze(data.user);
                             resolve(visitorObject);
                         })
-                        .catch((error) => {
-                            reject(error);
-                        });
+                        .catch(onFailed);
                 })
-                .catch(() => {
-                    reject('Invalid oauth data');
-                });
+                .catch(onFailed);
         } else {
             resolve(visitorObject);
         }

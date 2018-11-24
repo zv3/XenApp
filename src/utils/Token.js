@@ -6,7 +6,7 @@ import { AsyncStorage } from 'react-native';
 let oAuthData_ = null;
 
 const oneTimeToken = () => {
-    const ts = Date.now() + 30 * 60;
+    const ts = Math.floor(Date.now() / 1000) + 30 * 60;
 
     const once = CryptoJs.MD5(
         `0${ts}${randomString(16)}${CLIENT_SECRET}`
@@ -23,7 +23,7 @@ const accessToken = () => {
 };
 
 const saveToken = (oAuthData) => {
-    let oauthData = {
+    const oauthData = {
         accessToken: oAuthData.access_token,
         expiresAt: Date.now() + oAuthData.expires_in * 1000,
         refreshToken: oAuthData.refresh_token,
@@ -43,15 +43,9 @@ const getOAuthData = () => {
 
         AsyncStorage.getItem('oAuthData')
             .then((data) => {
-                let oAuthDataJson;
-                try {
-                    oAuthDataJson = JSON.parse(data);
-                } catch (e) {
-                    oAuthDataJson = false;
-                }
-
+                let oAuthDataJson = JSON.parse(data);
                 if (!oAuthDataJson) {
-                    reject('Invalid oauth data');
+                    reject(new Error('Invalid oauth data'));
                     return;
                 }
 
@@ -68,9 +62,20 @@ const setOAuthData = (oAuthData) => {
     oAuthData_ = oAuthData;
 };
 
+const get = () => {
+    return new Promise((resolve) => {
+        getOAuthData()
+            .then(resolve)
+            .catch(() => {
+                resolve(oneTimeToken());
+            });
+    });
+};
+
 export const Token = {
     oneTimeToken,
     accessToken,
     saveToken,
-    getOAuthData
+    getOAuthData,
+    get
 };

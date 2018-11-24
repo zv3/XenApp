@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet, SafeAreaView } from 'react-native';
 import BaseScreen, { LoadingState } from './BaseScreen';
 import { fetcher } from '../utils/Fetcher';
 import PropTypes from 'prop-types';
@@ -20,6 +20,12 @@ export default class ThreadDetailScreen extends BaseScreen {
         };
     };
 
+    _doReply = () => {
+        if (this._replyBox !== null) {
+            this._replyBox.clear();
+        }
+    };
+
     constructor(props) {
         super(props);
 
@@ -29,10 +35,6 @@ export default class ThreadDetailScreen extends BaseScreen {
         };
 
         this._replyBox = null;
-    }
-
-    _doRenderItem(item) {
-        return <PostCard post={item} />;
     }
 
     _gotoPage(/*link, page*/) {}
@@ -50,35 +52,30 @@ export default class ThreadDetailScreen extends BaseScreen {
         );
     }
 
-    _doReply(/*message*/) {
-        if (this._replyBox !== null) {
-            this._replyBox.clear();
-        }
-    }
-
-    _doRenderReplyBox() {
-        return (
+    _doRender() {
+        const replyBox = (
             <ReplyBox
                 ref={(component) => (this._replyBox = component)}
-                onSubmit={(message) => this._doReply(message)}
+                onSubmit={this._doReply}
+                style={styles.replyBox}
             />
         );
-    }
+        const renderItem = (item) => <PostCard post={item} />;
 
-    _doRender() {
         return (
-            <View style={styles.container}>
-                <FlatList
-                    renderItem={({ item }) => this._doRenderItem(item)}
-                    data={this.state.posts}
-                    ItemSeparatorComponent={() => PostCardSeparator()}
-                    keyExtractor={(item) => JSON.stringify(item.post_id)}
-                    maxToRenderPerBatch={1}
-                    initialNumToRender={1}
-                />
-                {this._doRenderPageNav()}
-                {this._doRenderReplyBox()}
-            </View>
+            <SafeAreaView style={styles.container}>
+                <View style={styles.postList}>
+                    <FlatList
+                        renderItem={({ item }) => renderItem(item)}
+                        data={this.state.posts}
+                        ItemSeparatorComponent={PostCardSeparator}
+                        keyExtractor={(item) => JSON.stringify(item.post_id)}
+                        maxToRenderPerBatch={1}
+                        initialNumToRender={1}
+                    />
+                </View>
+                {replyBox}
+            </SafeAreaView>
         );
     }
 
@@ -103,7 +100,7 @@ export default class ThreadDetailScreen extends BaseScreen {
         ];
 
         fetcher
-            .post('batch', { body: JSON.stringify(batchParams) })
+            .post('batch', JSON.stringify(batchParams))
             .then((response) => {
                 this._setLoadingState(LoadingState.Done);
 
@@ -122,6 +119,10 @@ export default class ThreadDetailScreen extends BaseScreen {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // paddingBottom: 60
-    }
+        flexDirection: 'column'
+    },
+    postList: {
+        flex: 1
+    },
+    replyBox: {}
 });
