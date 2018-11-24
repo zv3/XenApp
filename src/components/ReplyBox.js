@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, TextInput } from 'react-native';
-import { ButtonIcon } from './Button';
+import ButtonIcon from './ButtonIcon';
 import PropTypes from 'prop-types';
 
 export default class ReplyBox extends React.Component {

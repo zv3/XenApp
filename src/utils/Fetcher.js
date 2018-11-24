@@ -34,11 +34,11 @@ const request = (method: String, uri: String, options: Object) => {
         {
             baseURL: BASE_URL,
             method: method,
-            timeout: 10000,
+            timeout: 1000,
             params: {},
             headers: {
                 Accept: 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'multipart/form-data;charset=UTF-8'
             },
             paramsSerializer: function(params) {
                 return querystring.stringify(params);

@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
-import { ButtonIcon } from './Button';
+import ButtonIcon from './ButtonIcon';
 import HTML from 'react-native-render-html';
+import moment from 'moment';
+import Avatar from './Avatar';
 
 export const PostCardSeparator = () => <View style={styles.separator} />;
 
@@ -16,13 +18,12 @@ export default class PostCard extends React.Component {
 
         return (
             <View style={styles.header}>
-                <Image
-                    source={{ uri: post.links.poster_avatar }}
-                    style={styles.avatar}
-                />
+                <Avatar uri={post.links.poster_avatar} style={styles.avatar} />
                 <View>
                     <Text style={styles.user}>{post.poster_username}</Text>
-                    <Text>{post.post_create_date}</Text>
+                    <Text>
+                        {moment(post.post_create_date * 1000).fromNow()}
+                    </Text>
                 </View>
             </View>
         );
@@ -37,6 +38,8 @@ export default class PostCard extends React.Component {
         );
     };
 
+    _onActionPressed = () => {};
+
     _doRenderFooter = () => {
         const { post } = this.props;
 
@@ -48,6 +51,7 @@ export default class PostCard extends React.Component {
                     iconSize={18}
                     disabled={disabled}
                     style={styles.footerButton}
+                    onPress={this._onActionPressed}
                 />
             );
         };
@@ -118,14 +122,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
 
-    avatar: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        resizeMode: 'contain',
-        marginRight: 10
-    },
-
     user: {
         fontSize: 16,
         fontWeight: 'bold',
@@ -136,5 +132,9 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 10,
         backgroundColor: '#ececec'
+    },
+
+    avatar: {
+        marginRight: 10
     }
 });

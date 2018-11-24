@@ -1,10 +1,15 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
-import { Button } from '../components/Button';
+import {
+    View,
+    TextInput,
+    StyleSheet,
+    ActivityIndicator,
+    Alert
+} from 'react-native';
+import Button from '../components/Button';
 import { passwordEncrypter } from '../utils/Encrypter';
 import { CLIENT_ID } from '../Config';
 import { fetcher } from '../utils/Fetcher';
-import SnackBar from '../components/SnackBar';
 import { NavigationActions } from 'react-navigation';
 import { Token } from '../utils/Token';
 import PropTypes from 'prop-types';
@@ -25,11 +30,7 @@ export default class LoginScreen extends React.Component {
             isSubmitting: true
         });
 
-        if (this._snackBar !== null) {
-            this._snackBar.hide();
-        }
-
-        let payload = {
+        const payload = {
             username: this.state.data.username,
             password: passwordEncrypter(this.state.data.password),
             grant_type: 'password',
@@ -37,8 +38,18 @@ export default class LoginScreen extends React.Component {
             password_algo: 'aes128'
         };
 
+        const onFailedLogin = () => {
+            Alert.alert('Cannot log-in', 'Invalid password or email');
+
+            setTimeout(() => {
+                this.setState({
+                    isSubmitting: false
+                });
+            }, 2000);
+        };
+
         fetcher
-            .post('oauth/token', { body: payload })
+            .post('oauth/token', payload)
             .then((response) => {
                 if (response.hasOwnProperty('access_token')) {
                     // login access.
@@ -55,21 +66,9 @@ export default class LoginScreen extends React.Component {
                     return;
                 }
 
-                this.setState({
-                    isSubmitting: false
-                });
+                onFailedLogin();
             })
-            .catch((error) => {
-                if (this._snackBar !== null) {
-                    this._snackBar.show(error[0]);
-                }
-
-                setTimeout(() => {
-                    this.setState({
-                        isSubmitting: false
-                    });
-                }, 2000);
-            });
+            .catch(onFailedLogin);
     };
 
     constructor(props) {
@@ -79,8 +78,6 @@ export default class LoginScreen extends React.Component {
             data: {},
             isSubmitting: false
         };
-
-        this._snackBar = null;
     }
 
     _onChangeText(name, value) {
@@ -113,10 +110,7 @@ export default class LoginScreen extends React.Component {
     }
 
     render() {
-        let isDisabled = true;
-        if (this.state.data.username && this.state.data.password) {
-            isDisabled = false;
-        }
+        const { data, isSubmitting } = this.state;
 
         return (
             <View style={styles.container}>
@@ -124,16 +118,12 @@ export default class LoginScreen extends React.Component {
                 {this._doRenderField('password', 'Password')}
                 <Button
                     title="Login"
-                    disabled={isDisabled}
-                    onPress={this._doLogin}>
-                    {this.state.isSubmitting && (
-                        <ActivityIndicator color="white" />
-                    )}
+                    disabled={!data.username || !data.password}
+                    onPress={this._doLogin}
+                    style={styles.submit}
+                    textStyle={styles.textStyle}>
+                    {isSubmitting && <ActivityIndicator color="white" />}
                 </Button>
-                <SnackBar
-                    text=""
-                    ref={(component) => (this._snackBar = component)}
-                />
             </View>
         );
     }
@@ -153,22 +143,22 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         padding: 10,
 
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,.1)',
-
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0,0,0,.1)',
-
-        borderLeftWidth: 1,
-        borderLeftColor: 'rgba(0,0,0,.1)',
-
-        borderRightWidth: 1,
-        borderRightColor: 'rgba(0,0,0,.1)',
-
         color: 'red',
         fontSize: 18,
         backgroundColor: '#FFF',
 
         borderRadius: 4
+    },
+
+    submit: {
+        backgroundColor: '#2577b1',
+        width: 200,
+        borderRadius: 3,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 20
+    },
+    textStyle: {
+        color: '#FFF'
     }
 });

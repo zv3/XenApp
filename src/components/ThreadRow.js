@@ -1,17 +1,10 @@
 import React from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    Image,
-    TouchableHighlight
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
+import Avatar from './Avatar';
 
-export const ThreadRowSeparator = () => {
-    return <View style={styles.separator} />;
-};
+export const ThreadRowSeparator = () => <View style={styles.separator} />;
 
 export default class ThreadRow extends React.Component {
     static propTypes = {
@@ -70,10 +63,7 @@ export default class ThreadRow extends React.Component {
                 onPress={() => this._onItemPress()}
                 underlayColor="red">
                 <View style={styles.container}>
-                    <Image
-                        source={{ uri: thread.links.first_poster_avatar }}
-                        style={styles.avatar}
-                    />
+                    <Avatar uri={thread.links.first_poster_avatar} />
                     <View style={styles.body}>
                         <Text style={styles.title} numberOfLines={3}>
                             {thread.thread_title}
@@ -93,13 +83,6 @@ const styles = StyleSheet.create({
         padding: 10,
         flexDirection: 'row',
         backgroundColor: 'white'
-    },
-    avatar: {
-        width: 46,
-        height: 46,
-        borderRadius: 23,
-        marginRight: 10,
-        resizeMode: 'contain'
     },
     title: {
         fontSize: 16,

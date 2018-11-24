@@ -8,9 +8,8 @@ import {
     StyleSheet
 } from 'react-native';
 import PropTypes from 'prop-types';
-import Icon from 'react-native-vector-icons/Feather';
 
-class Button extends React.Component {
+export default class Button extends React.Component {
     static propTypes = {
         title: PropTypes.string.isRequired,
         onPress: PropTypes.func,
@@ -75,34 +74,6 @@ class Button extends React.Component {
         );
     }
 }
-
-class ButtonIcon extends React.Component {
-    static propTypes = {
-        iconName: PropTypes.string.isRequired,
-        iconSize: PropTypes.number,
-        iconColor: PropTypes.string,
-        disabled: PropTypes.bool
-    };
-
-    static defaultProps = {
-        iconSize: 25,
-        disabled: false
-    };
-
-    render() {
-        return (
-            <Button title={''} {...this.props}>
-                <Icon
-                    name={this.props.iconName}
-                    color={this.props.iconColor}
-                    size={this.props.iconSize}
-                />
-            </Button>
-        );
-    }
-}
-
-export { Button, ButtonIcon };
 
 const styles = StyleSheet.create({
     button: Platform.select({

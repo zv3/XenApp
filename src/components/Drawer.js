@@ -4,11 +4,12 @@ import {
     TouchableHighlight,
     FlatList,
     Text,
-    StyleSheet
+    StyleSheet,
+    Platform
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import PropTypes from 'prop-types';
-import { ButtonIcon } from './Button';
+import ButtonIcon from './ButtonIcon';
 
 class DrawerTrigger extends React.Component {
     static propTypes = {
@@ -23,24 +24,22 @@ class DrawerTrigger extends React.Component {
         isBack: false
     };
 
-    _onPressed() {
-        if (this.props.isBack) {
-            this.props.navigation.goBack();
-        } else {
-            this.props.navigation.toggleDrawer();
-        }
-    }
+    _onPressed = () => {
+        const { navigation, isBack } = this.props;
+        isBack ? navigation.goBack() : navigation.toggleDrawer();
+    };
 
     render() {
+        const { iconSize, style, isBack } = this.props;
         const defaultStyle = { marginLeft: 10 };
 
         return (
             <ButtonIcon
-                iconName={this.props.isBack ? 'chevron-left' : 'menu'}
-                iconColor="red"
-                iconSize={this.props.iconSize}
-                style={[defaultStyle, this.props.style]}
-                onPress={() => this._onPressed()}
+                iconName={isBack ? 'chevron-left' : 'menu'}
+                iconColor={Platform.OS === 'ios' ? 'red' : 'white'}
+                iconSize={iconSize}
+                style={[defaultStyle, style]}
+                onPress={this._onPressed}
             />
         );
     }

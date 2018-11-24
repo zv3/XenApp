@@ -40,7 +40,9 @@ const AppNavigator = createDrawerNavigator({
     AppRoot: AppRootStack
 }, {
     initialRouteName: 'AppRoot',
+    /* eslint-disable */
     contentComponent: ({navigation}) => <DrawerMenuContent navigation={navigation} />,
+    /* eslint-enable */
     mode: Platform.OS === 'ios' ? 'modal' : 'card'
 });
 
@@ -51,9 +53,7 @@ export default class App extends Component<Props> {
     };
 
     componentDidMount() {
-        const loadDone = () => {
-            this.setState({ isLoading: false })
-        };
+        const loadDone = () => this.setState({ isLoading: false });
 
         const refreshToken = (oAuthData) => {
             const payload = {
@@ -63,29 +63,25 @@ export default class App extends Component<Props> {
                 refresh_token: oAuthData.refreshToken
             };
 
-            fetcher.post('oauth/token', {
-                body: payload
-            }).then((response) => {
-                Token.saveToken(response);
-                loadDone();
-            }).catch(() => {
-                loadDone();
-            });
+            fetcher.post('oauth/token', payload)
+                .then((response) => {
+                    Token.saveToken(response);
+                    loadDone();
+                })
+                .catch(loadDone);
         };
 
         Token.getOAuthData()
             .then((oauthData) => {
-                const aMinuteMS = 60 * 1000;
-                if (!oauthData.expiresAt || (oauthData.expiresAt - Date.now()) < aMinuteMS) {
+                const aMinuteMS = 60;
+                if (!oauthData.expiresAt || (oauthData.expiresAt - Math.floor(Date.now()/1000)) < aMinuteMS) {
                     // Need refresh token
                     refreshToken(oauthData);
                 } else {
                     loadDone();
                 }
             })
-            .catch(() => {
-                loadDone();
-            });
+            .catch(loadDone);
     }
 
     render() {

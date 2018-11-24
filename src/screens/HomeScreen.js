@@ -2,7 +2,7 @@ import React from 'react';
 import { View, FlatList, Image } from 'react-native';
 import { fetcher } from '../utils/Fetcher';
 import { DrawerTrigger } from '../components/Drawer';
-import { ButtonIcon } from '../components/Button';
+import ButtonIcon from '../components/ButtonIcon';
 import BaseScreen, { LoadingState } from './BaseScreen';
 import ThreadRow, { ThreadRowSeparator } from '../components/ThreadRow';
 import PageNav from '../components/PageNav';
@@ -120,6 +120,8 @@ export default class HomeScreen extends BaseScreen {
                     links: results.links,
                     showPageNav: true
                 });
+
+                this._setLoadingState(LoadingState.Done);
             })
             .catch(() => {
                 this._setLoadingState(LoadingState.Error);

@@ -1,0 +1,70 @@
+PODS:
+  - FLAnimatedImage (1.0.12)
+  - React (0.57.5):
+    - React/Core (= 0.57.5)
+  - react-native-fast-image (5.1.1):
+    - FLAnimatedImage
+    - React
+    - SDWebImage/Core
+    - SDWebImage/GIF
+  - React/Core (0.57.5):
+    - yoga (= 0.57.5.React)
+  - React/RCTAnimation (0.57.5):
+    - React/Core
+  - React/RCTImage (0.57.5):
+    - React/Core
+    - React/RCTNetwork
+  - React/RCTNetwork (0.57.5):
+    - React/Core
+  - React/RCTText (0.57.5):
+    - React/Core
+  - RNSnackbar (0.5.3):
+    - React
+  - RNVectorIcons (6.1.0):
+    - React
+  - SDWebImage/Core (4.4.2)
+  - SDWebImage/GIF (4.4.2):
+    - FLAnimatedImage (~> 1.0)
+    - SDWebImage/Core
+  - yoga (0.57.5.React)
+
+DEPENDENCIES:
+  - react-native-fast-image (from `../node_modules/react-native-fast-image`)
+  - React/Core (from `../node_modules/react-native`)
+  - React/RCTAnimation (from `../node_modules/react-native`)
+  - React/RCTImage (from `../node_modules/react-native`)
+  - React/RCTNetwork (from `../node_modules/react-native`)
+  - React/RCTText (from `../node_modules/react-native`)
+  - RNSnackbar (from `../node_modules/react-native-snackbar`)
+  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
+  - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - FLAnimatedImage
+    - SDWebImage
+
+EXTERNAL SOURCES:
+  React:
+    :path: "../node_modules/react-native"
+  react-native-fast-image:
+    :path: "../node_modules/react-native-fast-image"
+  RNSnackbar:
+    :path: "../node_modules/react-native-snackbar"
+  RNVectorIcons:
+    :path: "../node_modules/react-native-vector-icons"
+  yoga:
+    :path: "../node_modules/react-native/ReactCommon/yoga"
+
+SPEC CHECKSUMS:
+  FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
+  React: 1fe0eb13d90b625d94c3b117c274dcfd2e760e11
+  react-native-fast-image: cba3d9bf9c2cf8ddb643d887a686c53a5dd90a2c
+  RNSnackbar: 90718c3ffbe9ca9178763c96fc2aa7e81d78851f
+  RNVectorIcons: 8c52e1e8da1153613fdef44748e865c25556cb9c
+  SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
+  yoga: b1ce48b6cf950b98deae82838f5173ea7cf89e85
+
+PODFILE CHECKSUM: 38bef23b16c427fce6fed4caf2d86a2ae9e33cc9
+
+COCOAPODS: 1.5.3

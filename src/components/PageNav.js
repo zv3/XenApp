@@ -7,7 +7,7 @@ import {
     LayoutAnimation
 } from 'react-native';
 import PropTypes from 'prop-types';
-import { ButtonIcon } from './Button';
+import ButtonIcon from './ButtonIcon';
 
 export default class PageNav extends React.Component {
     static propTypes = {

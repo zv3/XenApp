@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, TextInput } from 'react-native';
-import { Button } from '../components/Button';
-import SnackBar from '../components/SnackBar';
+import Button from '../components/Button';
 
 export default class ThreadCreateScreen extends React.Component {
     static navigationOptions = () => {
@@ -16,8 +15,6 @@ export default class ThreadCreateScreen extends React.Component {
         this.state = {
             fields: {}
         };
-
-        this._snackBar = null;
     }
 
     _setFieldValue(name, value) {
@@ -58,10 +55,6 @@ export default class ThreadCreateScreen extends React.Component {
                     textProps={{ style: styles.buttonText }}
                     onPress={() => this._doSave()}
                     style={[styles.submit]}
-                />
-                <SnackBar
-                    text=""
-                    ref={(component) => (this._snackBar = component)}
                 />
             </View>
         );

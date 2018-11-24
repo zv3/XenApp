@@ -9,7 +9,7 @@ import {
 import PropTypes from 'prop-types';
 import BaseScreen, { LoadingState } from './BaseScreen';
 import { DrawerTrigger } from '../components/Drawer';
-import { ButtonIcon } from '../components/Button';
+import ButtonIcon from '../components/ButtonIcon';
 import { fetcher } from '../utils/Fetcher';
 import { NavigationActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Feather';
