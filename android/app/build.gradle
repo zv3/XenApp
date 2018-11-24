@@ -76,7 +76,12 @@ project.ext.react = [
     entryFile: "index.js"
 ]
 
+project.ext.vectoricons = [
+    iconFontNames: [ 'Feather.ttf' ] // Name of the font files you want to copy
+]
+
 apply from: "../../node_modules/react-native/react.gradle"
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -101,8 +106,8 @@ android {
         applicationId "com.xenapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode versionMajor * 10000000 + versionMinor * 1000000 + versionPatch
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
