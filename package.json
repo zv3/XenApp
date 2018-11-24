@@ -27,7 +27,8 @@
     "jest": "23.6.0",
     "metro-react-native-babel-preset": "0.47.0",
     "prettier": "1.14.3",
-    "react-test-renderer": "16.5.0"
+    "react-test-renderer": "16.5.0",
+    "merge": "^1.2.1"
   },
   "jest": {
     "preset": "react-native"
