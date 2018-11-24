@@ -18,8 +18,6 @@ PODS:
     - React/Core
   - React/RCTText (0.57.5):
     - React/Core
-  - RNSnackbar (0.5.3):
-    - React
   - RNVectorIcons (6.1.0):
     - React
   - SDWebImage/Core (4.4.2)
@@ -35,7 +33,6 @@ DEPENDENCIES:
   - React/RCTImage (from `../node_modules/react-native`)
   - React/RCTNetwork (from `../node_modules/react-native`)
   - React/RCTText (from `../node_modules/react-native`)
-  - RNSnackbar (from `../node_modules/react-native-snackbar`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -49,8 +46,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native"
   react-native-fast-image:
     :path: "../node_modules/react-native-fast-image"
-  RNSnackbar:
-    :path: "../node_modules/react-native-snackbar"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   yoga:
@@ -60,11 +55,10 @@ SPEC CHECKSUMS:
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
   React: 1fe0eb13d90b625d94c3b117c274dcfd2e760e11
   react-native-fast-image: cba3d9bf9c2cf8ddb643d887a686c53a5dd90a2c
-  RNSnackbar: 90718c3ffbe9ca9178763c96fc2aa7e81d78851f
   RNVectorIcons: 8c52e1e8da1153613fdef44748e865c25556cb9c
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
   yoga: b1ce48b6cf950b98deae82838f5173ea7cf89e85
 
-PODFILE CHECKSUM: 38bef23b16c427fce6fed4caf2d86a2ae9e33cc9
+PODFILE CHECKSUM: 95683c24cdad1b60edb8e003a4a1388526d1cde5
 
 COCOAPODS: 1.5.3
