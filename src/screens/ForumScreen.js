@@ -8,12 +8,12 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 import BaseScreen, { LoadingState } from './BaseScreen';
-import { DrawerTrigger } from '../components/Drawer';
 import ButtonIcon from '../components/ButtonIcon';
-import { fetcher } from '../utils/Fetcher';
+import { Fetcher } from '../utils/Fetcher';
 import { NavigationActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Feather';
 import ThreadRow, { ThreadRowSeparator } from '../components/ThreadRow';
+import DrawerTrigger from '../drawer/DrawerTrigger';
 
 export default class ForumScreen extends BaseScreen {
     static propTypes = {
@@ -76,8 +76,7 @@ export default class ForumScreen extends BaseScreen {
             });
         }
 
-        return fetcher
-            .post('batch', JSON.stringify(batchParams))
+        return Fetcher.post('batch', JSON.stringify(batchParams))
             .then((response) => {
                 const navItems = response.jobs.navigation.elements;
 
@@ -95,9 +94,7 @@ export default class ForumScreen extends BaseScreen {
 
                 this.setState(stateData);
             })
-            .catch(() => {
-                this._setLoadingState(LoadingState.Error);
-            });
+            .catch(() => this._setLoadingState(LoadingState.Error));
     }
 
     _getRenderableItems() {

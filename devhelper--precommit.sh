@@ -2,10 +2,12 @@
 
 set -e
 
-esLintStatus=$($(./node_modules/.bin/eslint ./src/ >> /dev/null) || echo "Failed") >> /dev/null
+_eslintStatus=$($(./node_modules/.bin/eslint ./src/ >> /dev/null) || echo "Failed") >> /dev/null
 
-if [[ ! -z "${esLintStatus}" ]]; then
-    echo "Failed to eslint check. Run eslint.sh to see the details"
+if [[ ! -z "${_eslintStatus}" ]]; then
+    echo "Failed to eslint check. Please fix the following issues:"
+
+    ./node_modules/.bin/eslint ./src/
 
     exit 1
 fi

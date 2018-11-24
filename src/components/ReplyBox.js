@@ -3,7 +3,7 @@ import { View, StyleSheet, TextInput } from 'react-native';
 import ButtonIcon from './ButtonIcon';
 import PropTypes from 'prop-types';
 
-export default class ReplyBox extends React.Component {
+export default class ReplyBox extends React.PureComponent {
     state = {
         message: '',
         quoteUser: '',
@@ -50,17 +50,16 @@ export default class ReplyBox extends React.Component {
     _doRenderQuoteText() {}
 
     render() {
-        const isDisabled =
-            this.message().length === 0 || this.state.isSubmitting;
+        const { message, isSubmitting } = this.state;
 
         return (
             <View style={[styles.container, this.props.style]}>
                 <TextInput
                     style={styles.input}
                     multiline={true}
-                    editable={!this.state.isSubmitting}
+                    editable={!isSubmitting}
                     onChangeText={(message) => this.setMessage(message)}
-                    value={this.state.message}
+                    value={message}
                     placeholder="Enter an message..."
                 />
                 <View style={styles.submit}>
@@ -68,7 +67,7 @@ export default class ReplyBox extends React.Component {
                         iconName="send"
                         iconSize={20}
                         iconColor={'#FFF'}
-                        disabled={isDisabled}
+                        disabled={this.message().length === 0 || isSubmitting}
                         onPress={this._doSubmit}
                         style={styles.sendButton}
                     />

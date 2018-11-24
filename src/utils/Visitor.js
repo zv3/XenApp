@@ -1,5 +1,5 @@
 import { Token } from './Token';
-import { fetcher } from './Fetcher';
+import { Fetcher } from './Fetcher';
 
 let visitorObject = null;
 
@@ -10,10 +10,9 @@ const getVisitor = () => {
         if (visitorObject === null) {
             Token.getOAuthData()
                 .then((data) => {
-                    fetcher
-                        .get('users/me', {
-                            oauth_token: data.accessToken
-                        })
+                    Fetcher.get('users/me', {
+                        oauth_token: data.accessToken
+                    })
                         .then((data) => {
                             visitorObject = Object.freeze(data.user);
                             resolve(visitorObject);

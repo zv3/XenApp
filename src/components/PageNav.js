@@ -4,83 +4,99 @@ import {
     Text,
     StyleSheet,
     Dimensions,
-    LayoutAnimation
+    Animated,
+    Easing
 } from 'react-native';
 import PropTypes from 'prop-types';
 import ButtonIcon from './ButtonIcon';
 
-export default class PageNav extends React.Component {
+const { width } = Dimensions.get('window');
+const PAGE_NAV_WIDTH = 200;
+
+export default class PageNav extends React.PureComponent {
     static propTypes = {
         links: PropTypes.object.isRequired,
         gotoPage: PropTypes.func.isRequired
     };
 
-    state = {
-        offsetY: 20
-    };
+    constructor(props) {
+        super(props);
 
-    _onItemPressed(iconName) {
-        const links = this.props.links;
+        this.state = {
+            translateY: new Animated.Value(35)
+        };
+    }
+
+    _onItemPressed = (iconName) => {
+        const { links, gotoPage } = this.props;
+        const { prev, page, pages, next } = links;
 
         switch (iconName) {
             case 'chevrons-left':
-                this.props.gotoPage(links.prev, 1);
+                gotoPage(prev, 1);
                 break;
             case 'chevron-left':
-                this.props.gotoPage(links.prev, links.page - 1);
+                gotoPage(prev, page - 1);
                 break;
             case 'chevron-right':
-                this.props.gotoPage(links.next, links.page + 1);
+                gotoPage(next, page + 1);
                 break;
             case 'chevrons-right':
-                this.props.gotoPage(links.next, links.pages);
+                gotoPage(next, pages);
                 break;
+            default:
+                throw new Error(`Unknown icon name ${iconName}`);
         }
-    }
+    };
 
-    _doRenderButton(iconName, disabled = false) {
-        return (
-            <ButtonIcon
-                iconName={iconName}
-                disabled={disabled}
-                iconColor={disabled ? '#888888' : 'rgba(255, 255, 255, 0.88)'}
-                onPress={() => this._onItemPressed(iconName)}
-            />
-        );
-    }
+    _doRenderButton = (iconName, disabled = false) => (
+        <ButtonIcon
+            iconName={iconName}
+            disabled={disabled}
+            iconColor={disabled ? '#888888' : 'rgba(255, 255, 255, 0.88)'}
+            onPress={() => this._onItemPressed(iconName)}
+        />
+    );
 
     show() {
-        LayoutAnimation.easeInEaseOut();
-        this.setState({
-            offsetY: 20
-        });
+        Animated.timing(this.state.translateY, {
+            toValue: -95,
+            duration: 100,
+            useNativeDriver: true,
+            easing: Easing.bounce
+        }).start();
     }
 
     hide() {
-        this.setState({
-            offsetY: -35
-        });
+        Animated.timing(this.state.translateY, {
+            toValue: 35,
+            duration: 100,
+            useNativeDriver: true
+        }).start();
     }
 
     render() {
         const links = this.props.links;
+        const { page, pages } = links;
+
+        const transform = {
+            transform: [{ translateY: this.state.translateY }]
+        };
 
         return (
-            <View style={[styles.container, { bottom: this.state.offsetY }]}>
-                {this._doRenderButton('chevrons-left', links.page === 1)}
-                {this._doRenderButton('chevron-left', links.page === 1)}
-                <Text style={styles.text}>
-                    {this.props.links.page} / {this.props.links.pages}
-                </Text>
-                {this._doRenderButton(
-                    'chevron-right',
-                    links.page === links.pages
-                )}
-                {this._doRenderButton(
-                    'chevrons-right',
-                    links.page === links.pages
-                )}
-            </View>
+            <Animated.View style={transform}>
+                <View style={styles.container}>
+                    {this._doRenderButton('chevrons-left', page === 1)}
+                    {this._doRenderButton('chevron-left', page === 1)}
+
+                    <Text style={styles.text}>
+                        {page} / {pages}
+                    </Text>
+
+                    {this._doRenderButton('chevron-right', page === pages)}
+                    {this._doRenderButton('chevrons-right', page === pages)}
+                </View>
+            </Animated.View>
         );
     }
 }
@@ -88,18 +104,17 @@ export default class PageNav extends React.Component {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
-        width: 200,
+        width: PAGE_NAV_WIDTH,
         height: 35,
         backgroundColor: '#131313',
-        // bottom: -35,
         borderRadius: 4,
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        left: (Dimensions.get('window').width - 220) / 2,
+        left: (width - PAGE_NAV_WIDTH - 10 * 2) / 2,
         paddingLeft: 10,
-        paddingRight: 10
+        paddingRight: 10,
+        zIndex: 3
     },
     text: {
         fontSize: 17,

@@ -17,8 +17,20 @@ export default class ButtonIcon extends React.PureComponent {
     };
 
     render() {
+        const { title, style } = this.props;
+        const buttonStyles = [];
+
+        if (title) {
+            buttonStyles.push({
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center'
+            });
+        }
+        buttonStyles.push(style);
+
         return (
-            <Button title={''} {...this.props}>
+            <Button title={''} {...this.props} style={buttonStyles}>
                 <Icon
                     name={this.props.iconName}
                     color={this.props.iconColor}

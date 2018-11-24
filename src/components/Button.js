@@ -18,6 +18,7 @@ export default class Button extends React.Component {
         textProps: PropTypes.object,
         accessibilityLabel: PropTypes.string,
         testID: PropTypes.string,
+        textColor: PropTypes.string,
         textStyle: PropTypes.object,
         style: PropTypes.any
     };
@@ -32,7 +33,8 @@ export default class Button extends React.Component {
             accessibilityLabel,
             testID,
             style,
-            textStyle
+            textStyle,
+            textColor
         } = this.props;
 
         const Touchable =
@@ -41,6 +43,10 @@ export default class Button extends React.Component {
         const buttonStyles = [styles.button, style];
         const textStyles = [styles.text, textStyle];
         const accessibilityStates = [];
+
+        if (textColor) {
+            textStyles.push({ color: textColor });
+        }
 
         if (disabled) {
             buttonStyles.push(styles.buttonDisabled);

@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, FlatList, Image } from 'react-native';
-import { fetcher } from '../utils/Fetcher';
-import { DrawerTrigger } from '../components/Drawer';
+import { Fetcher } from '../utils/Fetcher';
 import ButtonIcon from '../components/ButtonIcon';
 import BaseScreen, { LoadingState } from './BaseScreen';
 import ThreadRow, { ThreadRowSeparator } from '../components/ThreadRow';
 import PageNav from '../components/PageNav';
 import { Visitor } from '../utils/Visitor';
 import PropTypes from 'prop-types';
+import DrawerTrigger from '../drawer/DrawerTrigger';
 
 class HomeHeaderRight extends React.Component {
     static propTypes = {
@@ -108,8 +108,7 @@ export default class HomeScreen extends BaseScreen {
             }
         ];
 
-        fetcher
-            .post('batch', JSON.stringify(batchParams))
+        Fetcher.post('batch', JSON.stringify(batchParams))
             .then((response) => {
                 this._setLoadingState(LoadingState.Done);
 
@@ -130,12 +129,11 @@ export default class HomeScreen extends BaseScreen {
 
     _gotoPage(link, page) {
         this._setLoadingState(LoadingState.Begin);
-        fetcher
-            .get(link, {
-                query: {
-                    page: page
-                }
-            })
+        Fetcher.get(link, {
+            query: {
+                page: page
+            }
+        })
             .then((response) => {
                 this._setLoadingState(LoadingState.Done);
 

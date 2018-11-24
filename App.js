@@ -14,14 +14,14 @@ import {
     createDrawerNavigator
 } from "react-navigation";
 import HomeScreen from "./src/screens/HomeScreen";
-import {DrawerMenuContent} from "./src/components/Drawer"
 import ThreadDetailScreen from "./src/screens/ThreadDetailScreen";
 import LoginScreen from "./src/screens/LoginScreen";
-import {fetcher} from "./src/utils/Fetcher";
+import {Fetcher} from "./src/utils/Fetcher";
 import {CLIENT_ID, CLIENT_SECRET} from "./src/Config";
 import {Token} from "./src/utils/Token";
 import ForumScreen from "./src/screens/ForumScreen";
 import ThreadCreateScreen from "./src/screens/ThreadCreateScreen";
+import DrawerNavList from "./src/drawer/DrawerNavList";
 
 const AppRootStack = createStackNavigator({
     Home: HomeScreen,
@@ -41,7 +41,7 @@ const AppNavigator = createDrawerNavigator({
 }, {
     initialRouteName: 'AppRoot',
     /* eslint-disable */
-    contentComponent: ({navigation}) => <DrawerMenuContent navigation={navigation} />,
+    contentComponent: ({navigation}) => <DrawerNavList navigation={navigation} />,
     /* eslint-enable */
     mode: Platform.OS === 'ios' ? 'modal' : 'card'
 });
@@ -63,7 +63,7 @@ export default class App extends Component<Props> {
                 refresh_token: oAuthData.refreshToken
             };
 
-            fetcher.post('oauth/token', payload)
+            Fetcher.post('oauth/token', payload)
                 .then((response) => {
                     Token.saveToken(response);
                     loadDone();

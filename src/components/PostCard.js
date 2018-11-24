@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     },
 
     footer: {
-        padding: 10,
+        paddingHorizontal: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#d8d8d8',
         flexDirection: 'row',

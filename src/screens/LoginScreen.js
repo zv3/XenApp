@@ -9,7 +9,7 @@ import {
 import Button from '../components/Button';
 import { passwordEncrypter } from '../utils/Encrypter';
 import { CLIENT_ID } from '../Config';
-import { fetcher } from '../utils/Fetcher';
+import { Fetcher } from '../utils/Fetcher';
 import { NavigationActions } from 'react-navigation';
 import { Token } from '../utils/Token';
 import PropTypes from 'prop-types';
@@ -48,8 +48,7 @@ export default class LoginScreen extends React.Component {
             }, 2000);
         };
 
-        fetcher
-            .post('oauth/token', payload)
+        Fetcher.post('oauth/token', payload)
             .then((response) => {
                 if (response.hasOwnProperty('access_token')) {
                     // login access.

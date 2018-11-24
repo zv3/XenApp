@@ -73,7 +73,7 @@ const request = (method: String, uri: String, options: Object) => {
                 opts.params.oauth_token = token;
             }
 
-            opts.url = `api/index.php?${uri}`;
+            opts.url = uri.indexOf('http') === 0 ? uri : `api/index.php?${uri}`;
 
             const CancelToken = axios.CancelToken;
             const source = CancelToken.source();
@@ -108,7 +108,7 @@ const request = (method: String, uri: String, options: Object) => {
     });
 };
 
-export const fetcher = {
+export const Fetcher = {
     get,
     post,
     put,
