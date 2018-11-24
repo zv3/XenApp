@@ -60,6 +60,7 @@ export default class ReplyBox extends React.PureComponent {
                     editable={!isSubmitting}
                     onChangeText={(message) => this.setMessage(message)}
                     value={message}
+                    autoCorrect={false}
                     placeholder="Enter an message..."
                 />
                 <View style={styles.submit}>
@@ -103,9 +104,9 @@ const styles = StyleSheet.create({
         width: 36,
         height: 36,
         borderRadius: 18,
-        alignItems: 'center',
-        justifyContent: 'center',
         shadowColor: '#000',
+        justifyContent: 'center',
+        alignItems: 'center',
         shadowOffset: { width: 1, height: 1.5 },
         shadowOpacity: 0.12
     }

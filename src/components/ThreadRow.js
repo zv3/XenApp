@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import Avatar from './Avatar';
+import moment from 'moment';
 
 export const ThreadRowSeparator = () => <View style={styles.separator} />;
 
@@ -28,16 +29,21 @@ export default class ThreadRow extends React.Component {
         const style = {
             container: {
                 paddingTop: 10,
-                text: {
-                    fontSize: 14,
-                    color: '#8c8c8c'
-                }
+                flexDirection: 'row'
+            },
+            text: {
+                fontSize: 14,
+                color: '#8c8c8c',
+                marginRight: 10
             }
         };
 
         return (
             <View style={style.container}>
                 <Text style={style.text}>{thread.creator_username}</Text>
+                <Text style={style.text}>
+                    {moment(thread.thread_create_date * 1000).fromNow()}
+                </Text>
             </View>
         );
     }
@@ -93,11 +99,12 @@ const styles = StyleSheet.create({
     body: {
         width: 0,
         flexGrow: 1,
-        flex: 1
+        flex: 1,
+        marginLeft: 10
     },
 
     bodyText: {
-        fontSize: 14,
+        fontSize: 16,
         flexWrap: 'wrap',
         color: '#505050'
     },

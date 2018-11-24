@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import PropTypes from 'prop-types';
 import ButtonIcon from './ButtonIcon';
 import HTML from 'react-native-render-html';
@@ -31,9 +31,49 @@ export default class PostCard extends React.Component {
 
     _doRenderBody = () => {
         const post = this.props.post;
+        const quoteStyle = [];
+        for (const key in styles.quoteBlock) {
+            if (styles.quoteBlock.hasOwnProperty(key)) {
+                quoteStyle.push(`${key}:${styles.quoteBlock[[key]]}`);
+            }
+        }
+
+        const htmlConfig = {
+            baseFontStyle: {
+                fontSize: 18
+            },
+            ignoredTags: ['head', 'scripts', 'table'],
+            alterNode: (node) => {
+                const { attribs } = node;
+
+                if (
+                    attribs &&
+                    attribs.class &&
+                    attribs.class.indexOf('bbCodeBlock--quote') !== -1
+                ) {
+                    node.attribs = Object.assign(attribs, {
+                        style: quoteStyle.join(';')
+                    });
+
+                    return node;
+                }
+            },
+            alterData: (node) => {
+                const { data, parent } = node;
+                if (
+                    parent &&
+                    parent.attribs &&
+                    parent.attribs.class &&
+                    parent.attribs.class.indexOf('bbCodeBlock') !== -1
+                ) {
+                    return data.replace(/^\s*/, '');
+                }
+            }
+        };
+
         return (
             <View style={styles.body}>
-                <HTML html={post.post_body_html} />
+                <HTML html={post.post_body_html} {...htmlConfig} />
             </View>
         );
     };
@@ -44,13 +84,22 @@ export default class PostCard extends React.Component {
         const { post } = this.props;
 
         const renderButton = (icon, text, disabled = false) => {
+            const iconColor = Platform.select({
+                ios: {
+                    color: disabled ? '#cdcdcd' : '#007AFF'
+                },
+                android: {
+                    color: disabled ? '#a1a1a1' : '#007AFF'
+                }
+            });
+
             return (
                 <ButtonIcon
                     iconName={icon}
+                    iconColor={iconColor.color}
                     title={text}
                     iconSize={18}
                     disabled={disabled}
-                    style={styles.footerButton}
                     onPress={this._onActionPressed}
                 />
             );
@@ -116,12 +165,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
 
-    footerButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-
     user: {
         fontSize: 16,
         fontWeight: 'bold',
@@ -136,5 +179,17 @@ const styles = StyleSheet.create({
 
     avatar: {
         marginRight: 10
+    },
+    quoteBlock: {
+        backgroundColor: '#f5f5f5',
+        padding: 10,
+        borderLeftWidth: 3,
+        borderLeftColor: '#f2930d',
+        borderTopWidth: 1,
+        borderTopColor: '#dfdfdf',
+        borderRightWidth: 1,
+        borderRightColor: '#dfdfdf',
+        borderBottomWidth: 1,
+        borderBottomColor: '#dfdfdf'
     }
 });

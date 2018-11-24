@@ -25,6 +25,8 @@ export default class PageNav extends React.PureComponent {
         this.state = {
             translateY: new Animated.Value(35)
         };
+
+        this._showDelayId = 0;
     }
 
     _onItemPressed = (iconName) => {
@@ -59,20 +61,40 @@ export default class PageNav extends React.PureComponent {
     );
 
     show() {
-        Animated.timing(this.state.translateY, {
-            toValue: -95,
-            duration: 100,
-            useNativeDriver: true,
-            easing: Easing.bounce
-        }).start();
+        if (this._showDelayId) {
+            clearTimeout(this._showDelayId);
+        }
+
+        this._showDelayId = setTimeout(() => {
+            this._showDelayId = 0;
+
+            Animated.timing(this.state.translateY, {
+                toValue: -95,
+                duration: 100,
+                useNativeDriver: true,
+                easing: Easing.bounce
+            }).start();
+        }, 1000);
     }
 
     hide() {
+        if (this._showDelayId) {
+            clearTimeout(this._showDelayId);
+            this._showDelayId = 0;
+        }
+
         Animated.timing(this.state.translateY, {
             toValue: 35,
             duration: 100,
             useNativeDriver: true
         }).start();
+    }
+
+    componentWillUnmount(): void {
+        if (this._showDelayId) {
+            clearTimeout(this._showDelayId);
+            this._showDelayId = 0;
+        }
     }
 
     render() {

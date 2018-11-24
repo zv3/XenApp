@@ -153,8 +153,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#2577b1',
         width: 200,
         borderRadius: 3,
-        flexDirection: 'row',
-        justifyContent: 'center',
         marginTop: 20
     },
     textStyle: {

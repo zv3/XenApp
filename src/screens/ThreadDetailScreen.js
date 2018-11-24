@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, FlatList, StyleSheet, SafeAreaView } from 'react-native';
+import {
+    View,
+    FlatList,
+    StyleSheet,
+    SafeAreaView,
+    Keyboard,
+    Animated
+} from 'react-native';
 import BaseScreen, { LoadingState } from './BaseScreen';
 import { Fetcher } from '../utils/Fetcher';
 import PropTypes from 'prop-types';
@@ -44,27 +51,50 @@ export default class ThreadDetailScreen extends BaseScreen {
 
         this.setState(newState);
 
-        setTimeout(() => {
-            this._pageNav && this._pageNav.show();
-        }, 1000);
+        if (this._pageNav) {
+            setTimeout(() => {
+                this._pageNav.show();
+            }, 1000);
+        }
     };
 
     _onMomentumScrollBegin = () => this._pageNav && this._pageNav.hide();
     _onMomentumScrollEnd = () => this._pageNav && this._pageNav.show();
 
+    _onKeyboardDidShown = (ev) => {
+        const { endCoordinates } = ev;
+
+        this._pageNav && this._pageNav.hide();
+
+        Animated.timing(this.state.translateY, {
+            useNativeDriver: true,
+            duration: 100,
+            toValue: -1 * endCoordinates.height + 35
+        }).start();
+    };
+    _onKeyboardDidHide = () => {
+        Animated.timing(this.state.translateY, {
+            useNativeDriver: true,
+            duration: 100,
+            toValue: 0
+        }).start();
+    };
+
     constructor(props) {
         super(props);
 
         this.state = {
-            ...this.state
+            ...this.state,
+            translateY: new Animated.Value(0)
         };
 
         this._replyBox = null;
         this._pageNav = null;
+        this._postList = null;
     }
 
     _doRender() {
-        const { links, posts } = this.state;
+        const { links, posts, translateY } = this.state;
         const replyBox = (
             <ReplyBox
                 ref={(component) => (this._replyBox = component)}
@@ -74,22 +104,36 @@ export default class ThreadDetailScreen extends BaseScreen {
         );
         const renderItem = (item) => <PostCard post={item} />;
 
+        const transform = {
+            transform: [
+                {
+                    translateY: translateY
+                }
+            ]
+        };
+
         return (
             <SafeAreaView style={styles.container}>
-                <View style={styles.postList}>
-                    <FlatList
-                        renderItem={({ item }) => renderItem(item)}
-                        data={posts}
-                        ItemSeparatorComponent={PostCardSeparator}
-                        keyExtractor={(item) => JSON.stringify(item.post_id)}
-                        maxToRenderPerBatch={1}
-                        initialNumToRender={1}
-                        onMomentumScrollBegin={this._onMomentumScrollBegin}
-                        onMomentumScrollEnd={this._onMomentumScrollEnd}
-                    />
-                </View>
+                <Animated.View style={[styles.postList, transform]}>
+                    <View style={styles.postList}>
+                        <FlatList
+                            ref={(c) => (this._postList = c)}
+                            renderItem={({ item }) => renderItem(item)}
+                            data={posts}
+                            ItemSeparatorComponent={PostCardSeparator}
+                            keyExtractor={(item) =>
+                                JSON.stringify(item.post_id)
+                            }
+                            maxToRenderPerBatch={1}
+                            initialNumToRender={1}
+                            numColumns={1}
+                            onMomentumScrollBegin={this._onMomentumScrollBegin}
+                            onMomentumScrollEnd={this._onMomentumScrollEnd}
+                        />
+                    </View>
 
-                {replyBox}
+                    {replyBox}
+                </Animated.View>
 
                 {links && (
                     <PageNav
@@ -135,6 +179,20 @@ export default class ThreadDetailScreen extends BaseScreen {
 
     componentDidMount() {
         this._doLoadData();
+
+        this._keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            this._onKeyboardDidShown
+        );
+        this._keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            this._onKeyboardDidHide
+        );
+    }
+
+    componentWillUnmount(): void {
+        this._keyboardDidShowListener.remove();
+        this._keyboardDidHideListener.remove();
     }
 }
 
