@@ -6,17 +6,19 @@ This is __NOT__ official app by XenForo Company.
 
 Table of Contents:
 
-* [Installation](#Installation)
-    * [Requirements](#Requirements)
-    * [MacOS](#MAC OS User)
-    * [Windows](#Window User)
-* [Configuration](#Configuration)
-* Run on device
-* [Contribute node](#Contribute Note)
+* [Installation](#installation)
+    * [Requirements](#requirements)
+    * [MacOS](#mac-os-user)
+    * [Windows](#windows-user)
+* [Configuration](#configuration)
+* [Run on device](#run-on-device)
+* [Contribute node](#contribute-note)
 
 Installation
 ---------------
+
 ####MAC OS User:
+
 Step1: You must be install [brew](https://brew.sh) by running the following command:
 
 `/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
@@ -38,7 +40,7 @@ Step 4: Go to project and run it:
 
 `cd /path/to/this/repo && npm run ios`
 
-####Window User:
+####Windows User:
 
 Step 1: You must be install [chocolatey](https://chocolatey.org/install), a popular package manager for Windows.
 
