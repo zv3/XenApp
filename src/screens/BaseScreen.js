@@ -12,15 +12,15 @@ export default class BaseScreen extends React.Component {
         loadingState: LoadingState.Begin
     };
 
-    _setLoadingState(state) {
-        switch (state) {
+    _setLoadingState(loadingState, otherStates: ?Object) {
+        switch (loadingState) {
             case LoadingState.Begin:
             case LoadingState.Done:
             case LoadingState.Error:
-                this.setState({ loadingState: state });
+                this.setState({ ...otherStates, loadingState });
                 break;
             default:
-                throw new Error(`Unknown loading state ${state}`);
+                throw new Error(`Unknown loading state ${loadingState}`);
         }
     }
 
@@ -41,21 +41,25 @@ export default class BaseScreen extends React.Component {
             }
         };
 
-        if (this.state.loadingState === LoadingState.Begin) {
+        const { loadingState } = this.state;
+
+        if (loadingState === LoadingState.Begin) {
             return (
                 <View style={style.container}>
                     <ActivityIndicator />
                     <Text style={style.loading}>Loading...</Text>
                 </View>
             );
-        } else if (this.state.loadingState === LoadingState.Error) {
+        } else if (loadingState === LoadingState.Error) {
             return (
                 <View style={style.container}>
                     <Text>Whoops! Something went wrong. Please try again.</Text>
                 </View>
             );
+        } else if (loadingState === LoadingState.Done) {
+            return this._doRender();
         }
 
-        return this._doRender();
+        throw new Error(`Unknown loading state ${loadingState} for rendering`);
     }
 }

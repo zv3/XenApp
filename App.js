@@ -22,6 +22,8 @@ import {Token} from "./src/utils/Token";
 import ForumScreen from "./src/screens/ForumScreen";
 import ThreadCreateScreen from "./src/screens/ThreadCreateScreen";
 import DrawerNavList from "./src/drawer/DrawerNavList";
+import BatchApi from "./src/api/BatchApi";
+import {Visitor} from "./src/utils/Visitor";
 
 const AppRootStack = createStackNavigator({
     Home: HomeScreen,
@@ -33,7 +35,7 @@ const AppRootStack = createStackNavigator({
     // oauth screens
     Login: LoginScreen
 }, {
-    initialRouteName: 'Home'
+    initialRouteName: 'Forum'
 });
 
 const AppNavigator = createDrawerNavigator({
@@ -55,6 +57,16 @@ export default class App extends Component<Props> {
     componentDidMount() {
         const loadDone = () => this.setState({ isLoading: false });
 
+        const preloadData = () => {
+            BatchApi.addRequest('GET', 'users/me');
+            BatchApi.dispatch()
+                .then((data) => {
+                    Visitor.setVisitor(data['users/me'].user);
+                    loadDone();
+                })
+                .catch(loadDone);
+        };
+
         const refreshToken = (oAuthData) => {
             const payload = {
                 grant_type: 'refresh_token',
@@ -66,7 +78,8 @@ export default class App extends Component<Props> {
             Fetcher.post('oauth/token', payload)
                 .then((response) => {
                     Token.saveToken(response);
-                    loadDone();
+
+                    preloadData();
                 })
                 .catch(loadDone);
         };
@@ -78,7 +91,7 @@ export default class App extends Component<Props> {
                     // Need refresh token
                     refreshToken(oauthData);
                 } else {
-                    loadDone();
+                    preloadData();
                 }
             })
             .catch(loadDone);

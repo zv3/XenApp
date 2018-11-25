@@ -42,6 +42,12 @@ export default class DrawerNavList extends React.PureComponent {
         navigation: PropTypes.object.isRequired
     };
 
+    _onNavItemPress = (item) =>
+        this.props.navigation.navigate(item.navigationId);
+    _renderNavItem = ({ item }) => (
+        <DrawerNavItem item={item} onPress={this._onNavItemPress} />
+    );
+
     render() {
         const { navigation } = this.props;
 
@@ -51,14 +57,7 @@ export default class DrawerNavList extends React.PureComponent {
                 <FlatList
                     data={navItems}
                     keyExtractor={(item) => item.navigationId}
-                    renderItem={({ item }) => (
-                        <DrawerNavItem
-                            item={item}
-                            onPress={() =>
-                                navigation.navigate(item.navigationId)
-                            }
-                        />
-                    )}
+                    renderItem={this._renderNavItem}
                     getItemLayout={(data, index) => ({
                         length: 40,
                         offset: 40 * index,

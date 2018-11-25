@@ -14,7 +14,7 @@ export default class DrawerNavItem extends React.PureComponent {
 
         return (
             <TouchableHighlight
-                onPress={() => onPress()}
+                onPress={() => onPress(item)}
                 underlayColor="rgb(237, 246, 253)">
                 <View style={styles.item}>
                     <Icon name={item.icon} size={20} />

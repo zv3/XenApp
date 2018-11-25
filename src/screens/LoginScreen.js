@@ -10,7 +10,6 @@ import Button from '../components/Button';
 import { passwordEncrypter } from '../utils/Encrypter';
 import { CLIENT_ID } from '../Config';
 import { Fetcher } from '../utils/Fetcher';
-import { NavigationActions } from 'react-navigation';
 import { Token } from '../utils/Token';
 import PropTypes from 'prop-types';
 
@@ -30,9 +29,11 @@ export default class LoginScreen extends React.Component {
             isSubmitting: true
         });
 
+        const { username, password } = this.state.data;
+
         const payload = {
-            username: this.state.data.username,
-            password: passwordEncrypter(this.state.data.password),
+            username: username,
+            password: passwordEncrypter(password),
             grant_type: 'password',
             client_id: CLIENT_ID,
             password_algo: 'aes128'
@@ -54,13 +55,9 @@ export default class LoginScreen extends React.Component {
                     // login access.
 
                     Token.saveToken(response);
+                    this.props.navigation.dispatch('Home');
 
-                    this.props.navigation.dispatch(
-                        NavigationActions.navigate({
-                            routeName: 'Home',
-                            key: `home_${response.user_id}`
-                        })
-                    );
+                    // AuthEvent.dispatch();
 
                     return;
                 }
@@ -153,7 +150,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#2577b1',
         width: 200,
         borderRadius: 3,
-        marginTop: 20
+        marginTop: 20,
+        flexDirection: 'row',
+        justifyContent: 'center'
     },
     textStyle: {
         color: '#FFF'

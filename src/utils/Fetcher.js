@@ -34,7 +34,7 @@ const request = (method: String, uri: String, options: Object) => {
         {
             baseURL: BASE_URL,
             method: method,
-            timeout: 1000,
+            timeout: 5000,
             params: {},
             headers: {
                 Accept: 'application/json',
@@ -58,7 +58,14 @@ const request = (method: String, uri: String, options: Object) => {
             methodUpper === 'PUT' ||
             methodUpper === 'DELETE')
     ) {
-        opts.data = querystring.stringify(opts.data);
+        const formData = new FormData();
+        for (const key in opts.data) {
+            if (opts.data.hasOwnProperty(key)) {
+                formData.append(key, opts.data[key]);
+            }
+        }
+
+        opts.data = formData;
     }
 
     let onCancelSetup = null;
@@ -94,7 +101,7 @@ const request = (method: String, uri: String, options: Object) => {
                         data.hasOwnProperty('status') &&
                         data.status === 'error'
                     ) {
-                        reject(new Error(data.message));
+                        reject(new Error(data.errors[0]));
                     } else {
                         resolve(data);
                     }

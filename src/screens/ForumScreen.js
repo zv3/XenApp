@@ -9,11 +9,11 @@ import {
 import PropTypes from 'prop-types';
 import BaseScreen, { LoadingState } from './BaseScreen';
 import ButtonIcon from '../components/ButtonIcon';
-import { Fetcher } from '../utils/Fetcher';
 import { NavigationActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Feather';
 import ThreadRow, { ThreadRowSeparator } from '../components/ThreadRow';
 import DrawerTrigger from '../drawer/DrawerTrigger';
+import BatchApi from '../api/BatchApi';
 
 export default class ForumScreen extends BaseScreen {
     static propTypes = {
@@ -46,53 +46,36 @@ export default class ForumScreen extends BaseScreen {
 
     componentDidMount() {
         let parentId = 0,
-            item,
-            batchParams = [];
-        if (this.props.navigation) {
-            parentId = this.props.navigation.getParam('parentId', 0);
-            item = this.props.navigation.getParam('item');
+            item;
+
+        const { navigation } = this.props;
+        if (navigation) {
+            parentId = navigation.getParam('parentId', 0);
+            item = navigation.getParam('item');
         }
 
-        batchParams.push({
-            method: 'GET',
-            uri: 'navigation',
-            params: {
-                parent: parentId
-            }
+        BatchApi.addRequest('GET', 'navigation', {
+            parent: parentId
         });
 
         if (item && item.navigation_type === 'forum') {
-            batchParams.push({
-                method: 'GET',
-                uri: 'threads',
-                params: {
-                    forum_id: item.forum_id
-                }
-            });
-
-            batchParams.push({
-                method: 'GET',
-                uri: `forums/${item.forum_id}`
-            });
+            BatchApi.addRequest('get', 'threads', { forum_id: item.forum_id });
+            BatchApi.addRequest('get', `forums/${item.forum_id}`);
         }
 
-        return Fetcher.post('batch', JSON.stringify(batchParams))
+        return BatchApi.dispatch()
             .then((response) => {
-                const navItems = response.jobs.navigation.elements;
+                const { navigation, threads } = response;
 
-                this._setLoadingState(LoadingState.Done);
-
-                let stateData = {
-                    navItems: navItems
+                const stateData = {
+                    navItems: navigation.elements
                 };
 
                 if (item && item.navigation_type === 'forum') {
-                    stateData.threads = response.jobs.threads.threads;
-                    stateData.forum =
-                        response.jobs[`forums/${item.forum_id}`].forum;
+                    stateData.threads = threads.threads;
+                    stateData.forum = response[`forums/${item.forum_id}`].forum;
                 }
-
-                this.setState(stateData);
+                this._setLoadingState(LoadingState.Done, stateData);
             })
             .catch(() => this._setLoadingState(LoadingState.Error));
     }
@@ -197,29 +180,31 @@ export default class ForumScreen extends BaseScreen {
     }
 
     _doRenderMixed() {
-        const forum = this.state.forum;
+        const { forum, threads } = this.state;
         let createThreadButton = null;
 
         if (forum.permissions.create_thread) {
             createThreadButton = (
-                <ButtonIcon
-                    iconName="plus"
-                    iconSize={30}
-                    type="primary"
-                    onPress={() => this._onCreateThreadPressed()}
-                    iconColor="white"
-                    style={styles.addButton}
-                />
+                <View style={styles.floatButton}>
+                    <ButtonIcon
+                        iconName="plus"
+                        iconSize={30}
+                        type="primary"
+                        onPress={() => this._onCreateThreadPressed()}
+                        iconColor="white"
+                        style={styles.addButton}
+                    />
+                </View>
             );
         }
 
         return (
             <View style={styles.container}>
                 <FlatList
-                    data={this.state.threads}
+                    data={threads}
                     ListHeaderComponent={this._doRenderHeader()}
                     keyExtractor={(item) => JSON.stringify(item.thread_id)}
-                    ItemSeparatorComponent={() => ThreadRowSeparator()}
+                    ItemSeparatorComponent={ThreadRowSeparator}
                     renderItem={({ item }) => (
                         <ThreadRow
                             navigation={this.props.navigation}
@@ -271,12 +256,15 @@ const styles = StyleSheet.create({
         paddingBottom: 20
     },
 
+    floatButton: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20
+    },
+
     addButton: {
         width: 40,
         height: 40,
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
         borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',

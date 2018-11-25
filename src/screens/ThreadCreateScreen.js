@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, TextInput } from 'react-native';
+import { View, StyleSheet, TextInput, Text } from 'react-native';
 import Button from '../components/Button';
+import ButtonIcon from '../components/ButtonIcon';
 
 export default class ThreadCreateScreen extends React.Component {
     static navigationOptions = () => {
@@ -27,13 +28,16 @@ export default class ThreadCreateScreen extends React.Component {
         }));
     }
 
-    _doRenderTextField(name, label) {
+    _doRenderTextField(name, label, props) {
         return (
             <TextInput
                 editable={true}
                 style={styles.input}
                 placeholder={label}
+                autoCorrect={false}
+                multiline={true}
                 onTextChange={(text) => this._setFieldValue(name, text)}
+                {...props}
             />
         );
     }
@@ -45,16 +49,21 @@ export default class ThreadCreateScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                {this._doRenderTextField('thread_title', 'Thread Title')}
+                <Text>You are create thread in forum: XXXX</Text>
+                {this._doRenderTextField('thread_title', 'Thread Title', {
+                    maxLength: 100
+                })}
                 {this._doRenderTextField('thread_body', 'Content')}
 
-                <Button text="Attach files" onPress={this._doAttachFiles} />
+                <Button title="Attach files" onPress={this._doAttachFiles} />
 
-                <Button
-                    text="SAVE"
-                    textProps={{ style: styles.buttonText }}
+                <ButtonIcon
+                    iconName={'save'}
+                    iconColor={'#FFF'}
+                    textColor={'#FFF'}
+                    title="Save"
                     onPress={() => this._doSave()}
-                    style={[styles.submit]}
+                    style={styles.submit}
                 />
             </View>
         );
@@ -72,19 +81,19 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         padding: 10,
 
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0,0,0,.1)',
+        // borderBottomWidth: 1,
+        // borderBottomColor: 'rgba(0,0,0,.1)',
+        //
+        // borderTopWidth: 1,
+        // borderTopColor: 'rgba(0,0,0,.1)',
+        //
+        // borderLeftWidth: 1,
+        // borderLeftColor: 'rgba(0,0,0,.1)',
+        //
+        // borderRightWidth: 1,
+        // borderRightColor: 'rgba(0,0,0,.1)',
 
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(0,0,0,.1)',
-
-        borderLeftWidth: 1,
-        borderLeftColor: 'rgba(0,0,0,.1)',
-
-        borderRightWidth: 1,
-        borderRightColor: 'rgba(0,0,0,.1)',
-
-        color: 'red',
+        // color: 'red',
         fontSize: 18,
         backgroundColor: '#FFF',
 
@@ -94,15 +103,8 @@ const styles = StyleSheet.create({
     submit: {
         backgroundColor: '#ff4081',
         width: '100%',
-        padding: 5,
+        // padding: 5,
         borderRadius: 4,
-        marginTop: 10,
-        flexDirection: 'row',
-        justifyContent: 'center'
-    },
-
-    buttonText: {
-        color: '#FFF',
-        fontSize: 16
+        marginTop: 10
     }
 });

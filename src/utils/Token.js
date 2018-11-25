@@ -31,6 +31,8 @@ const saveToken = (oAuthData) => {
     };
 
     AsyncStorage.setItem('oAuthData', JSON.stringify(oauthData));
+
+    return oauthData;
 };
 
 const getOAuthData = () => {
@@ -52,9 +54,7 @@ const getOAuthData = () => {
                 setOAuthData(oAuthDataJson);
                 resolve(oAuthDataJson);
             })
-            .catch((error) => {
-                reject(error);
-            });
+            .catch((error) => reject(error));
     });
 };
 
@@ -65,10 +65,8 @@ const setOAuthData = (oAuthData) => {
 const get = () => {
     return new Promise((resolve) => {
         getOAuthData()
-            .then(resolve)
-            .catch(() => {
-                resolve(oneTimeToken());
-            });
+            .then((data) => resolve(data.accessToken))
+            .catch(() => resolve(oneTimeToken()));
     });
 };
 

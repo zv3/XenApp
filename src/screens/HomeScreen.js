@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, FlatList, Image } from 'react-native';
+import { View, FlatList, Image, StyleSheet } from 'react-native';
 import { Fetcher } from '../utils/Fetcher';
 import ButtonIcon from '../components/ButtonIcon';
 import BaseScreen, { LoadingState } from './BaseScreen';
@@ -24,12 +24,8 @@ class HomeHeaderRight extends React.Component {
 
     componentDidMount() {
         Visitor.getVisitor()
-            .then((visitor) => {
-                this.setState({ visitor: visitor });
-            })
-            .catch(() => {
-                this.setState({ visitor: false });
-            });
+            .then((visitor) => this.setState({ visitor }))
+            .catch(() => this.setState({ visitor: false }));
     }
 
     render() {
@@ -94,7 +90,7 @@ export default class HomeScreen extends BaseScreen {
         this.state = {
             ...this.state,
             results: [],
-            showPageNav: false
+            links: null
         };
 
         this._pageNav = null;
@@ -110,17 +106,9 @@ export default class HomeScreen extends BaseScreen {
 
         Fetcher.post('batch', JSON.stringify(batchParams))
             .then((response) => {
-                this._setLoadingState(LoadingState.Done);
+                const { results, links } = response.jobs['threads/recent'];
 
-                const results = response.jobs['threads/recent'];
-
-                this.setState({
-                    results: results.results,
-                    links: results.links,
-                    showPageNav: true
-                });
-
-                this._setLoadingState(LoadingState.Done);
+                this._setLoadingState(LoadingState.Done, { results, links });
             })
             .catch(() => {
                 this._setLoadingState(LoadingState.Error);
@@ -149,7 +137,7 @@ export default class HomeScreen extends BaseScreen {
     }
 
     _doRenderPageNav() {
-        if (!this.state.showPageNav || !this.state.links) {
+        if (!this.state.links) {
             return null;
         }
 
@@ -172,7 +160,7 @@ export default class HomeScreen extends BaseScreen {
 
     _doRender() {
         return (
-            <View>
+            <View style={styles.container}>
                 <FlatList
                     renderItem={({ item }) => (
                         <ThreadRow
@@ -191,3 +179,9 @@ export default class HomeScreen extends BaseScreen {
         );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1
+    }
+});
