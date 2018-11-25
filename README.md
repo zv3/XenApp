@@ -17,7 +17,7 @@ Table of Contents:
 Installation
 ---------------
 
-####MAC OS User:
+### MAC OS User:
 
 Step1: You must be install [brew](https://brew.sh) by running the following command:
 
@@ -40,7 +40,7 @@ Step 4: Go to project and run it:
 
 `cd /path/to/this/repo && npm run ios`
 
-####Windows User:
+### Windows User:
 
 Step 1: You must be install [chocolatey](https://chocolatey.org/install), a popular package manager for Windows.
 
@@ -56,7 +56,7 @@ Step 4: Go to project and run it:
 
 `cd /path/to/this/repo && npm run android`
 
-#####Note:
+##### Note:
 On Window you can only run `android` simulator
 
 Configuration
