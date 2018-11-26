@@ -94,7 +94,9 @@ export default class ThreadDetailScreen extends BaseScreen {
         Animated.timing(this.state.translateY, {
             useNativeDriver: true,
             duration: 100,
-            toValue: -1 * (height - endCoordinates.screenY) + 35
+            toValue:
+                -1 * (height - endCoordinates.screenY) +
+                this._replyBox.getLayoutHeight()
         }).start();
     };
     _onKeyboardDidHide = () => {

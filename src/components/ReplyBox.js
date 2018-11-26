@@ -4,16 +4,26 @@ import ButtonIcon from './ButtonIcon';
 import PropTypes from 'prop-types';
 
 export default class ReplyBox extends React.PureComponent {
-    state = {
-        message: '',
-        quoteUser: '',
-        enabled: true
-    };
-
     static propTypes = {
         onSubmit: PropTypes.func.isRequired,
         style: PropTypes.object
     };
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            message: '',
+            quoteUser: '',
+            enabled: true
+        };
+
+        this._layoutHeight = 40;
+    }
+
+    getLayoutHeight() {
+        return this._layoutHeight;
+    }
 
     setMessage(message) {
         this.setState({ message: message });
@@ -54,7 +64,11 @@ export default class ReplyBox extends React.PureComponent {
         const { message, enabled } = this.state;
 
         return (
-            <View style={[styles.container, this.props.style]}>
+            <View
+                style={[styles.container, this.props.style]}
+                onLayout={(ev) =>
+                    (this._layoutHeight = ev.nativeEvent.layout.height)
+                }>
                 <TextInput
                     style={styles.input}
                     multiline={true}

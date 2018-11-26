@@ -10,6 +10,7 @@ import DrawerTrigger from '../drawer/DrawerTrigger';
 import AuthEvent from '../events/AuthEvent';
 import Avatar from '../components/Avatar';
 import { Visitor } from '../utils/Visitor';
+import BatchApi from '../api/BatchApi';
 
 class HomeHeaderRight extends React.PureComponent {
     static propTypes = {
@@ -94,14 +95,8 @@ export default class HomeScreen extends BaseScreen {
     }
 
     componentDidMount() {
-        const batchParams = [
-            {
-                method: 'GET',
-                uri: 'threads/recent'
-            }
-        ];
-
-        Fetcher.post('batch', JSON.stringify(batchParams))
+        BatchApi.addRequest('get', 'threads/recent');
+        BatchApi.dispatch()
             .then((response) => {
                 const { results, links } = response.jobs['threads/recent'];
 
