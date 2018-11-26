@@ -1,6 +1,6 @@
 {
   "name": "XenApp",
-  "version": "0.0.1",
+  "version": "1.0.181126",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start --port=19000",
