@@ -13,7 +13,21 @@ export default class ThreadRow extends React.Component {
         navigation: PropTypes.object.isRequired
     };
 
-    _doRenderPreview() {
+    _onItemPress = () => {
+        const { navigation, thread } = this.props;
+        navigation.dispatch(
+            NavigationActions.navigate({
+                routeName: 'ThreadDetail',
+                key: `thread_${thread.thread_id}`,
+                params: {
+                    threadId: thread.thread_id,
+                    title: thread.thread_title
+                }
+            })
+        );
+    };
+
+    _doRenderPreview = () => {
         const thread = this.props.thread;
         let message = thread.first_post.post_body_plain_text;
 
@@ -22,9 +36,9 @@ export default class ThreadRow extends React.Component {
         }
 
         return <Text style={styles.bodyText}>{message}</Text>;
-    }
+    };
 
-    _doRenderMeta() {
+    _doRenderMeta = () => {
         const thread = this.props.thread;
         const style = {
             container: {
@@ -46,28 +60,13 @@ export default class ThreadRow extends React.Component {
                 </Text>
             </View>
         );
-    }
-
-    _onItemPress() {
-        this.props.navigation.dispatch(
-            NavigationActions.navigate({
-                routeName: 'ThreadDetail',
-                key: `thread_${this.props.thread.thread_id}`,
-                params: {
-                    threadId: this.props.thread.thread_id,
-                    title: this.props.thread.thread_title
-                }
-            })
-        );
-    }
+    };
 
     render() {
         const thread = this.props.thread;
 
         return (
-            <TouchableHighlight
-                onPress={() => this._onItemPress()}
-                underlayColor="red">
+            <TouchableHighlight onPress={this._onItemPress}>
                 <View style={styles.container}>
                     <Avatar uri={thread.links.first_poster_avatar} />
                     <View style={styles.body}>

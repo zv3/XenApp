@@ -5,7 +5,10 @@ import {
     StyleSheet,
     SafeAreaView,
     Keyboard,
-    Animated
+    Animated,
+    Dimensions,
+    Platform,
+    Alert
 } from 'react-native';
 import BaseScreen, { LoadingState } from './BaseScreen';
 import { Fetcher } from '../utils/Fetcher';
@@ -13,6 +16,9 @@ import PropTypes from 'prop-types';
 import PageNav from '../components/PageNav';
 import PostCard, { PostCardSeparator } from '../components/PostCard';
 import ReplyBox from '../components/ReplyBox';
+import PostApi from '../api/PostApi';
+
+const { height } = Dimensions.get('window');
 
 export default class ThreadDetailScreen extends BaseScreen {
     static propTypes = {
@@ -27,10 +33,29 @@ export default class ThreadDetailScreen extends BaseScreen {
         };
     };
 
-    _doReply = () => {
-        if (this._replyBox !== null) {
-            this._replyBox.clear();
-        }
+    _doReply = (message) => {
+        const threadId = this.props.navigation.getParam('threadId');
+
+        PostApi.create(threadId, message)
+            .then((response) => {
+                if (this._replyBox !== null) {
+                    this._replyBox.clear();
+                }
+
+                const { post } = response;
+                this.setState((prevState) => ({
+                    ...prevState,
+                    posts: [...prevState.posts, post]
+                }));
+
+                this._postList.scrollToEnd({
+                    animated: true
+                });
+            })
+            .catch((err) => {
+                Alert.alert('Whoops!', err.toString());
+                this._replyBox.toggleEnabled(true);
+            });
     };
 
     _gotoPage = (link, page) => {
@@ -69,7 +94,7 @@ export default class ThreadDetailScreen extends BaseScreen {
         Animated.timing(this.state.translateY, {
             useNativeDriver: true,
             duration: 100,
-            toValue: -1 * endCoordinates.height + 35
+            toValue: -1 * (height - endCoordinates.screenY) + 35
         }).start();
     };
     _onKeyboardDidHide = () => {
@@ -181,7 +206,7 @@ export default class ThreadDetailScreen extends BaseScreen {
         this._doLoadData();
 
         this._keyboardDidShowListener = Keyboard.addListener(
-            'keyboardDidShow',
+            Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
             this._onKeyboardDidShown
         );
         this._keyboardDidHideListener = Keyboard.addListener(

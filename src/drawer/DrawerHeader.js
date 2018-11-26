@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import ButtonIcon from '../components/ButtonIcon';
 import PropTypes from 'prop-types';
-import Avatar from "../components/Avatar";
+import Avatar from '../components/Avatar';
 
 export default class DrawerHeader extends React.PureComponent {
     static propTypes = {
@@ -17,7 +17,7 @@ export default class DrawerHeader extends React.PureComponent {
         if (user) {
             childrenNode = (
                 <View>
-                    <Avatar uri={user.links.avatar_small}/>
+                    <Avatar uri={user.links.avatar_small} />
                     <Text style={styles.user}>{user.username}</Text>
                 </View>
             );

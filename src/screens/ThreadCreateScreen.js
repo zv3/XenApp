@@ -1,7 +1,16 @@
 import React from 'react';
-import { View, StyleSheet, TextInput, Text, SafeAreaView } from 'react-native';
+import {
+    View,
+    StyleSheet,
+    TextInput,
+    Text,
+    SafeAreaView,
+    Alert
+} from 'react-native';
 import ButtonIcon from '../components/ButtonIcon';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
+import ThreadApi from '../api/ThreadApi';
+import { NavigationActions } from 'react-navigation';
 
 export default class ThreadCreateScreen extends React.Component {
     static navigationOptions = () => {
@@ -14,25 +23,7 @@ export default class ThreadCreateScreen extends React.Component {
         navigation: PropTypes.object.isRequired
     };
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            fields: {}
-        };
-    }
-
-    _setFieldValue(name, value) {
-        this.setState((prevState) => ({
-            ...prevState,
-            fields: {
-                ...prevState.fields,
-                [name]: value
-            }
-        }));
-    }
-
-    _doRenderTextField(name, label, props) {
+    _doRenderTextField = (name, label, props) => {
         const style = [styles.input];
         if (props.hasOwnProperty('style')) {
             style.push(props.style);
@@ -41,39 +32,104 @@ export default class ThreadCreateScreen extends React.Component {
 
         return (
             <TextInput
-                editable={true}
+                editable={!this.state.isSubmitting}
                 style={style}
                 placeholder={label}
                 autoCorrect={false}
-                multiline={true}
-                onTextChange={(text) => this._setFieldValue(name, text)}
+                onChangeText={(text) => this._setFieldValue(name, text)}
                 {...props}
             />
         );
-    }
+    };
 
-    _doSubmit = () => {};
+    _setFieldValue = (name, value) => {
+        this.setState((prevState) => ({
+            ...prevState,
+            fields: {
+                ...prevState.fields,
+                [name]: value
+            }
+        }));
+    };
 
-    render() {
-        const {navigation} = this.props;
+    _doSubmit = () => {
+        this.setState({ isSubmitting: true });
+
+        const { navigation } = this.props;
         const forum = navigation.getParam('forum');
 
-        return (
-            <SafeAreaView style={{flex:1}}>
-                <View style={styles.container}>
-                    <View style={{flexGrow:1}}>
-                        <Text style={styles.heading}>In forum: <Text style={styles.forumTitle}>{forum.forum_title}</Text></Text>
+        const { title, body } = this.state.fields;
 
-                        {this._doRenderTextField('thread_title', 'Thread Title', {
+        ThreadApi.create(forum.forum_id, title, body)
+            .then((response) => {
+                const { thread } = response;
+
+                navigation.dispatch(
+                    NavigationActions.navigate({
+                        routeName: 'ThreadDetail',
+                        key: `thread_${thread.thread_id}`,
+                        params: {
+                            threadId: thread.thread_id,
+                            title: thread.thread_title
+                        }
+                    })
+                );
+            })
+            .catch((err) => {
+                Alert.alert('Whoops!', err.toString());
+
+                this.setState({ isSubmitting: false });
+            });
+    };
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            fields: {
+                title: '',
+                body: ''
+            },
+            isSubmitting: false
+        };
+    }
+
+    render() {
+        const { navigation } = this.props;
+        const forum = navigation.getParam('forum');
+
+        const contentProps = {
+            numberOfLines: 15,
+            multiline: true,
+            style: {
+                // flexGrow: 1
+                height: 150
+            }
+        };
+
+        const submitStyles = [styles.submit];
+        const flex = { flex: 1 };
+
+        return (
+            <SafeAreaView style={flex}>
+                <View style={styles.container}>
+                    <View>
+                        <Text style={styles.heading}>
+                            In forum:{' '}
+                            <Text style={styles.forumTitle}>
+                                {forum.forum_title}
+                            </Text>
+                        </Text>
+
+                        {this._doRenderTextField('title', 'Thread Title', {
                             maxLength: 100
                         })}
 
-                        {this._doRenderTextField('thread_body', 'Content', {
-                            numberOfLines: 15,
-                            style: {
-                                flexGrow: 1
-                            }
-                        })}
+                        {this._doRenderTextField(
+                            'body',
+                            'Content',
+                            contentProps
+                        )}
                     </View>
 
                     {/*<Button title="Attach files" onPress={this._doAttachFiles} />*/}
@@ -84,7 +140,7 @@ export default class ThreadCreateScreen extends React.Component {
                         textColor={'#FFF'}
                         title="Save"
                         onPress={this._doSubmit}
-                        style={styles.submit}
+                        style={submitStyles}
                     />
                 </View>
             </SafeAreaView>

@@ -7,7 +7,7 @@ export default class ReplyBox extends React.PureComponent {
     state = {
         message: '',
         quoteUser: '',
-        isSubmitting: false
+        enabled: true
     };
 
     static propTypes = {
@@ -22,8 +22,12 @@ export default class ReplyBox extends React.PureComponent {
     clear() {
         this.setState({
             message: '',
-            isSubmitting: false
+            enabled: true
         });
+    }
+
+    toggleEnabled(enabled: boolean): void {
+        this.setState({ enabled });
     }
 
     message() {
@@ -40,24 +44,21 @@ export default class ReplyBox extends React.PureComponent {
             return;
         }
 
-        this.setState({
-            isSubmitting: true
-        });
-
+        this.toggleEnabled(false);
         this.props.onSubmit(message);
     };
 
     _doRenderQuoteText() {}
 
     render() {
-        const { message, isSubmitting } = this.state;
+        const { message, enabled } = this.state;
 
         return (
             <View style={[styles.container, this.props.style]}>
                 <TextInput
                     style={styles.input}
                     multiline={true}
-                    editable={!isSubmitting}
+                    editable={enabled}
                     onChangeText={(message) => this.setMessage(message)}
                     value={message}
                     autoCorrect={false}
@@ -68,7 +69,7 @@ export default class ReplyBox extends React.PureComponent {
                         iconName="send"
                         iconSize={20}
                         iconColor={'#FFF'}
-                        disabled={this.message().length === 0 || isSubmitting}
+                        disabled={this.message().length === 0 || !enabled}
                         onPress={this._doSubmit}
                         style={styles.sendButton}
                     />
@@ -90,7 +91,8 @@ const styles = StyleSheet.create({
     input: {
         paddingTop: 5,
         paddingBottom: 5,
-        flexGrow: 1
+        flexGrow: 1,
+        fontSize: 18
     },
 
     submit: {

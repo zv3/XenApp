@@ -7,15 +7,12 @@ import {
     Alert
 } from 'react-native';
 import Button from '../components/Button';
-import { passwordEncrypter } from '../utils/Encrypter';
-import { CLIENT_ID } from '../Config';
-import { Fetcher } from '../utils/Fetcher';
 import { Token } from '../utils/Token';
 import PropTypes from 'prop-types';
-import UserApi from "../api/UserApi";
-import AuthEvent from "../events/AuthEvent";
-import {Visitor} from "../utils/Visitor";
-import OAuthApi from "../api/OAuthApi";
+import UserApi from '../api/UserApi';
+import AuthEvent from '../events/AuthEvent';
+import { Visitor } from '../utils/Visitor';
+import OAuthApi from '../api/OAuthApi';
 
 export default class LoginScreen extends React.Component {
     static navigationOptions = () => {
@@ -56,7 +53,7 @@ export default class LoginScreen extends React.Component {
                         Visitor.setVisitor(user);
                         AuthEvent.dispatch(user);
                     })
-                    .catch(onFailedLogin)
+                    .catch(onFailedLogin);
             })
             .catch(onFailedLogin);
     };

@@ -98,8 +98,7 @@ export default class PageNav extends React.PureComponent {
     }
 
     render() {
-        const links = this.props.links;
-        const { page, pages } = links;
+        const { page, pages } = this.props.links;
 
         const transform = {
             transform: [{ translateY: this.state.translateY }]

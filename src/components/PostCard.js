@@ -5,6 +5,7 @@ import ButtonIcon from './ButtonIcon';
 import HTML from 'react-native-render-html';
 import moment from 'moment';
 import Avatar from './Avatar';
+import PostApi from '../api/PostApi';
 
 export const PostCardSeparator = () => <View style={styles.separator} />;
 
@@ -12,6 +13,22 @@ export default class PostCard extends React.Component {
     static propTypes = {
         post: PropTypes.object.isRequired
     };
+
+    static getDerivedStateFromProps(nextProps, state) {
+        if (state.isLiked === null) {
+            return { isLiked: nextProps.post.post_is_liked };
+        }
+
+        return null;
+    }
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isLiked: null
+        };
+    }
 
     _doRenderHeader = () => {
         const post = this.props.post;
@@ -78,10 +95,31 @@ export default class PostCard extends React.Component {
         );
     };
 
-    _onActionPressed = () => {};
+    _onActionPressed = (icon) => {
+        const { post } = this.props;
+
+        switch (icon) {
+            case 'thumbs-up':
+                if (this.state.isLiked) {
+                    PostApi.unlike(post.post_id)
+                        .then(() => this.setState({ isLiked: false }))
+                        .catch(() => {});
+                } else {
+                    PostApi.like(post.post_id)
+                        .then(() => this.setState({ isLiked: true }))
+                        .catch(() => {});
+                }
+                break;
+            case 'share':
+                break;
+            default:
+                throw new Error(`Unknown action pressed: ${icon}`);
+        }
+    };
 
     _doRenderFooter = () => {
         const { post } = this.props;
+        const { isLiked } = this.state;
 
         const renderButton = (icon, text, disabled = false) => {
             const iconColor = Platform.select({
@@ -100,26 +138,28 @@ export default class PostCard extends React.Component {
                     title={text}
                     iconSize={18}
                     disabled={disabled}
-                    onPress={this._onActionPressed}
+                    onPress={() => this._onActionPressed(icon)}
                 />
             );
         };
 
         return (
             <View style={styles.footer}>
-                {renderButton('thumbs-up', 'Like', !post.permissions.like)}
                 {renderButton(
-                    'message-square',
-                    'Reply',
-                    !post.permissions.reply
+                    'thumbs-up',
+                    isLiked ? 'Unlike' : 'Like',
+                    !post.permissions.like
                 )}
                 {renderButton('share', 'Share')}
             </View>
         );
     };
 
-    shouldComponentUpdate(nextProps): boolean {
-        return nextProps.post.post_id !== this.props.post.post_id;
+    shouldComponentUpdate(nextProps, nextState): boolean {
+        return (
+            nextProps.post.post_id !== this.props.post.post_id ||
+            this.state.isLiked !== nextState.isLiked
+        );
     }
 
     render() {

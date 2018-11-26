@@ -1,6 +1,6 @@
-import {passwordEncrypter} from "../utils/Encrypter";
-import {CLIENT_ID, CLIENT_SECRET} from "../Config";
-import {Fetcher} from "../utils/Fetcher";
+import { passwordEncrypter } from '../utils/Encrypter';
+import { CLIENT_ID, CLIENT_SECRET } from '../Config';
+import { Fetcher } from '../utils/Fetcher';
 
 export default class OAuthApi {
     static login(username: String, password: String): Promise {

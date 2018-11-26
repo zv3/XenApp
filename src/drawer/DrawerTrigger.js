@@ -12,7 +12,7 @@ export default class DrawerTrigger extends React.PureComponent {
     };
 
     static defaultProps = {
-        iconSize: 25,
+        iconSize: 28,
         isBack: false
     };
 

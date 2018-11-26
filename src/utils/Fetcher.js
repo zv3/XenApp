@@ -4,13 +4,7 @@ import { Token } from './Token';
 import axios from 'axios';
 
 const get = (uri, params: any, options: ?Object) => {
-    const opts = Object.assign(
-        {},
-        {
-            params: params
-        },
-        options
-    );
+    const opts = Object.assign({}, { params: params }, options);
 
     return request('GET', uri, opts);
 };
@@ -21,6 +15,7 @@ const post = (uri, data: any, options: ?Object) => {
 };
 const put = (uri, data: any, options: ?Object) => {
     const opts = Object.assign({}, { data: data }, options);
+
     return request('PUT', uri, opts);
 };
 const del = (uri, data: any, options: ?Object) => {
@@ -88,7 +83,8 @@ const request = (method: String, uri: String, options: Object) => {
                 opts.params.oauth_token = token;
             }
 
-            const isFullUri = (uri.indexOf('http://') === 0 || uri.indexOf('https://') === 0);
+            const isFullUri =
+                uri.indexOf('http://') === 0 || uri.indexOf('https://') === 0;
             opts.url = isFullUri ? uri : `api/index.php?${normalizeUri(uri)}`;
 
             const CancelToken = axios.CancelToken;
@@ -110,7 +106,12 @@ const request = (method: String, uri: String, options: Object) => {
                         data.hasOwnProperty('status') &&
                         data.status === 'error'
                     ) {
-                        reject(new Error(data.errors[0]));
+                        if (Array.isArray(data.errors)) {
+                            reject(new Error(data.errors[0]));
+                        } else {
+                            const errorKeys = Object.keys(data.errors);
+                            reject(new Error(data.errors[errorKeys[0]]));
+                        }
                     } else {
                         resolve(data);
                     }

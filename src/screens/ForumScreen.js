@@ -223,7 +223,7 @@ export default class ForumScreen extends BaseScreen {
         }
 
         return (
-            <View>
+            <View style={styles.container}>
                 <FlatList
                     renderItem={({ item }) => this._doRenderNavItem(item)}
                     data={this._getRenderableItems()}

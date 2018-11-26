@@ -34,7 +34,7 @@ const AppRootStack = createStackNavigator({
     // oauth screens
     Login: LoginScreen
 }, {
-    initialRouteName: 'Forum'
+    initialRouteName: 'Home'
 });
 
 const AppNavigator = createDrawerNavigator({

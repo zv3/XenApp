@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, FlatList, Image, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet } from 'react-native';
 import { Fetcher } from '../utils/Fetcher';
 import ButtonIcon from '../components/ButtonIcon';
 import BaseScreen, { LoadingState } from './BaseScreen';
@@ -7,9 +7,9 @@ import ThreadRow, { ThreadRowSeparator } from '../components/ThreadRow';
 import PageNav from '../components/PageNav';
 import PropTypes from 'prop-types';
 import DrawerTrigger from '../drawer/DrawerTrigger';
-import AuthEvent from "../events/AuthEvent";
-import Avatar from "../components/Avatar";
-import {Visitor} from "../utils/Visitor";
+import AuthEvent from '../events/AuthEvent';
+import Avatar from '../components/Avatar';
+import { Visitor } from '../utils/Visitor';
 
 class HomeHeaderRight extends React.PureComponent {
     static propTypes = {
@@ -20,7 +20,8 @@ class HomeHeaderRight extends React.PureComponent {
         avatarUrl: null
     };
 
-    _onAuthEvent = (visitor) => this.setState({ avatarUrl: visitor && visitor.links.avatar_small });
+    _onAuthEvent = (visitor) =>
+        this.setState({ avatarUrl: visitor && visitor.links.avatar_small });
 
     componentDidMount(): void {
         AuthEvent.addListener(this._onAuthEvent);
@@ -34,7 +35,7 @@ class HomeHeaderRight extends React.PureComponent {
     }
 
     render() {
-        const {avatarUrl} = this.state;
+        const { avatarUrl } = this.state;
         if (avatarUrl) {
             const viewStyle = {
                 container: {

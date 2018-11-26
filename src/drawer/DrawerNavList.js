@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { FlatList, StyleSheet, View } from 'react-native';
 import DrawerNavItem from './DrawerNavItem';
 import DrawerHeader from './DrawerHeader';
-import AuthEvent from "../events/AuthEvent";
-import {Visitor} from "../utils/Visitor";
+import AuthEvent from '../events/AuthEvent';
+import { Visitor } from '../utils/Visitor';
 
 const navItems = [
     {

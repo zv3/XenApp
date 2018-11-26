@@ -21,7 +21,7 @@ export default class BaseEvent {
         }
     }
 
-    static removeAllListeners(name: ?String) {
+    static removeAllListeners(name: ?String): void {
         if (name) {
             if (_events.hasOwnProperty([name])) {
                 delete _events[[name]];
