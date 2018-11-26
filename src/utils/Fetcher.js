@@ -74,13 +74,22 @@ const request = (method: String, uri: String, options: Object) => {
         delete opts.onCancelSetup;
     }
 
+    const normalizeUri = (uri) => {
+        if (uri.substr(0, 1) === '/') {
+            uri = uri.substr(1);
+        }
+
+        return uri;
+    };
+
     return new Promise((resolve, reject) => {
         Token.get().then((token) => {
             if (!opts.params.oauth_token) {
                 opts.params.oauth_token = token;
             }
 
-            opts.url = uri.indexOf('http') === 0 ? uri : `api/index.php?${uri}`;
+            const isFullUri = (uri.indexOf('http://') === 0 || uri.indexOf('https://') === 0);
+            opts.url = isFullUri ? uri : `api/index.php?${normalizeUri(uri)}`;
 
             const CancelToken = axios.CancelToken;
             const source = CancelToken.source();

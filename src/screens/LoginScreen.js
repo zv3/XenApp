@@ -12,6 +12,10 @@ import { CLIENT_ID } from '../Config';
 import { Fetcher } from '../utils/Fetcher';
 import { Token } from '../utils/Token';
 import PropTypes from 'prop-types';
+import UserApi from "../api/UserApi";
+import AuthEvent from "../events/AuthEvent";
+import {Visitor} from "../utils/Visitor";
+import OAuthApi from "../api/OAuthApi";
 
 export default class LoginScreen extends React.Component {
     static navigationOptions = () => {
@@ -31,14 +35,6 @@ export default class LoginScreen extends React.Component {
 
         const { username, password } = this.state.data;
 
-        const payload = {
-            username: username,
-            password: passwordEncrypter(password),
-            grant_type: 'password',
-            client_id: CLIENT_ID,
-            password_algo: 'aes128'
-        };
-
         const onFailedLogin = () => {
             Alert.alert('Cannot log-in', 'Invalid password or email');
 
@@ -49,20 +45,18 @@ export default class LoginScreen extends React.Component {
             }, 2000);
         };
 
-        Fetcher.post('oauth/token', payload)
+        OAuthApi.login(username, password)
             .then((response) => {
-                if (response.hasOwnProperty('access_token')) {
-                    // login access.
+                UserApi.get('me', { oauth_token: response.access_token })
+                    .then((user) => {
+                        Token.saveToken(response);
 
-                    Token.saveToken(response);
-                    this.props.navigation.dispatch('Home');
+                        this.props.navigation.navigate('Home');
 
-                    // AuthEvent.dispatch();
-
-                    return;
-                }
-
-                onFailedLogin();
+                        Visitor.setVisitor(user);
+                        AuthEvent.dispatch(user);
+                    })
+                    .catch(onFailedLogin)
             })
             .catch(onFailedLogin);
     };

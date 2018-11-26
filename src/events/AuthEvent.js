@@ -5,6 +5,10 @@ export default class AuthEvent extends BaseEvent {
         BaseEvent.addListener('AuthEvent', callback);
     }
 
+    static removeListener(callback: Function): void {
+        BaseEvent.removeListener('AuthEvent', callback);
+    }
+
     static dispatch(...data): void {
         BaseEvent.dispatch('AuthEvent', ...data);
     }

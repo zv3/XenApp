@@ -5,55 +5,53 @@ import ButtonIcon from '../components/ButtonIcon';
 import BaseScreen, { LoadingState } from './BaseScreen';
 import ThreadRow, { ThreadRowSeparator } from '../components/ThreadRow';
 import PageNav from '../components/PageNav';
-import { Visitor } from '../utils/Visitor';
 import PropTypes from 'prop-types';
 import DrawerTrigger from '../drawer/DrawerTrigger';
+import AuthEvent from "../events/AuthEvent";
+import Avatar from "../components/Avatar";
+import {Visitor} from "../utils/Visitor";
 
-class HomeHeaderRight extends React.Component {
+class HomeHeaderRight extends React.PureComponent {
     static propTypes = {
         navigation: PropTypes.object.isRequired
     };
 
-    constructor(props) {
-        super(props);
+    state = {
+        avatarUrl: null
+    };
 
-        this.state = {
-            visitor: null
-        };
+    _onAuthEvent = (visitor) => this.setState({ avatarUrl: visitor && visitor.links.avatar_small });
+
+    componentDidMount(): void {
+        AuthEvent.addListener(this._onAuthEvent);
+        Visitor.getVisitor()
+            .then(this._onAuthEvent)
+            .catch(() => this._onAuthEvent(null));
     }
 
-    componentDidMount() {
-        Visitor.getVisitor()
-            .then((visitor) => this.setState({ visitor }))
-            .catch(() => this.setState({ visitor: false }));
+    componentWillUnmount(): void {
+        AuthEvent.removeListener(this._onAuthEvent);
     }
 
     render() {
-        if (
-            this.state.visitor !== null &&
-            typeof this.state.visitor === 'object'
-        ) {
+        const {avatarUrl} = this.state;
+        if (avatarUrl) {
             const viewStyle = {
                 container: {
                     marginRight: 10
-                },
-                avatar: {
-                    width: 28,
-                    height: 28,
-                    borderRadius: 14,
-                    resizeMode: 'contain'
                 }
             };
 
             return (
                 <View style={viewStyle.container}>
-                    <Image
-                        source={{ uri: this.state.visitor.links.avatar_small }}
+                    <Avatar
+                        uri={avatarUrl}
+                        size={28}
                         style={viewStyle.avatar}
                     />
                 </View>
             );
-        } else if (this.state.visitor === false) {
+        } else {
             const loginStyle = {
                 flex: 1,
                 flexDirection: 'row',
@@ -70,8 +68,6 @@ class HomeHeaderRight extends React.Component {
                 </View>
             );
         }
-
-        return null;
     }
 }
 

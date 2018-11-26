@@ -16,14 +16,13 @@ import {
 import HomeScreen from "./src/screens/HomeScreen";
 import ThreadDetailScreen from "./src/screens/ThreadDetailScreen";
 import LoginScreen from "./src/screens/LoginScreen";
-import {Fetcher} from "./src/utils/Fetcher";
-import {CLIENT_ID, CLIENT_SECRET} from "./src/Config";
 import {Token} from "./src/utils/Token";
 import ForumScreen from "./src/screens/ForumScreen";
 import ThreadCreateScreen from "./src/screens/ThreadCreateScreen";
 import DrawerNavList from "./src/drawer/DrawerNavList";
 import BatchApi from "./src/api/BatchApi";
 import {Visitor} from "./src/utils/Visitor";
+import OAuthApi from "./src/api/OAuthApi";
 
 const AppRootStack = createStackNavigator({
     Home: HomeScreen,
@@ -62,34 +61,24 @@ export default class App extends Component<Props> {
             BatchApi.dispatch()
                 .then((data) => {
                     Visitor.setVisitor(data['users/me'].user);
+
                     loadDone();
-                })
-                .catch(loadDone);
-        };
-
-        const refreshToken = (oAuthData) => {
-            const payload = {
-                grant_type: 'refresh_token',
-                client_id: CLIENT_ID,
-                client_secret: CLIENT_SECRET,
-                refresh_token: oAuthData.refreshToken
-            };
-
-            Fetcher.post('oauth/token', payload)
-                .then((response) => {
-                    Token.saveToken(response);
-
-                    preloadData();
                 })
                 .catch(loadDone);
         };
 
         Token.getOAuthData()
             .then((oauthData) => {
-                const aMinuteMS = 60;
-                if (!oauthData.expiresAt || (oauthData.expiresAt - Math.floor(Date.now()/1000)) < aMinuteMS) {
+                const aMinuteMS = 60 * 1000;
+                if (!oauthData.expiresAt || (oauthData.expiresAt - Date.now()) < aMinuteMS) {
                     // Need refresh token
-                    refreshToken(oauthData);
+                    OAuthApi.refresh(oauthData)
+                        .then((response) => {
+                            Token.saveToken(response);
+
+                            preloadData();
+                        })
+                        .catch(loadDone);
                 } else {
                     preloadData();
                 }
