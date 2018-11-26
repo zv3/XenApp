@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform, Dimensions } from 'react-native';
 import PropTypes from 'prop-types';
 import ButtonIcon from './ButtonIcon';
 import HTML from 'react-native-render-html';
 import moment from 'moment';
 import Avatar from './Avatar';
 import PostApi from '../api/PostApi';
+
+const { width } = Dimensions.get('window');
 
 export const PostCardSeparator = () => <View style={styles.separator} />;
 
@@ -85,7 +87,8 @@ export default class PostCard extends React.Component {
                 ) {
                     return data.replace(/^\s*/, '');
                 }
-            }
+            },
+            imagesMaxWidth: width - styles.body.padding * 2
         };
 
         return (
@@ -223,6 +226,7 @@ const styles = StyleSheet.create({
     quoteBlock: {
         backgroundColor: '#f5f5f5',
         padding: 10,
+        marginBottom: 10,
         borderLeftWidth: 3,
         borderLeftColor: '#f2930d',
         borderTopWidth: 1,
