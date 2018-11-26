@@ -39,7 +39,7 @@ const request = (method: String, uri: String, options: Object) => {
                 return querystring.stringify(params);
             },
             validateStatus: function(status) {
-                return status >= 200 && status < 404;
+                return status >= 200 && status < 400;
             },
             onCancelSetup: null
         },
@@ -77,6 +77,12 @@ const request = (method: String, uri: String, options: Object) => {
         return uri;
     };
 
+    let skipDefaultHandler = false;
+    if (opts.hasOwnProperty('skipDefaultHandler')) {
+        skipDefaultHandler = opts.skipDefaultHandler;
+        delete opts.skipDefaultHandler;
+    }
+
     return new Promise((resolve, reject) => {
         Token.get().then((token) => {
             if (!opts.params.oauth_token) {
@@ -102,18 +108,26 @@ const request = (method: String, uri: String, options: Object) => {
                 .request(opts)
                 .then((response) => {
                     const data = response.data;
-                    if (
-                        data.hasOwnProperty('status') &&
-                        data.status === 'error'
-                    ) {
-                        if (Array.isArray(data.errors)) {
-                            reject(new Error(data.errors[0]));
-                        } else {
-                            const errorKeys = Object.keys(data.errors);
-                            reject(new Error(data.errors[errorKeys[0]]));
-                        }
+
+                    if (skipDefaultHandler) {
+                        resolve(response);
                     } else {
-                        resolve(data);
+                        if (
+                            data.hasOwnProperty('status') &&
+                            data.status === 'error'
+                        ) {
+                            if (Array.isArray(data.errors)) {
+                                reject(new Error(data.errors[0]), response);
+                            } else {
+                                const errorKeys = Object.keys(data.errors);
+                                reject(
+                                    new Error(data.errors[errorKeys[0]]),
+                                    response
+                                );
+                            }
+                        } else {
+                            resolve(data);
+                        }
                     }
                 })
                 .catch((error) => {
