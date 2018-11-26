@@ -4,7 +4,13 @@ XenApp
 
 This is __NOT__ official app by XenForo Company.
 
-Table of Contents:
+## XenForo support versions:
+
+* 1.5.x
+* 2.0.x
+* 2.1.x (not ready yet)
+
+## Table of Contents:
 
 * [Installation](#installation)
     * [Requirements](#requirements)
