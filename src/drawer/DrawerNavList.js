@@ -20,17 +20,12 @@ const navItems = [
     {
         title: 'Conversations',
         icon: 'inbox',
-        navigationId: 'Conversation'
+        navigationId: 'ConversationList'
     },
     {
         title: 'Forums',
         icon: 'folder',
         navigationId: 'Forum'
-    },
-    {
-        title: 'Watched Content',
-        icon: 'bookmark',
-        navigationId: 'WatchedContent'
     },
     {
         title: 'Settings',

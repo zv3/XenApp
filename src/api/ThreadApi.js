@@ -7,7 +7,7 @@ export default class ThreadApi {
         forumId: Number,
         title: String,
         body: String,
-        otherFields: ?Object
+        otherFields: Object = {}
     ): Promise {
         const payload = Object.assign(
             {

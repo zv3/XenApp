@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start --port=19000",
     "test": "jest",
-    "ios": "react-native run-ios --port=19000",
+    "ios": "react-native run-ios --port=19000 --simulator='iPhone X'",
     "android": "react-native run-android"
   },
   "dependencies": {

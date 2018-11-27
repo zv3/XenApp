@@ -7,45 +7,12 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, View, Text, ActivityIndicator, StyleSheet} from 'react-native';
-
-import {
-    createStackNavigator,
-    createDrawerNavigator
-} from "react-navigation";
-import HomeScreen from "./src/screens/HomeScreen";
-import ThreadDetailScreen from "./src/screens/ThreadDetailScreen";
-import LoginScreen from "./src/screens/LoginScreen";
+import {View, Text, ActivityIndicator, StyleSheet} from 'react-native';
 import {Token} from "./src/utils/Token";
-import ForumScreen from "./src/screens/ForumScreen";
-import ThreadCreateScreen from "./src/screens/ThreadCreateScreen";
-import DrawerNavList from "./src/drawer/DrawerNavList";
 import BatchApi from "./src/api/BatchApi";
 import {Visitor} from "./src/utils/Visitor";
 import OAuthApi from "./src/api/OAuthApi";
-
-const AppRootStack = createStackNavigator({
-    Home: HomeScreen,
-    ThreadDetail: ThreadDetailScreen,
-    Forum: ForumScreen,
-    ThreadCreate: ThreadCreateScreen,
-
-
-    // oauth screens
-    Login: LoginScreen
-}, {
-    initialRouteName: 'Home'
-});
-
-const AppNavigator = createDrawerNavigator({
-    AppRoot: AppRootStack
-}, {
-    initialRouteName: 'AppRoot',
-    /* eslint-disable */
-    contentComponent: ({navigation}) => <DrawerNavList navigation={navigation} />,
-    /* eslint-enable */
-    mode: Platform.OS === 'ios' ? 'modal' : 'card'
-});
+import {AppNavigator} from './src/AppRoutes'
 
 type Props = {};
 export default class App extends Component<Props> {

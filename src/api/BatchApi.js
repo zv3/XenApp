@@ -3,7 +3,7 @@ import { Fetcher } from '../utils/Fetcher';
 const _batchParams = [];
 
 export default class BatchApi {
-    static addRequest(method: String, uri: String, params: ?Object): void {
+    static addRequest(method: String, uri: String, params: Object = {}): void {
         _batchParams.push({
             method: method,
             uri: uri,

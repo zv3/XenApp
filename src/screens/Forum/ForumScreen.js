@@ -7,13 +7,13 @@ import {
     Text
 } from 'react-native';
 import PropTypes from 'prop-types';
-import BaseScreen, { LoadingState } from './BaseScreen';
-import ButtonIcon from '../components/ButtonIcon';
+import BaseScreen, { LoadingState } from '../BaseScreen';
+import ButtonIcon from '../../components/ButtonIcon';
 import { NavigationActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Feather';
-import ThreadRow, { ThreadRowSeparator } from '../components/ThreadRow';
-import DrawerTrigger from '../drawer/DrawerTrigger';
-import BatchApi from '../api/BatchApi';
+import ThreadRow, { ThreadRowSeparator } from '../../components/ThreadRow';
+import DrawerTrigger from '../../drawer/DrawerTrigger';
+import BatchApi from '../../api/BatchApi';
 
 export default class ForumScreen extends BaseScreen {
     static propTypes = {

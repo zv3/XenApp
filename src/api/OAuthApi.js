@@ -6,8 +6,8 @@ export default class OAuthApi {
     static login(
         username: String,
         password: String,
-        tfa: ?Object,
-        options: ?Object
+        tfa: Object = {},
+        options: Object = {}
     ): Promise {
         const payload = Object.assign(
             {
@@ -23,7 +23,7 @@ export default class OAuthApi {
         return Fetcher.post('oauth/token', payload, options);
     }
 
-    static refresh(oAuthData, options: ?Object): Promise {
+    static refresh(oAuthData, options: Object = {}): Promise {
         const payload = {
             grant_type: 'refresh_token',
             client_id: CLIENT_ID,

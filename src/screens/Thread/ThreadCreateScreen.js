@@ -7,9 +7,9 @@ import {
     SafeAreaView,
     Alert
 } from 'react-native';
-import ButtonIcon from '../components/ButtonIcon';
+import ButtonIcon from '../../components/ButtonIcon';
 import PropTypes from 'prop-types';
-import ThreadApi from '../api/ThreadApi';
+import ThreadApi from '../../api/ThreadApi';
 import { NavigationActions } from 'react-navigation';
 
 export default class ThreadCreateScreen extends React.Component {

@@ -66,16 +66,15 @@ export default class PostCard extends React.Component {
             alterNode: (node) => {
                 const { attribs } = node;
 
-                if (
-                    attribs &&
-                    attribs.class &&
-                    attribs.class.indexOf('bbCodeBlock--quote') !== -1
-                ) {
-                    node.attribs = Object.assign(attribs, {
-                        style: quoteStyle.join(';')
-                    });
+                if (attribs && attribs.class) {
+                    const classList = attribs.class.split(' ');
+                    if (classList.indexOf('bbCodeBlock') !== -1) {
+                        node.attribs = Object.assign(attribs, {
+                            style: quoteStyle.join(';')
+                        });
 
-                    return node;
+                        return node;
+                    }
                 }
             },
             alterData: (node) => {

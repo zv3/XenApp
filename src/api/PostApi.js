@@ -4,7 +4,7 @@ export default class PostApi {
     static create(
         threadId: Number,
         body: String,
-        otherFields: ?Object
+        otherFields: Object = {}
     ): Promise {
         const payload = Object.assign(
             {

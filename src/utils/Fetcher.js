@@ -82,10 +82,10 @@ const request = (method: String, uri: String, options: Object) => {
         skipDefaultHandler = opts.skipDefaultHandler;
         delete opts.skipDefaultHandler;
     }
-
+console.log(opts);
     return new Promise((resolve, reject) => {
         Token.get().then((token) => {
-            if (!opts.params.oauth_token) {
+            if (!opts.params || !opts.params.oauth_token) {
                 opts.params.oauth_token = token;
             }
 

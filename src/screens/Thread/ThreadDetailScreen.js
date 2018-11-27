@@ -5,20 +5,17 @@ import {
     StyleSheet,
     SafeAreaView,
     Keyboard,
-    Animated,
-    Dimensions,
     Platform,
-    Alert
+    Alert,
+    LayoutAnimation
 } from 'react-native';
-import BaseScreen, { LoadingState } from './BaseScreen';
-import { Fetcher } from '../utils/Fetcher';
+import BaseScreen, { LoadingState } from '../BaseScreen';
+import { Fetcher } from '../../utils/Fetcher';
 import PropTypes from 'prop-types';
-import PageNav from '../components/PageNav';
-import PostCard, { PostCardSeparator } from '../components/PostCard';
-import ReplyBox from '../components/ReplyBox';
-import PostApi from '../api/PostApi';
-
-const { height } = Dimensions.get('window');
+import PageNav from '../../components/PageNav';
+import PostCard, { PostCardSeparator } from '../../components/PostCard';
+import ReplyBox from '../../components/ReplyBox';
+import PostApi from '../../api/PostApi';
 
 export default class ThreadDetailScreen extends BaseScreen {
     static propTypes = {
@@ -90,21 +87,19 @@ export default class ThreadDetailScreen extends BaseScreen {
         const { endCoordinates } = ev;
 
         this._pageNav && this._pageNav.hide();
+        const maxViewHeight = this._viewHeight - endCoordinates.height - this._replyBox.getLayoutHeight();
 
-        Animated.timing(this.state.translateY, {
-            useNativeDriver: true,
-            duration: 100,
-            toValue:
-                -1 * (height - endCoordinates.screenY) +
-                this._replyBox.getLayoutHeight()
-        }).start();
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+        this.setState({ maxViewHeight });
     };
     _onKeyboardDidHide = () => {
-        Animated.timing(this.state.translateY, {
-            useNativeDriver: true,
-            duration: 100,
-            toValue: 0
-        }).start();
+        this.setState({ maxViewHeight: 0});
+    };
+
+    _onTopViewLayout = (ev) => {
+        if (this._viewHeight === -1) {
+            this._viewHeight = ev.nativeEvent.layout.height;
+        }
     };
 
     constructor(props) {
@@ -112,16 +107,19 @@ export default class ThreadDetailScreen extends BaseScreen {
 
         this.state = {
             ...this.state,
-            translateY: new Animated.Value(0)
+            posts: [],
+            maxViewHeight: 0
         };
 
         this._replyBox = null;
         this._pageNav = null;
         this._postList = null;
+
+        this._viewHeight = -1;
     }
 
     _doRender() {
-        const { links, posts, translateY } = this.state;
+        const { links, posts, maxViewHeight } = this.state;
         const replyBox = (
             <ReplyBox
                 ref={(component) => (this._replyBox = component)}
@@ -131,36 +129,32 @@ export default class ThreadDetailScreen extends BaseScreen {
         );
         const renderItem = (item) => <PostCard post={item} />;
 
-        const transform = {
-            transform: [
-                {
-                    translateY: translateY
-                }
-            ]
-        };
+        const postListStyles = [styles.postList];
+        if (maxViewHeight > 0) {
+            postListStyles.push({
+                flex: 0,
+                height: maxViewHeight
+            });
+        }
 
         return (
-            <SafeAreaView style={styles.container}>
-                <Animated.View style={[styles.postList, transform]}>
-                    <View style={styles.postList}>
-                        <FlatList
-                            ref={(c) => (this._postList = c)}
-                            renderItem={({ item }) => renderItem(item)}
-                            data={posts}
-                            ItemSeparatorComponent={PostCardSeparator}
-                            keyExtractor={(item) =>
-                                JSON.stringify(item.post_id)
-                            }
-                            maxToRenderPerBatch={1}
-                            initialNumToRender={1}
-                            numColumns={1}
-                            onMomentumScrollBegin={this._onMomentumScrollBegin}
-                            onMomentumScrollEnd={this._onMomentumScrollEnd}
-                        />
-                    </View>
+            <SafeAreaView style={styles.container} onLayout={this._onTopViewLayout}>
+                <View style={postListStyles}>
+                    <FlatList
+                        ref={(c) => (this._postList = c)}
+                        renderItem={({ item }) => renderItem(item)}
+                        data={posts}
+                        ItemSeparatorComponent={PostCardSeparator}
+                        keyExtractor={(item, index) => item + index}
+                        maxToRenderPerBatch={1}
+                        initialNumToRender={1}
+                        numColumns={1}
+                        onMomentumScrollBegin={this._onMomentumScrollBegin}
+                        onMomentumScrollEnd={this._onMomentumScrollEnd}
+                    />
+                </View>
 
-                    {replyBox}
-                </Animated.View>
+                <View>{replyBox}</View>
 
                 {links && (
                     <PageNav
@@ -230,6 +224,5 @@ const styles = StyleSheet.create({
     },
     postList: {
         flex: 1
-    },
-    replyBox: {}
+    }
 });
