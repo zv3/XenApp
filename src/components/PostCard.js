@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, Platform, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Platform, Dimensions, Share } from 'react-native';
 import PropTypes from 'prop-types';
 import ButtonIcon from './ButtonIcon';
 import HTML from 'react-native-render-html';
 import moment from 'moment';
 import Avatar from './Avatar';
 import PostApi from '../api/PostApi';
+import {BASE_URL} from "../Config";
 
 const { width } = Dimensions.get('window');
 
@@ -113,7 +114,25 @@ export default class PostCard extends React.Component {
                         .catch(() => {});
                 }
                 break;
-            case 'share':
+            case 'share': {
+                const content = {
+                    title: 'Share this post',
+                    message: post.post_body_html
+                };
+                if (Platform.OS === 'ios') {
+                    content.url = `${BASE_URL}/posts/${post.post_id}`;
+                }
+
+                const options = Platform.select({
+                    ios: {
+                    },
+                    android: {
+                        dialogTitle: 'Share this post'
+                    }
+                });
+
+                Share.share(content, options);
+            }
                 break;
             default:
                 throw new Error(`Unknown action pressed: ${icon}`);
