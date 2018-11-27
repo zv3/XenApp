@@ -53,7 +53,7 @@ export default class BaseScreen extends React.Component {
         } else if (loadingState === LoadingState.Error) {
             return (
                 <View style={style.container}>
-                    <Text>Whoops! Something went wrong. Please try again.</Text>
+                    <Text style={style.loading}>Whoops! Something went wrong. Please try again.</Text>
                 </View>
             );
         } else if (loadingState === LoadingState.Done) {
