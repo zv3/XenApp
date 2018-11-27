@@ -98,7 +98,7 @@ export default class HomeScreen extends BaseScreen {
         BatchApi.addRequest('get', 'threads/recent');
         BatchApi.dispatch()
             .then((response) => {
-                const { results, links } = response.jobs['threads/recent'];
+                const { results, links } = response['threads/recent'];
 
                 this._setLoadingState(LoadingState.Done, { results, links });
             })
