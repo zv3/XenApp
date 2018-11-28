@@ -59,7 +59,7 @@ export default class App extends Component<Props> {
                 </View>
             );
         }
-Token.removeOAuth();
+
         return (<AppNavigator/>);
     }
 }
