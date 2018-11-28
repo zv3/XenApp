@@ -8,6 +8,7 @@ import ConversationList from "./ConversationList";
 import DrawerTrigger from "../../drawer/DrawerTrigger";
 import {Fetcher} from "../../utils/Fetcher";
 import ButtonIcon from "../../components/ButtonIcon";
+import Visitor from "../../utils/Visitor";
 
 export default class ConversationListScreen extends BaseScreen {
     static navigationOptions = ({navigation}) => {
@@ -44,6 +45,12 @@ export default class ConversationListScreen extends BaseScreen {
     };
 
     _doLoadData = () => {
+        if (Visitor.isGuest()) {
+            this._setLoadingState(LoadingState.Done);
+
+            return;
+        }
+
         const isRefreshing = false;
 
         ConversationApi.getList()
@@ -80,6 +87,10 @@ export default class ConversationListScreen extends BaseScreen {
     }
 
     _doRender() {
+        if (Visitor.isGuest()) {
+            return this._doRenderRequireAuth();
+        }
+
         const {conversations, links, isRefreshing} = this.state;
 
         return (

@@ -7,6 +7,11 @@ export const Style = {
         flex: 1
     },
 
+    contentCenter: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+
     userName: {
         fontSize: 14,
         color: '#8c8c8c',

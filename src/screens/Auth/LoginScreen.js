@@ -12,7 +12,7 @@ import { Token } from '../../utils/Token';
 import PropTypes from 'prop-types';
 import UserApi from '../../api/UserApi';
 import AuthEvent from '../../events/AuthEvent';
-import { Visitor } from '../../utils/Visitor';
+import Visitor from '../../utils/Visitor';
 import OAuthApi from '../../api/OAuthApi';
 
 export default class LoginScreen extends React.Component {

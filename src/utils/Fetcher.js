@@ -39,7 +39,7 @@ const request = (method: String, uri: String, options: Object) => {
                 return querystring.stringify(params);
             },
             validateStatus: function(status) {
-                return status >= 200 && status < 400;
+                return status >= 200 && status < 403;
             },
             onCancelSetup: null
         },
@@ -117,13 +117,13 @@ const request = (method: String, uri: String, options: Object) => {
                             data.status === 'error'
                         ) {
                             if (Array.isArray(data.errors)) {
-                                reject(new Error(data.errors[0]), response);
+                                reject([new Error(data.errors[0]), response]);
                             } else {
                                 const errorKeys = Object.keys(data.errors);
-                                reject(
+                                reject([
                                     new Error(data.errors[errorKeys[0]]),
                                     response
-                                );
+                                ]);
                             }
                         } else {
                             resolve(data);
@@ -132,8 +132,8 @@ const request = (method: String, uri: String, options: Object) => {
                 })
                 .catch((error) => {
                     axios.isCancel(error)
-                        ? reject(new Error('Request cancelled'))
-                        : reject(error);
+                        ? reject([new Error('Request cancelled'), null])
+                        : reject([error, null]);
                 });
         });
     });

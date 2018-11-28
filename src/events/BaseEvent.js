@@ -17,7 +17,10 @@ export default class BaseEvent {
 
     static dispatch(name: String, ...data: any): void {
         if (_events.hasOwnProperty([[name]])) {
-            _events[[name]].every((c) => c(...data));
+            for (let i = 0; i < _events[[name]].length; i++) {
+                const observer = _events[[name]][i];
+                observer(...data);
+            }
         }
     }
 

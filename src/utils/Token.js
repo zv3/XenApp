@@ -70,10 +70,13 @@ const get = () => {
     });
 };
 
+const removeOAuth = () => AsyncStorage.removeItem('oAuthData');
+
 export const Token = {
     oneTimeToken,
     accessToken,
     saveToken,
     getOAuthData,
-    get
+    get,
+    removeOAuth
 };

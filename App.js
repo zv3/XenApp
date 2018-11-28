@@ -42,7 +42,10 @@ export default class App extends Component<Props> {
 
                         preloadData();
                     })
-                    .catch(loadDone);
+                    .catch(() => {
+                        Token.removeOAuth();
+                        loadDone();
+                    });
             })
             .catch(loadDone);
     }
@@ -56,7 +59,7 @@ export default class App extends Component<Props> {
                 </View>
             );
         }
-
+Token.removeOAuth();
         return (<AppNavigator/>);
     }
 }

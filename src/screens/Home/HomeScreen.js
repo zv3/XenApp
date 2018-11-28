@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import DrawerTrigger from '../../drawer/DrawerTrigger';
 import AuthEvent from '../../events/AuthEvent';
 import Avatar from '../../components/Avatar';
-import { Visitor } from '../../utils/Visitor';
+import Visitor from '../../utils/Visitor';
 import BatchApi from '../../api/BatchApi';
 import ThreadList from "../../components/ThreadList";
 import {Style} from "../../Style";
@@ -27,9 +27,9 @@ class HomeHeaderRight extends React.PureComponent {
 
     componentDidMount(): void {
         AuthEvent.addListener(this._onAuthEvent);
-        Visitor.getVisitor()
-            .then(this._onAuthEvent)
-            .catch(() => this._onAuthEvent(null));
+        if (!Visitor.isGuest()) {
+            this._onAuthEvent(Visitor.getVisitor());
+        }
     }
 
     componentWillUnmount(): void {
@@ -112,20 +112,35 @@ export default class HomeScreen extends BaseScreen {
 
     _doLoadData = () => {
         this.setState({ isRefreshing: true });
+        if (Visitor.isGuest()) {
+            BatchApi.addRequest('get', 'threads/recent');
+        } else {
+            BatchApi.addRequest('get', 'threads', {
+                order: 'thread_update_date_reverse'
+            });
+        }
 
-        BatchApi.addRequest('get', 'threads', {
-            order: 'thread_update_date_reverse'
-        });
         BatchApi.dispatch()
             .then((response) => {
-                const { threads, links } = response.threads;
+                let threads, links;
+                if (Visitor.isGuest()) {
+                    threads = response['threads/recent'].results;
+                    links = response['threads/recent'].links;
+                } else {
+                    threads = response.threads.threads;
+                    links = response.threads.links;
+                }
                 const isRefreshing = false;
 
                 this._setLoadingState(LoadingState.Done, { threads, links, isRefreshing });
                 this._doTogglePageNav(true);
             })
-            .catch(() => this._setLoadingState(LoadingState.Error, { isRefreshing: false}));
+            .catch(() => this._setLoadingState(LoadingState.Error, { isRefreshing: false }));
     };
+
+    _doReload() {
+        this._doLoadData();
+    }
 
     constructor(props) {
         super(props);

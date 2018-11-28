@@ -15,6 +15,7 @@ import PageNav from '../../components/PageNav';
 import ReplyBox from '../../components/ReplyBox';
 import PostApi from '../../api/PostApi';
 import PostList from "./PostList";
+import BatchApi from "../../api/BatchApi";
 
 export default class ThreadDetailScreen extends BaseScreen {
     static propTypes = {
@@ -71,16 +72,11 @@ export default class ThreadDetailScreen extends BaseScreen {
         }
 
         this.setState(newState);
-
-        if (this._pageNav) {
-            setTimeout(() => {
-                this._pageNav.show();
-            }, 1000);
-        }
+        this._togglePageShow(true);
     };
 
-    _onMomentumScrollBegin = () => this._pageNav && this._pageNav.hide();
-    _onMomentumScrollEnd = () => this._pageNav && this._pageNav.show();
+    _onMomentumScrollBegin = () => this._togglePageShow(false);
+    _onMomentumScrollEnd = () => this._togglePageShow(true);
 
     _onKeyboardDidShown = (ev) => {
         const { endCoordinates } = ev;
@@ -99,6 +95,14 @@ export default class ThreadDetailScreen extends BaseScreen {
         if (this._viewHeight === -1) {
             this._viewHeight = ev.nativeEvent.layout.height;
         }
+    };
+
+    _togglePageShow = (show) => {
+        if (!this._pageNav) {
+            return;
+        }
+
+        show ? this._pageNav.show() : this._pageNav.hide();
     };
 
     constructor(props) {
@@ -166,26 +170,16 @@ export default class ThreadDetailScreen extends BaseScreen {
             throw new Error('Must be pass id into navigation params!');
         }
 
-        const batchParams = [
-            {
-                uri: `threads/${threadId}`,
-                method: 'GET'
-            },
-            {
-                uri: 'posts',
-                method: 'GET',
-                params: {
-                    thread_id: threadId
-                }
-            }
-        ];
+        BatchApi.addRequest('get', `threads/${threadId}`);
+        BatchApi.addRequest('get', 'posts', {
+            thread_id: threadId
+        });
 
-        Fetcher.post('batch', JSON.stringify(batchParams))
+        BatchApi.dispatch()
             .then((response) => {
-                const { jobs } = response;
                 this._onResponse(
-                    jobs.posts,
-                    jobs[`threads/${threadId}`].thread
+                    response.posts,
+                    response[`threads/${threadId}`].thread
                 );
             })
             .catch(() => this._setLoadingState(LoadingState.Error));

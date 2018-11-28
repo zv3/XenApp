@@ -15,7 +15,7 @@ export default class BatchApi {
         requests.every((request) => this.addRequest(request));
     }
 
-    static dispatch(): Promise {
+    static dispatch(options: Object = {}): Promise {
         if (_batchParams.length === 0) {
             throw new Error('There are no batch requests');
         }
@@ -27,7 +27,7 @@ export default class BatchApi {
         };
 
         return new Promise((resolve, reject) => {
-            Fetcher.post('batch', JSON.stringify(_batchParams))
+            Fetcher.post('batch', JSON.stringify(_batchParams), options)
                 .then((response) => {
                     removeAllBatchParams();
                     resolve(response.jobs);

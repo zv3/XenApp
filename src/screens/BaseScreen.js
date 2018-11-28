@@ -1,5 +1,8 @@
 import React from 'react';
 import { View, ActivityIndicator, Text } from 'react-native';
+import ButtonIcon from '../components/ButtonIcon';
+import { Style } from '../Style';
+import Button from '../components/Button';
 
 export const LoadingState = Object.freeze({
     Begin: 0,
@@ -7,7 +10,10 @@ export const LoadingState = Object.freeze({
     Error: -1
 });
 
-export default class BaseScreen extends React.Component {
+type Props = {
+    navigation: Object
+};
+export default class BaseScreen extends React.Component<Props> {
     state = {
         loadingState: LoadingState.Begin
     };
@@ -25,7 +31,22 @@ export default class BaseScreen extends React.Component {
     }
 
     _doRender() {
-        throw new Error('Child must be implemented!');
+        throw new Error('Children must be implemented!');
+    }
+
+    _doReload() {
+        throw new Error('Children must be implemented!');
+    }
+
+    _doRenderRequireAuth() {
+        const goToLogIn = () => this.props.navigation.navigate('Login');
+
+        return (
+            <View style={[Style.container, Style.contentCenter]}>
+                <Text>You must log-in to view this content.</Text>
+                <Button title={'Log in'} onPress={goToLogIn} />
+            </View>
+        );
     }
 
     render() {
@@ -37,7 +58,8 @@ export default class BaseScreen extends React.Component {
             container: {
                 flex: 1,
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                paddingHorizontal: 20
             }
         };
 
@@ -56,6 +78,11 @@ export default class BaseScreen extends React.Component {
                     <Text style={style.loading}>
                         Whoops! Something went wrong. Please try again.
                     </Text>
+                    <ButtonIcon
+                        iconName={'chevrons-right'}
+                        title={'Reload'}
+                        onPress={() => this._doReload()}
+                    />
                 </View>
             );
         } else if (loadingState === LoadingState.Done) {

@@ -5,6 +5,7 @@ import NotificationApi from "../../api/NotificationApi";
 import {Style} from "../../Style";
 import NotificationList from "./NotificationList";
 import ButtonIcon from "../../components/ButtonIcon";
+import Visitor from "../../utils/Visitor";
 
 const markReadAll = () => {
     NotificationApi.markAllRead()
@@ -36,6 +37,12 @@ export default class NotificationListScreen extends BaseScreen {
     };
 
     _doLoadData = () => {
+        if (Visitor.isGuest()) {
+            this._setLoadingState(LoadingState.Done);
+
+            return;
+        }
+
         const isRefreshing = false;
 
         NotificationApi.getList()
@@ -66,6 +73,10 @@ export default class NotificationListScreen extends BaseScreen {
     }
 
     _doRender() {
+        if (Visitor.isGuest()) {
+            return this._doRenderRequireAuth();
+        }
+
         const {notifications, isRefreshing} = this.state;
 
         return (

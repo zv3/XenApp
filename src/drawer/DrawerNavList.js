@@ -4,7 +4,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import DrawerNavItem from './DrawerNavItem';
 import DrawerHeader from './DrawerHeader';
 import AuthEvent from '../events/AuthEvent';
-import { Visitor } from '../utils/Visitor';
+import Visitor from '../utils/Visitor';
 
 const navItems = [
     {
@@ -49,14 +49,15 @@ export default class DrawerNavList extends React.PureComponent {
         return <DrawerNavItem item={item} onPress={this._onNavItemPress} />;
     };
 
-    _onAuthEvent = (user) => this.setState({ user });
+    _onAuthEvent = (user) => {
+        this.setState({ user });
+    };
 
     componentDidMount(): void {
         AuthEvent.addListener(this._onAuthEvent);
 
-        Visitor.getVisitor()
-            .then((user) => this.setState({ user }))
-            .catch(() => this._onAuthEvent(null));
+        const user = Visitor.getVisitor();
+        this.setState({ user });
     }
 
     componentWillUnmount(): void {
