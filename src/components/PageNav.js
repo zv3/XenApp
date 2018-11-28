@@ -69,7 +69,7 @@ export default class PageNav extends React.PureComponent {
             this._showDelayId = 0;
 
             Animated.timing(this.state.translateY, {
-                toValue: -95,
+                toValue: -65,
                 duration: 100,
                 useNativeDriver: true,
                 easing: Easing.bounce

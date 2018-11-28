@@ -4,75 +4,82 @@ import { NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import Avatar from './Avatar';
 import moment from 'moment';
+import UserName from "./UserName";
+import {Style} from "../Style";
 
 export const ThreadRowSeparator = () => <View style={styles.separator} />;
 
-export default class ThreadRow extends React.Component {
+export default class ThreadRow extends React.PureComponent {
     static propTypes = {
-        thread: PropTypes.object.isRequired,
-        navigation: PropTypes.object.isRequired
+        navigation: PropTypes.object.isRequired,
+        creatorUserId: PropTypes.number.isRequired,
+        creatorName: PropTypes.string.isRequired,
+        createdDate: PropTypes.number.isRequired,
+        creatorAvatar: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        routeName: PropTypes.string.isRequired,
+        rowId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+        message: PropTypes.string
     };
 
     _onItemPress = () => {
-        const { navigation, thread } = this.props;
+        const { navigation, rowId, title, routeName } = this.props;
         navigation.dispatch(
             NavigationActions.navigate({
-                routeName: 'ThreadDetail',
-                key: `thread_${thread.thread_id}`,
+                routeName: routeName,
+                key: `${routeName}_${rowId}`,
                 params: {
-                    threadId: thread.thread_id,
-                    title: thread.thread_title
+                    threadId: rowId,
+                    title: title
                 }
             })
         );
     };
 
     _doRenderPreview = () => {
-        const thread = this.props.thread;
-        let message = thread.first_post.post_body_plain_text;
-
-        if (message.length > 150) {
-            message = `${message.substr(0, 150)}...`;
+        const {message} = this.props;
+        if (!message) {
+            return null;
         }
 
-        return <Text style={styles.bodyText}>{message}</Text>;
+        const messageTrimed =
+            (message.length > 150) ? `${message.substr(0, 150)}...` : message;
+
+        return <Text style={styles.bodyText}>{messageTrimed}</Text>;
     };
 
     _doRenderMeta = () => {
-        const thread = this.props.thread;
+        const {creatorName, creatorUserId, createdDate, navigation} = this.props;
         const style = {
             container: {
                 paddingTop: 10,
                 flexDirection: 'row'
             },
             text: {
-                fontSize: 14,
-                color: '#8c8c8c',
+                ...Style.metaText,
                 marginRight: 10
             }
         };
 
         return (
             <View style={style.container}>
-                <Text style={style.text}>{thread.creator_username}</Text>
+                <UserName userId={creatorUserId} name={creatorName} navigation={navigation}/>
                 <Text style={style.text}>
-                    {moment(thread.thread_create_date * 1000).fromNow()}
+                    {moment(createdDate * 1000).fromNow()}
                 </Text>
             </View>
         );
     };
 
     render() {
-        const thread = this.props.thread;
+        const {title, creatorAvatar} = this.props;
 
         return (
             <TouchableHighlight onPress={this._onItemPress}>
                 <View style={styles.container}>
-                    <Avatar uri={thread.links.first_poster_avatar} />
+                    <Avatar uri={creatorAvatar} />
                     <View style={styles.body}>
-                        <Text style={styles.title} numberOfLines={3}>
-                            {thread.thread_title}
-                        </Text>
+                        <Text style={styles.title} numberOfLines={3}>{title}</Text>
                         {this._doRenderPreview()}
                         {this._doRenderMeta()}
                     </View>

@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import ThreadRow, { ThreadRowSeparator } from '../../components/ThreadRow';
 import DrawerTrigger from '../../drawer/DrawerTrigger';
 import BatchApi from '../../api/BatchApi';
+import ThreadList from "../../components/ThreadList";
 
 export default class ForumScreen extends BaseScreen {
     static propTypes = {
@@ -200,17 +201,10 @@ export default class ForumScreen extends BaseScreen {
 
         return (
             <View style={styles.container}>
-                <FlatList
-                    data={threads}
+                <ThreadList
+                    threads={threads}
+                    navigation={this.props.navigation}
                     ListHeaderComponent={this._doRenderHeader()}
-                    keyExtractor={(item) => JSON.stringify(item.thread_id)}
-                    ItemSeparatorComponent={ThreadRowSeparator}
-                    renderItem={({ item }) => (
-                        <ThreadRow
-                            navigation={this.props.navigation}
-                            thread={item}
-                        />
-                    )}
                 />
                 {createThreadButton}
             </View>

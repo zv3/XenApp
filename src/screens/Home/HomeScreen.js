@@ -1,9 +1,8 @@
 import React from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Fetcher } from '../../utils/Fetcher';
 import ButtonIcon from '../../components/ButtonIcon';
 import BaseScreen, { LoadingState } from '../BaseScreen';
-import ThreadRow, { ThreadRowSeparator } from '../../components/ThreadRow';
 import PageNav from '../../components/PageNav';
 import PropTypes from 'prop-types';
 import DrawerTrigger from '../../drawer/DrawerTrigger';
@@ -11,6 +10,7 @@ import AuthEvent from '../../events/AuthEvent';
 import Avatar from '../../components/Avatar';
 import { Visitor } from '../../utils/Visitor';
 import BatchApi from '../../api/BatchApi';
+import ThreadList from "../../components/ThreadList";
 
 class HomeHeaderRight extends React.PureComponent {
     static propTypes = {
@@ -153,18 +153,11 @@ export default class HomeScreen extends BaseScreen {
     _doRender() {
         return (
             <View style={styles.container}>
-                <FlatList
-                    renderItem={({ item }) => (
-                        <ThreadRow
-                            thread={item}
-                            navigation={this.props.navigation}
-                        />
-                    )}
-                    data={this.state.results}
+                <ThreadList
+                    threads={this.state.results}
+                    navigation={this.props.navigation}
                     onMomentumScrollBegin={() => this._doTogglePageNav(false)}
                     onMomentumScrollEnd={() => this._doTogglePageNav(true)}
-                    ItemSeparatorComponent={() => ThreadRowSeparator()}
-                    keyExtractor={(item) => JSON.stringify(item.thread_id)}
                 />
                 {this._doRenderPageNav()}
             </View>

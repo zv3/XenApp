@@ -1,32 +1,46 @@
 import React from 'react'
-import {SafeAreaView, FlatList} from 'react-native'
-import {Style} from "../../Style";
-import BaseScreen, {LoadingState} from "../BaseScreen";
-import DrawerTrigger from "../../drawer/DrawerTrigger";
-import ConversationApi from "../../api/ConversationApi";
+import {FlatList, Dimensions} from 'react-native'
+import ThreadRow, {ThreadRowSeparator} from "../../components/ThreadRow";
 
-export default class ConversationList extends BaseScreen {
-    static navigationOptions = () => {
-        return {
-            title: 'Conversations'
-        };
+type Props = {
+    conversations: Array,
+    navigation: Object
+};
+export default class ConversationList extends React.PureComponent<Props> {
+    _keyExtractor = (item) => JSON.stringify(item.conversation_id);
+    _renderItem = ({item}) => {
+        const creatorUsers = item.recipients.filter((value) => {
+           return value.user_id === item.creator_user_id;
+        });
+
+        return <ThreadRow
+            navigation={this.props.navigation}
+            creatorUserId={item.creator_user_id}
+            creatorName={item.creator_username}
+            createdDate={item.conversation_create_date}
+            creatorAvatar={creatorUsers[0].avatar_small}
+            title={item.conversation_title}
+            routeName={'ConversationDetail'}
+            rowId={item.conversation_id}
+            message={item.first_message.message_body_plain_text}
+        />;
     };
 
-    componentDidMount(): void {
-        ConversationApi.getList()
-            .then((response) => {
-                const {conversations, links} = response;
+    render() {
+        const {conversations} = this.props;
 
-                this._setLoadingState(LoadingState.Done, { conversations, links });
-            })
-            .catch(() => this._setLoadingState(LoadingState.Error));
-    }
-
-    _doRender() {
         return (
-            <SafeAreaView style={Style.container}>
-
-            </SafeAreaView>
+            <FlatList
+                renderItem={this._renderItem}
+                data={conversations}
+                initialNumToRender={3}
+                keyExtractor={this._keyExtractor}
+                numColumns={1}
+                maxToRenderPerBatch={3}
+                ItemSeparatorComponent={ThreadRowSeparator}
+                windowSize={Dimensions.get('window').width}
+                {...this.props}
+            />
         );
     }
 }
