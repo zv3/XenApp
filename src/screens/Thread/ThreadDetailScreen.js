@@ -64,14 +64,12 @@ export default class ThreadDetailScreen extends BaseScreen {
     };
 
     _onResponse = (response, thread: ?Object) => {
-        this._setLoadingState(LoadingState.Done);
-
-        const newState = { ...response };
-        if (thread) {
-            newState.thread = thread;
+        const {posts, links} = response;
+        if (!thread) {
+            thread = response.thread;
         }
 
-        this.setState(newState);
+        this._setLoadingState(LoadingState.Done, {posts, links, thread});
         this._togglePageShow(true);
     };
 
