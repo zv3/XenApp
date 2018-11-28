@@ -20,6 +20,7 @@ export default class ThreadList extends React.PureComponent<Props> {
             routeName={'ThreadDetail'}
             rowId={item.thread_id}
             navigation={navigation}
+            message={item.first_post.post_body_plain_text}
         />;
     };
 
