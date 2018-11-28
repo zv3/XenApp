@@ -72,6 +72,11 @@ export default class ConversationDetailScreen extends BaseScreen {
     constructor(props) {
         super(props);
 
+        this.state = {
+            ...this.state,
+            mavViewHeight: 0
+        };
+
         this._pageNav = null;
         this._replyBox = null;
         this._messageList = null;
@@ -110,11 +115,19 @@ export default class ConversationDetailScreen extends BaseScreen {
     }
 
     _doRender() {
-        const {links, messages, conversation} = this.state;
+        const {links, messages, conversation, maxViewHeight} = this.state;
+
+        const postListStyles = [styles.postList];
+        if (maxViewHeight > 0) {
+            postListStyles.push({
+                flex: 0,
+                height: maxViewHeight
+            });
+        }
 
         return (
             <SafeAreaView style={Style.container} onLayout={this._onTopViewLayout}>
-                <View style={styles.postList}>
+                <View style={postListStyles}>
                     <MessageList
                         ref={(c) => this._messageList = c}
                         messages={messages}
