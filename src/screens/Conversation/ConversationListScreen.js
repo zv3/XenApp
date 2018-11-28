@@ -38,21 +38,37 @@ export default class ConversationListScreen extends BaseScreen {
             });
     };
 
+    _pullRefreshData = () => {
+        this.setState({ isRefreshing: true });
+        this._doLoadData();
+    };
+
+    _doLoadData = () => {
+        const isRefreshing = false;
+
+        ConversationApi.getList()
+            .then((response) => {
+                const {conversations, links} = response;
+
+                this._setLoadingState(LoadingState.Done, { conversations, links, isRefreshing });
+                this._doTogglePageNav(true);
+            })
+            .catch(() => this._setLoadingState(LoadingState.Error, { isRefreshing }));
+    };
+
     constructor(props) {
         super(props);
+
+        this.state = {
+            ...this.state,
+            isRefreshing: false
+        };
 
         this._pageNav = null;
     }
 
     componentDidMount(): void {
-        ConversationApi.getList()
-            .then((response) => {
-                const {conversations, links} = response;
-
-                this._setLoadingState(LoadingState.Done, { conversations, links });
-                this._doTogglePageNav(true);
-            })
-            .catch(() => this._setLoadingState(LoadingState.Error));
+        this._doLoadData();
     }
 
     _doTogglePageNav(show) {
@@ -64,7 +80,7 @@ export default class ConversationListScreen extends BaseScreen {
     }
 
     _doRender() {
-        const {conversations, links} = this.state;
+        const {conversations, links, isRefreshing} = this.state;
 
         return (
             <SafeAreaView style={Style.container}>
@@ -73,6 +89,8 @@ export default class ConversationListScreen extends BaseScreen {
                     navigation={this.props.navigation}
                     onMomentumScrollBegin={() => this._doTogglePageNav(false)}
                     onMomentumScrollEnd={() => this._doTogglePageNav(true)}
+                    refreshing={isRefreshing}
+                    onRefresh={this._pullRefreshData}
                 />
                 {links && <PageNav
                     ref={(c) => (this._pageNav = c)}
