@@ -30,7 +30,7 @@ export default class ThreadRow extends React.PureComponent {
                 routeName: routeName,
                 key: `${routeName}_${rowId}`,
                 params: {
-                    threadId: rowId,
+                    id: rowId,
                     title: title
                 }
             })

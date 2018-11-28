@@ -7,7 +7,8 @@ type Props = {
     userId: Number,
     name: String,
     navigation: Object,
-    style?: Array | Object
+    style?: Array | Object,
+    userStyle?: Array | Object
 };
 export default class UserName extends React.PureComponent<Props> {
     _onPress = () => {
@@ -26,7 +27,7 @@ export default class UserName extends React.PureComponent<Props> {
     };
 
     render() {
-        const {name, style} = this.props;
+        const {name, style, userStyle} = this.props;
 
         return (
             <TouchableOpacity
@@ -34,7 +35,7 @@ export default class UserName extends React.PureComponent<Props> {
                 accessibilityRole="button"
                 onPress={this._onPress}>
                 <View style={style}>
-                    <Text style={Style.userName}>{name}</Text>
+                    <Text style={[Style.userName, userStyle]}>{name}</Text>
                 </View>
             </TouchableOpacity>
         );

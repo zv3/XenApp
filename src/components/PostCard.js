@@ -1,48 +1,60 @@
 import React from 'react';
-import { View, Text, StyleSheet, Platform, Dimensions, Share } from 'react-native';
+import { View, Text, StyleSheet, Platform, Dimensions } from 'react-native';
 import PropTypes from 'prop-types';
 import ButtonIcon from './ButtonIcon';
 import HTML from 'react-native-render-html';
 import moment from 'moment';
 import Avatar from './Avatar';
-import PostApi from '../api/PostApi';
-import {BASE_URL} from "../Config";
+import UserName from "./UserName";
+import {Style} from "../Style";
 
 const { width } = Dimensions.get('window');
 
 export const PostCardSeparator = () => <View style={styles.separator} />;
 
-export default class PostCard extends React.Component {
-    static propTypes = {
-        post: PropTypes.object.isRequired
+type Props = {
+    posterAvatar: ?PropTypes.string,
+
+    posterUserId: PropTypes.number,
+    posterName: PropTypes.string,
+
+    postedDate: PropTypes.number,
+    message: PropTypes.string,
+
+    onShare?: ?PropTypes.func,
+    onLike?: ?PropTypes.func,
+
+    isLiked: PropTypes.bool,
+    navigation: PropTypes.object
+};
+export default class PostCard extends React.PureComponent<Props> {
+    state = {
+        isLiked: null
     };
 
-    static getDerivedStateFromProps(nextProps, state) {
+    static getDerivedStateFromProps(nextProps: Props, state) {
         if (state.isLiked === null) {
-            return { isLiked: nextProps.post.post_is_liked };
+            return { isLiked: nextProps.isLiked };
         }
 
         return null;
     }
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            isLiked: null
-        };
-    }
-
     _doRenderHeader = () => {
-        const post = this.props.post;
+        const {posterAvatar, posterName, postedDate, posterUserId, navigation} = this.props;
 
         return (
             <View style={styles.header}>
-                <Avatar uri={post.links.poster_avatar} style={styles.avatar} />
+                <Avatar uri={posterAvatar} style={styles.avatar} />
                 <View>
-                    <Text style={styles.user}>{post.poster_username}</Text>
-                    <Text>
-                        {moment(post.post_create_date * 1000).fromNow()}
+                    <UserName
+                        userId={posterUserId}
+                        name={posterName}
+                        navigation={navigation}
+                        userStyle={styles.user}
+                    />
+                    <Text style={Style.metaText}>
+                        {moment(postedDate * 1000).fromNow()}
                     </Text>
                 </View>
             </View>
@@ -50,7 +62,7 @@ export default class PostCard extends React.Component {
     };
 
     _doRenderBody = () => {
-        const post = this.props.post;
+        const {message} = this.props;
         const quoteStyle = [];
         for (const key in styles.quoteBlock) {
             if (styles.quoteBlock.hasOwnProperty(key)) {
@@ -93,44 +105,25 @@ export default class PostCard extends React.Component {
 
         return (
             <View style={styles.body}>
-                <HTML html={post.post_body_html} {...htmlConfig} />
+                <HTML html={message} {...htmlConfig} />
             </View>
         );
     };
 
     _onActionPressed = (icon) => {
-        const { post } = this.props;
+        const { onShare, onLike } = this.props;
 
         switch (icon) {
-            case 'thumbs-up':
-                if (this.state.isLiked) {
-                    PostApi.unlike(post.post_id)
-                        .then(() => this.setState({ isLiked: false }))
-                        .catch(() => {});
-                } else {
-                    PostApi.like(post.post_id)
-                        .then(() => this.setState({ isLiked: true }))
-                        .catch(() => {});
-                }
+            case 'thumbs-up': {
+                const {isLiked} = this.state;
+                const onSuccess = () => this.setState({ isLiked: !isLiked });
+                const onFailure = () => {/** Do nothing */};
+
+                onLike(isLiked, onSuccess, onFailure);
+            }
                 break;
             case 'share': {
-                const content = {
-                    title: 'Share this post',
-                    message: post.post_body_html
-                };
-                if (Platform.OS === 'ios') {
-                    content.url = `${BASE_URL}/posts/${post.post_id}`;
-                }
-
-                const options = Platform.select({
-                    ios: {
-                    },
-                    android: {
-                        dialogTitle: 'Share this post'
-                    }
-                });
-
-                Share.share(content, options);
+                onShare();
             }
                 break;
             default:
@@ -139,8 +132,7 @@ export default class PostCard extends React.Component {
     };
 
     _doRenderFooter = () => {
-        const { post } = this.props;
-        const { isLiked } = this.state;
+        const { onShare, onLike } = this.props;
 
         const renderButton = (icon, text, disabled = false) => {
             const iconColor = Platform.select({
@@ -166,22 +158,14 @@ export default class PostCard extends React.Component {
 
         return (
             <View style={styles.footer}>
-                {renderButton(
+                {onLike && renderButton(
                     'thumbs-up',
-                    isLiked ? 'Unlike' : 'Like',
-                    !post.permissions.like
+                    this.state.isLiked ? 'Unlike' : 'Like'
                 )}
-                {renderButton('share', 'Share')}
+                {onShare && renderButton('share', 'Share')}
             </View>
         );
     };
-
-    shouldComponentUpdate(nextProps, nextState): boolean {
-        return (
-            nextProps.post.post_id !== this.props.post.post_id ||
-            this.state.isLiked !== nextState.isLiked
-        );
-    }
 
     render() {
         return (

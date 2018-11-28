@@ -1,7 +1,6 @@
 import React from 'react';
 import {
     View,
-    FlatList,
     StyleSheet,
     SafeAreaView,
     Keyboard,
@@ -13,9 +12,9 @@ import BaseScreen, { LoadingState } from '../BaseScreen';
 import { Fetcher } from '../../utils/Fetcher';
 import PropTypes from 'prop-types';
 import PageNav from '../../components/PageNav';
-import PostCard, { PostCardSeparator } from '../../components/PostCard';
 import ReplyBox from '../../components/ReplyBox';
 import PostApi from '../../api/PostApi';
+import PostList from "./PostList";
 
 export default class ThreadDetailScreen extends BaseScreen {
     static propTypes = {
@@ -127,7 +126,6 @@ export default class ThreadDetailScreen extends BaseScreen {
                 style={styles.replyBox}
             />
         );
-        const renderItem = (item) => <PostCard post={item} />;
 
         const postListStyles = [styles.postList];
         if (maxViewHeight > 0) {
@@ -140,15 +138,10 @@ export default class ThreadDetailScreen extends BaseScreen {
         return (
             <SafeAreaView style={styles.container} onLayout={this._onTopViewLayout}>
                 <View style={postListStyles}>
-                    <FlatList
+                    <PostList
                         ref={(c) => (this._postList = c)}
-                        renderItem={({ item }) => renderItem(item)}
-                        data={posts}
-                        ItemSeparatorComponent={PostCardSeparator}
-                        keyExtractor={(item, index) => item + index}
-                        maxToRenderPerBatch={1}
-                        initialNumToRender={1}
-                        numColumns={1}
+                        posts={posts}
+                        navigation={this.props.navigation}
                         onMomentumScrollBegin={this._onMomentumScrollBegin}
                         onMomentumScrollEnd={this._onMomentumScrollEnd}
                     />
@@ -168,9 +161,9 @@ export default class ThreadDetailScreen extends BaseScreen {
     }
 
     _doLoadData = () => {
-        const threadId = this.props.navigation.getParam('threadId');
+        const threadId = this.props.navigation.getParam('id');
         if (!threadId) {
-            throw new Error('Must be pass threadId into navigation params!');
+            throw new Error('Must be pass id into navigation params!');
         }
 
         const batchParams = [

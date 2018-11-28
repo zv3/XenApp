@@ -11,6 +11,7 @@ import ForumScreen from "./screens/Forum/ForumScreen";
 import ThreadCreateScreen from "./screens/Thread/ThreadCreateScreen";
 import LoginScreen from "./screens/Auth/LoginScreen";
 import ConversationListScreen from "./screens/Conversation/ConversationListScreen";
+import ConversationDetailScreen from "./screens/Conversation/ConversationDetailScreen";
 
 const AppRootStack = createStackNavigator({
     Home: HomeScreen,
@@ -19,11 +20,12 @@ const AppRootStack = createStackNavigator({
     ThreadCreate: ThreadCreateScreen,
 
     ConversationList: ConversationListScreen,
+    ConversationDetail: ConversationDetailScreen,
 
     // oauth screens
     Login: LoginScreen
 }, {
-    initialRouteName: 'ConversationList'
+    initialRouteName: 'Home'
 });
 
 export const AppNavigator = createDrawerNavigator({
