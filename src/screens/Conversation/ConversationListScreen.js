@@ -1,19 +1,40 @@
 import React from 'react'
-import {SafeAreaView, FlatList} from 'react-native'
+import {SafeAreaView} from 'react-native'
 import {Style} from "../../Style";
 import BaseScreen, {LoadingState} from "../BaseScreen";
 import ConversationApi from "../../api/ConversationApi";
 import PageNav from "../../components/PageNav";
 import ConversationList from "./ConversationList";
+import DrawerTrigger from "../../drawer/DrawerTrigger";
+import {Fetcher} from "../../utils/Fetcher";
+import ButtonIcon from "../../components/ButtonIcon";
 
 export default class ConversationListScreen extends BaseScreen {
-    static navigationOptions = () => {
+    static navigationOptions = ({navigation}) => {
+        const headerRightStyle = {
+            marginRight: 10
+        };
+
         return {
-            title: 'Conversations'
+            title: 'Conversations',
+            headerLeft: <DrawerTrigger navigation={navigation}/>,
+            headerRight: <ButtonIcon iconName={'plus'} style={headerRightStyle}/>
         };
     };
 
-    _gotoPage = () => {};
+    _gotoPage = (link, page) => {
+        this._setLoadingState(LoadingState.Begin);
+
+        Fetcher.get(link, {page: page})
+            .then(response => {
+                const {conversations, links} = response;
+                this._setLoadingState(LoadingState.Done, { conversations, links });
+                this._doTogglePageNav(true);
+            })
+            .catch((err) => {
+                this._setLoadingState(LoadingState.Error)
+            });
+    };
 
     constructor(props) {
         super(props);
