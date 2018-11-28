@@ -73,9 +73,6 @@ export default class ThreadDetailScreen extends BaseScreen {
         this._togglePageShow(true);
     };
 
-    _onMomentumScrollBegin = () => this._togglePageShow(false);
-    _onMomentumScrollEnd = () => this._togglePageShow(true);
-
     _onKeyboardDidShown = (ev) => {
         const { endCoordinates } = ev;
 
@@ -126,6 +123,7 @@ export default class ThreadDetailScreen extends BaseScreen {
                 ref={(component) => (this._replyBox = component)}
                 onSubmit={this._doReply}
                 style={styles.replyBox}
+                onTyping={() => this._togglePageShow(false)}
             />
         );
 
@@ -144,8 +142,8 @@ export default class ThreadDetailScreen extends BaseScreen {
                         ref={(c) => (this._postList = c)}
                         posts={posts}
                         navigation={this.props.navigation}
-                        onMomentumScrollBegin={this._onMomentumScrollBegin}
-                        onMomentumScrollEnd={this._onMomentumScrollEnd}
+                        onMomentumScrollBegin={() => this._togglePageShow(false)}
+                        onMomentumScrollEnd={() => this._togglePageShow(true)}
                     />
                 </View>
 

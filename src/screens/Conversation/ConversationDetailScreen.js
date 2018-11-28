@@ -154,6 +154,7 @@ export default class ConversationDetailScreen extends BaseScreen {
                 {conversation.permissions.reply
                     && <ReplyBox
                         ref={(c) => this._replyBox = c}
+                        onTyping={() => this._togglePageNav(false)}
                         onSubmit={this._onSubmit}/>}
 
                 {links && <PageNav
