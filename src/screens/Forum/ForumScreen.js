@@ -11,7 +11,7 @@ import BaseScreen, { LoadingState } from '../BaseScreen';
 import ButtonIcon from '../../components/ButtonIcon';
 import { NavigationActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Feather';
-import ThreadRow, { ThreadRowSeparator } from '../../components/ThreadRow';
+import { ThreadRowSeparator } from '../../components/ThreadRow';
 import DrawerTrigger from '../../drawer/DrawerTrigger';
 import BatchApi from '../../api/BatchApi';
 import ThreadList from "../../components/ThreadList";
@@ -24,6 +24,12 @@ export default class ForumScreen extends BaseScreen {
     static navigationOptions = ({ navigation }) => {
         const { params } = navigation.state;
         const backButtonVisible = !!params;
+        const backToRoot = () => navigation.navigate('Forum');
+
+        const headerRightStyle = { marginRight: 10 };
+
+        const headerRight =
+            backButtonVisible ? <ButtonIcon iconName={'home'} onPress={backToRoot} style={headerRightStyle}/> : null;
 
         return {
             title: params ? params.title : 'Forums',
@@ -32,7 +38,8 @@ export default class ForumScreen extends BaseScreen {
                     isBack={backButtonVisible}
                     navigation={navigation}
                 />
-            )
+            ),
+            headerRight: headerRight
         };
     };
 
@@ -64,7 +71,7 @@ export default class ForumScreen extends BaseScreen {
             BatchApi.addRequest('get', `forums/${item.forum_id}`);
         }
 
-        return BatchApi.dispatch()
+        BatchApi.dispatch()
             .then((response) => {
                 const { navigation, threads } = response;
 

@@ -4,8 +4,8 @@ import { NavigationActions } from 'react-navigation';
 import PropTypes from 'prop-types';
 import Avatar from './Avatar';
 import moment from 'moment';
-import UserName from "./UserName";
-import {Style} from "../Style";
+import UserName from './UserName';
+import { Style } from '../Style';
 
 export const ThreadRowSeparator = () => <View style={styles.separator} />;
 
@@ -17,7 +17,8 @@ export default class ThreadRow extends React.PureComponent {
         createdDate: PropTypes.number.isRequired,
         title: PropTypes.string.isRequired,
         routeName: PropTypes.string.isRequired,
-        rowId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+        rowId: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+            .isRequired,
 
         message: PropTypes.string,
         creatorAvatar: PropTypes.string
@@ -38,19 +39,24 @@ export default class ThreadRow extends React.PureComponent {
     };
 
     _doRenderPreview = () => {
-        const {message} = this.props;
+        const { message } = this.props;
         if (!message) {
             return null;
         }
 
         const messageTrimed =
-            (message.length > 150) ? `${message.substr(0, 150)}...` : message;
+            message.length > 150 ? `${message.substr(0, 150)}...` : message;
 
         return <Text style={styles.bodyText}>{messageTrimed}</Text>;
     };
 
     _doRenderMeta = () => {
-        const {creatorName, creatorUserId, createdDate, navigation} = this.props;
+        const {
+            creatorName,
+            creatorUserId,
+            createdDate,
+            navigation
+        } = this.props;
         const style = {
             container: {
                 paddingTop: 10,
@@ -64,7 +70,11 @@ export default class ThreadRow extends React.PureComponent {
 
         return (
             <View style={style.container}>
-                <UserName userId={creatorUserId} name={creatorName} navigation={navigation}/>
+                <UserName
+                    userId={creatorUserId}
+                    name={creatorName}
+                    navigation={navigation}
+                />
                 <Text style={style.text}>
                     {moment(createdDate * 1000).fromNow()}
                 </Text>
@@ -73,14 +83,16 @@ export default class ThreadRow extends React.PureComponent {
     };
 
     render() {
-        const {title, creatorAvatar} = this.props;
+        const { title, creatorAvatar } = this.props;
 
         return (
             <TouchableHighlight onPress={this._onItemPress}>
                 <View style={styles.container}>
                     <Avatar uri={creatorAvatar} />
                     <View style={styles.body}>
-                        <Text style={styles.title} numberOfLines={3}>{title}</Text>
+                        <Text style={styles.title} numberOfLines={3}>
+                            {title}
+                        </Text>
                         {this._doRenderPreview()}
                         {this._doRenderMeta()}
                     </View>

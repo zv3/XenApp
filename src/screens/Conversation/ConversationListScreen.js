@@ -15,10 +15,12 @@ export default class ConversationListScreen extends BaseScreen {
             marginRight: 10
         };
 
+        const addNewConvo = () => navigation.navigate('ConversationAdd');
+
         return {
             title: 'Conversations',
             headerLeft: <DrawerTrigger navigation={navigation}/>,
-            headerRight: <ButtonIcon iconName={'plus'} style={headerRightStyle}/>
+            headerRight: <ButtonIcon iconName={'plus'} style={headerRightStyle} onPress={addNewConvo}/>
         };
     };
 
@@ -31,7 +33,7 @@ export default class ConversationListScreen extends BaseScreen {
                 this._setLoadingState(LoadingState.Done, { conversations, links });
                 this._doTogglePageNav(true);
             })
-            .catch((err) => {
+            .catch(() => {
                 this._setLoadingState(LoadingState.Error)
             });
     };

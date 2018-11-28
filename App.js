@@ -36,19 +36,13 @@ export default class App extends Component<Props> {
 
         Token.getOAuthData()
             .then((oauthData) => {
-                const aMinuteMS = 60 * 1000;
-                if (!oauthData.expiresAt || (oauthData.expiresAt - Date.now()) < aMinuteMS) {
-                    // Need refresh token
-                    OAuthApi.refresh(oauthData)
-                        .then((response) => {
-                            Token.saveToken(response);
+                OAuthApi.refresh(oauthData)
+                    .then((response) => {
+                        Token.saveToken(response);
 
-                            preloadData();
-                        })
-                        .catch(loadDone);
-                } else {
-                    preloadData();
-                }
+                        preloadData();
+                    })
+                    .catch(loadDone);
             })
             .catch(loadDone);
     }

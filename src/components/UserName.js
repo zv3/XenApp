@@ -1,6 +1,6 @@
-import React from 'react'
-import {View, TouchableOpacity, Text} from 'react-native'
-import {Style} from "../Style";
+import React from 'react';
+import { View, TouchableOpacity, Text } from 'react-native';
+import { Style } from '../Style';
 import { NavigationActions } from 'react-navigation';
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
 };
 export default class UserName extends React.PureComponent<Props> {
     _onPress = () => {
-        const {navigation, userId, name} = this.props;
+        const { navigation, userId, name } = this.props;
 
         navigation.dispatch(
             NavigationActions.navigate({
@@ -27,7 +27,7 @@ export default class UserName extends React.PureComponent<Props> {
     };
 
     render() {
-        const {name, style, userStyle} = this.props;
+        const { name, style, userStyle } = this.props;
 
         return (
             <TouchableOpacity

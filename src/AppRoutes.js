@@ -12,6 +12,7 @@ import ThreadCreateScreen from "./screens/Thread/ThreadCreateScreen";
 import LoginScreen from "./screens/Auth/LoginScreen";
 import ConversationListScreen from "./screens/Conversation/ConversationListScreen";
 import ConversationDetailScreen from "./screens/Conversation/ConversationDetailScreen";
+import ConversationAddScreen from "./screens/Conversation/ConversationAddScreen";
 
 const AppRootStack = createStackNavigator({
     Home: HomeScreen,
@@ -21,6 +22,7 @@ const AppRootStack = createStackNavigator({
 
     ConversationList: ConversationListScreen,
     ConversationDetail: ConversationDetailScreen,
+    ConversationAdd: ConversationAddScreen,
 
     // oauth screens
     Login: LoginScreen

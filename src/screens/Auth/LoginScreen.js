@@ -34,7 +34,7 @@ export default class LoginScreen extends React.Component {
         const { username, password, code } = this.state.data;
 
         const onFailedLogin = () => {
-            if (code.length > 0) {
+            if (code && code.length > 0) {
                 Alert.alert('Cannot verify', 'Invalid code provided');
             } else {
                 Alert.alert('Cannot log-in', 'Invalid password or email');
@@ -63,6 +63,7 @@ export default class LoginScreen extends React.Component {
         OAuthApi.login(username, password, tfa, { skipDefaultHandler: true })
             .then((response) => {
                 const { data, status, headers } = response;
+
                 if (status === 202) {
                     this.setState({
                         tfaProvider: headers['x-api-tfa-providers'],

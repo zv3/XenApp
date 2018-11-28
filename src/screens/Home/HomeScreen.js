@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, SafeAreaView } from 'react-native';
 import { Fetcher } from '../../utils/Fetcher';
 import ButtonIcon from '../../components/ButtonIcon';
 import BaseScreen, { LoadingState } from '../BaseScreen';
@@ -11,6 +11,7 @@ import Avatar from '../../components/Avatar';
 import { Visitor } from '../../utils/Visitor';
 import BatchApi from '../../api/BatchApi';
 import ThreadList from "../../components/ThreadList";
+import {Style} from "../../Style";
 
 class HomeHeaderRight extends React.PureComponent {
     static propTypes = {
@@ -82,12 +83,37 @@ export default class HomeScreen extends BaseScreen {
         };
     };
 
+    _gotoPage = (link, page) => {
+        this._setLoadingState(LoadingState.Begin);
+
+        Fetcher.get(link, {
+                query: {
+                    page: page
+                }
+            })
+            .then((response) => {
+                const {threads, links} = response;
+
+                this._setLoadingState(LoadingState.Done, { threads, links });
+                this._doTogglePageNav(true);
+            })
+            .catch(() => this._setLoadingState(LoadingState.Error));
+    };
+
+    _doTogglePageNav = (show) => {
+        if (this._pageNav === null) {
+            return;
+        }
+
+        show ? this._pageNav.show() : this._pageNav.hide();
+    };
+
     constructor(props) {
         super(props);
 
         this.state = {
             ...this.state,
-            results: [],
+            threads: [],
             links: null
         };
 
@@ -95,78 +121,36 @@ export default class HomeScreen extends BaseScreen {
     }
 
     componentDidMount() {
-        BatchApi.addRequest('get', 'threads/recent');
+        BatchApi.addRequest('get', 'threads', {
+            order: 'thread_update_date_reverse'
+        });
         BatchApi.dispatch()
             .then((response) => {
-                const { results, links } = response['threads/recent'];
+                const { threads, links } = response.threads;
 
-                this._setLoadingState(LoadingState.Done, { results, links });
+                this._setLoadingState(LoadingState.Done, { threads, links });
+                this._doTogglePageNav(true);
             })
-            .catch(() => {
-                this._setLoadingState(LoadingState.Error);
-            });
-    }
-
-    _gotoPage(link, page) {
-        this._setLoadingState(LoadingState.Begin);
-        Fetcher.get(link, {
-            query: {
-                page: page
-            }
-        })
-            .then((response) => {
-                this._setLoadingState(LoadingState.Done);
-
-                this.setState((prevState) => ({
-                    ...prevState,
-                    results: response.data,
-                    links: response.links
-                }));
-            })
-            .catch(() => {
-                this._setLoadingState(LoadingState.Error);
-            });
-    }
-
-    _doRenderPageNav() {
-        if (!this.state.links) {
-            return null;
-        }
-
-        return (
-            <PageNav
-                ref={(c) => (this._pageNav = c)}
-                links={this.state.links}
-                gotoPage={(link, page) => this._gotoPage(link, page)}
-            />
-        );
-    }
-
-    _doTogglePageNav(show) {
-        if (this._pageNav === null) {
-            return;
-        }
-
-        show ? this._pageNav.show() : this._pageNav.hide();
+            .catch(() => this._setLoadingState(LoadingState.Error));
     }
 
     _doRender() {
+        const {threads, links} = this.state;
+
         return (
-            <View style={styles.container}>
+            <SafeAreaView style={Style.container}>
                 <ThreadList
-                    threads={this.state.results}
+                    threads={threads}
                     navigation={this.props.navigation}
                     onMomentumScrollBegin={() => this._doTogglePageNav(false)}
                     onMomentumScrollEnd={() => this._doTogglePageNav(true)}
                 />
-                {this._doRenderPageNav()}
-            </View>
+                {links && <PageNav
+                    ref={(c) => (this._pageNav = c)}
+                    links={this.state.links}
+                    gotoPage={this._gotoPage}
+                />}
+            </SafeAreaView>
         );
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    }
-});

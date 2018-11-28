@@ -1,5 +1,5 @@
 import React from 'react';
-import {View} from 'react-native'
+import { View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import PropTypes from 'prop-types';
 
@@ -26,7 +26,7 @@ export default class Avatar extends React.PureComponent {
         ];
 
         if (!uri) {
-            return <View style={styles}/>;
+            return <View style={styles} />;
         }
 
         return <FastImage source={{ uri: uri }} style={styles} />;

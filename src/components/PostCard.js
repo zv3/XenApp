@@ -5,8 +5,8 @@ import ButtonIcon from './ButtonIcon';
 import HTML from 'react-native-render-html';
 import moment from 'moment';
 import Avatar from './Avatar';
-import UserName from "./UserName";
-import {Style} from "../Style";
+import UserName from './UserName';
+import { Style } from '../Style';
 
 const { width } = Dimensions.get('window');
 
@@ -41,7 +41,13 @@ export default class PostCard extends React.PureComponent<Props> {
     }
 
     _doRenderHeader = () => {
-        const {posterAvatar, posterName, postedDate, posterUserId, navigation} = this.props;
+        const {
+            posterAvatar,
+            posterName,
+            postedDate,
+            posterUserId,
+            navigation
+        } = this.props;
 
         return (
             <View style={styles.header}>
@@ -62,7 +68,7 @@ export default class PostCard extends React.PureComponent<Props> {
     };
 
     _doRenderBody = () => {
-        const {message} = this.props;
+        const { message } = this.props;
         const quoteStyle = [];
         for (const key in styles.quoteBlock) {
             if (styles.quoteBlock.hasOwnProperty(key)) {
@@ -114,17 +120,22 @@ export default class PostCard extends React.PureComponent<Props> {
         const { onShare, onLike } = this.props;
 
         switch (icon) {
-            case 'thumbs-up': {
-                const {isLiked} = this.state;
-                const onSuccess = () => this.setState({ isLiked: !isLiked });
-                const onFailure = () => {/** Do nothing */};
+            case 'thumbs-up':
+                {
+                    const { isLiked } = this.state;
+                    const onSuccess = () =>
+                        this.setState({ isLiked: !isLiked });
+                    const onFailure = () => {
+                        /** Do nothing */
+                    };
 
-                onLike(isLiked, onSuccess, onFailure);
-            }
+                    onLike(isLiked, onSuccess, onFailure);
+                }
                 break;
-            case 'share': {
-                onShare();
-            }
+            case 'share':
+                {
+                    onShare();
+                }
                 break;
             default:
                 throw new Error(`Unknown action pressed: ${icon}`);
@@ -158,10 +169,11 @@ export default class PostCard extends React.PureComponent<Props> {
 
         return (
             <View style={styles.footer}>
-                {onLike && renderButton(
-                    'thumbs-up',
-                    this.state.isLiked ? 'Unlike' : 'Like'
-                )}
+                {onLike &&
+                    renderButton(
+                        'thumbs-up',
+                        this.state.isLiked ? 'Unlike' : 'Like'
+                    )}
                 {onShare && renderButton('share', 'Share')}
             </View>
         );
