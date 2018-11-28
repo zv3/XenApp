@@ -3,22 +3,22 @@ import { BASE_URL } from '../Config';
 import { Token } from './Token';
 import axios from 'axios';
 
-const get = (uri, params: any, options: ?Object) => {
+const get = (uri, params: Object = {}, options: Object = {}) => {
     const opts = Object.assign({}, { params: params }, options);
 
     return request('GET', uri, opts);
 };
-const post = (uri, data: any, options: ?Object) => {
+const post = (uri, data: Object = {}, options: Object = {}) => {
     const opts = Object.assign({}, { data: data }, options);
 
     return request('POST', uri, opts);
 };
-const put = (uri, data: any, options: ?Object) => {
+const put = (uri, data: Object = {}, options: Object = {}) => {
     const opts = Object.assign({}, { data: data }, options);
 
     return request('PUT', uri, opts);
 };
-const del = (uri, data: any, options: ?Object) => {
+const del = (uri, data: Object = {}, options: Object = {}) => {
     const opts = Object.assign({}, { data: data }, options);
 
     return request('DELETE', uri, opts);
