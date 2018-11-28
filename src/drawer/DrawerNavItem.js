@@ -1,8 +1,8 @@
 import React from 'react';
 import { TouchableHighlight, View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import {DrawerStyle} from "../Style";
-import {Visitor} from "../utils/Visitor";
+import { DrawerStyle } from '../Style';
+import { Visitor } from '../utils/Visitor';
 
 type Props = {
     item: Object,
@@ -15,15 +15,20 @@ export default class DrawerNavItem extends React.PureComponent<Props> {
 
     componentDidMount(): void {
         const item = this.props.item;
-        if (item.navigationId === 'NotificationList'
-            || item.navigationId === 'ConversationList'
+        if (
+            item.navigationId === 'NotificationList' ||
+            item.navigationId === 'ConversationList'
         ) {
             Visitor.getVisitor()
                 .then((user) => {
                     if (item.navigationId === 'NotificationList') {
-                        this.setState({ counter: user.user_unread_notification_count });
+                        this.setState({
+                            counter: user.user_unread_notification_count
+                        });
                     } else if (item.navigationId === 'ConversationList') {
-                        this.setState({ counter: user.user_unread_conversation_count });
+                        this.setState({
+                            counter: user.user_unread_conversation_count
+                        });
                     }
                 })
                 .catch(() => {});
@@ -35,7 +40,9 @@ export default class DrawerNavItem extends React.PureComponent<Props> {
         const counter = this.state.counter;
 
         const counterComponent =
-            counter > 0 ? <Text style={DrawerStyle.itemBadge}>{counter}</Text> : null;
+            counter > 0 ? (
+                <Text style={DrawerStyle.itemBadge}>{counter}</Text>
+            ) : null;
 
         return (
             <TouchableHighlight

@@ -1,4 +1,4 @@
-import {Fetcher} from "../utils/Fetcher";
+import { Fetcher } from '../utils/Fetcher';
 
 export default class NotificationApi {
     static getList(params: Object = {}, options: Object = {}): Promise {

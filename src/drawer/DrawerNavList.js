@@ -5,7 +5,6 @@ import DrawerNavItem from './DrawerNavItem';
 import DrawerHeader from './DrawerHeader';
 import AuthEvent from '../events/AuthEvent';
 import { Visitor } from '../utils/Visitor';
-import BaseEvent from "../events/BaseEvent";
 
 const navItems = [
     {
