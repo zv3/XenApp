@@ -10,7 +10,7 @@ import React, {Component} from 'react';
 import {View, Text, ActivityIndicator, StyleSheet} from 'react-native';
 import {Token} from "./src/utils/Token";
 import BatchApi from "./src/api/BatchApi";
-import {Visitor} from "./src/utils/Visitor";
+import Visitor from "./src/utils/Visitor";
 import OAuthApi from "./src/api/OAuthApi";
 import {AppNavigator} from './src/AppRoutes'
 

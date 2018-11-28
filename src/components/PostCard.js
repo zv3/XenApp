@@ -109,10 +109,13 @@ export default class PostCard extends React.PureComponent<Props> {
             imagesMaxWidth: width - styles.body.padding * 2
         };
 
+        let bodyHtml;
+        if (message) {
+            bodyHtml = <HTML html={message} {...htmlConfig} />;
+        }
+
         return (
-            <View style={styles.body}>
-                <HTML html={message} {...htmlConfig} />
-            </View>
+            <View style={styles.body}>{bodyHtml}</View>
         );
     };
 

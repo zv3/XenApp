@@ -8,7 +8,6 @@ import ReplyBox from "../../components/ReplyBox";
 import ConversationApi from "../../api/ConversationApi";
 import MessageList from "./MessageList";
 import {Fetcher} from "../../utils/Fetcher";
-import PostList from "../Thread/PostList";
 
 export default class ConversationDetailScreen extends BaseScreen {
     static navigationOptions = ({navigation}) => {
@@ -47,7 +46,11 @@ export default class ConversationDetailScreen extends BaseScreen {
                         ...prevState.messages,
                         message
                     ]
-                }), () => this._messageList.scrollToEnd());
+                }));
+
+                this._messageList.scrollToEnd({
+                    animated: true
+                });
             })
             .catch(() => this._replyBox.toggleEnabled(true));
     };
@@ -140,7 +143,7 @@ export default class ConversationDetailScreen extends BaseScreen {
             <SafeAreaView style={Style.container} onLayout={this._onTopViewLayout}>
                 <View style={postListStyles}>
                     <MessageList
-                        ref={(c) => this._messageList = c}
+                        ref={(c) => (this._messageList = c)}
                         messages={messages}
                         navigation={this.props.navigation}
                         onMomentumScrollBegin={() => this._togglePageNav(false)}
