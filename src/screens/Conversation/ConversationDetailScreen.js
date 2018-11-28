@@ -8,6 +8,7 @@ import ReplyBox from "../../components/ReplyBox";
 import ConversationApi from "../../api/ConversationApi";
 import MessageList from "./MessageList";
 import {Fetcher} from "../../utils/Fetcher";
+import PostList from "../Thread/PostList";
 
 export default class ConversationDetailScreen extends BaseScreen {
     static navigationOptions = ({navigation}) => {
@@ -26,6 +27,7 @@ export default class ConversationDetailScreen extends BaseScreen {
                 const {messages, links} = response;
 
                 this._setLoadingState(LoadingState.Done, { messages, links });
+                this._togglePageNav(true);
             })
             .catch(() => this._setLoadingState(LoadingState.Error));
     };
@@ -69,6 +71,14 @@ export default class ConversationDetailScreen extends BaseScreen {
         }
     };
 
+    _togglePageNav = (show) => {
+        if (!this._pageNav) {
+            return;
+        }
+
+        show ? this._pageNav.show() : this._pageNav.hide();
+    };
+
     constructor(props) {
         super(props);
 
@@ -101,6 +111,7 @@ export default class ConversationDetailScreen extends BaseScreen {
                 const links = response['conversation-messages'].links;
 
                 this._setLoadingState(LoadingState.Done, { conversation, messages, links });
+                this._togglePageNav(true);
             })
             .catch(() => this._setLoadingState(LoadingState.Error));
 
@@ -132,6 +143,8 @@ export default class ConversationDetailScreen extends BaseScreen {
                         ref={(c) => this._messageList = c}
                         messages={messages}
                         navigation={this.props.navigation}
+                        onMomentumScrollBegin={() => this._togglePageNav(false)}
+                        onMomentumScrollEnd={() => this._togglePageNav(true)}
                     />
                 </View>
 
