@@ -5,6 +5,7 @@ import DrawerNavItem from './DrawerNavItem';
 import DrawerHeader from './DrawerHeader';
 import AuthEvent from '../events/AuthEvent';
 import { Visitor } from '../utils/Visitor';
+import BaseEvent from "../events/BaseEvent";
 
 const navItems = [
     {
@@ -15,7 +16,7 @@ const navItems = [
     {
         title: 'Notifications',
         icon: 'bell',
-        navigationId: 'Notifications'
+        navigationId: 'NotificationList'
     },
     {
         title: 'Conversations',
@@ -45,9 +46,9 @@ export default class DrawerNavList extends React.PureComponent {
 
     _onNavItemPress = (item) =>
         this.props.navigation.navigate(item.navigationId);
-    _renderNavItem = ({ item }) => (
-        <DrawerNavItem item={item} onPress={this._onNavItemPress} />
-    );
+    _renderNavItem = ({ item }) => {
+        return <DrawerNavItem item={item} onPress={this._onNavItemPress} />;
+    };
 
     _onAuthEvent = (user) => this.setState({ user });
 
@@ -56,7 +57,7 @@ export default class DrawerNavList extends React.PureComponent {
 
         Visitor.getVisitor()
             .then((user) => this.setState({ user }))
-            .catch(() => this.setState({ user: null }));
+            .catch(() => this._onAuthEvent(null));
     }
 
     componentWillUnmount(): void {

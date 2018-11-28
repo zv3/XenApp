@@ -18,7 +18,7 @@ export default class ThreadList extends React.PureComponent<Props> {
                 createdDate={item.thread_create_date}
                 creatorAvatar={item.links.first_poster_avatar}
                 title={item.thread_title}
-                routeName={'ThreadDetail'}
+                routeName={'Thread'}
                 rowId={item.thread_id}
                 navigation={navigation}
                 message={item.first_post.post_body_plain_text}

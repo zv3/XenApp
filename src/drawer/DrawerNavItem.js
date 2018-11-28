@@ -1,43 +1,52 @@
 import React from 'react';
-import { TouchableHighlight, View, Text, StyleSheet } from 'react-native';
+import { TouchableHighlight, View, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import PropTypes from 'prop-types';
+import {DrawerStyle} from "../Style";
+import {Visitor} from "../utils/Visitor";
 
-export default class DrawerNavItem extends React.PureComponent {
-    static propTypes = {
-        item: PropTypes.object.isRequired,
-        onPress: PropTypes.func.isRequired
+type Props = {
+    item: Object,
+    onPress: Function
+};
+export default class DrawerNavItem extends React.PureComponent<Props> {
+    state = {
+        counter: 0
     };
+
+    componentDidMount(): void {
+        const item = this.props.item;
+        if (item.navigationId === 'NotificationList'
+            || item.navigationId === 'ConversationList'
+        ) {
+            Visitor.getVisitor()
+                .then((user) => {
+                    if (item.navigationId === 'NotificationList') {
+                        this.setState({ counter: user.user_unread_notification_count });
+                    } else if (item.navigationId === 'ConversationList') {
+                        this.setState({ counter: user.user_unread_conversation_count });
+                    }
+                })
+                .catch(() => {});
+        }
+    }
 
     render() {
         const { item, onPress } = this.props;
+        const counter = this.state.counter;
+
+        const counterComponent =
+            counter > 0 ? <Text style={DrawerStyle.itemBadge}>{counter}</Text> : null;
 
         return (
             <TouchableHighlight
                 onPress={() => onPress(item)}
-                underlayColor="rgb(237, 246, 253)">
-                <View style={styles.item}>
+                underlayColor={DrawerStyle.itemHighlightedColor}>
+                <View style={DrawerStyle.item}>
                     <Icon name={item.icon} size={20} />
-                    <Text style={styles.itemText}>{item.title}</Text>
+                    <Text style={DrawerStyle.itemText}>{item.title}</Text>
+                    {counterComponent}
                 </View>
             </TouchableHighlight>
         );
     }
 }
-
-const styles = StyleSheet.create({
-    item: {
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 15,
-        paddingRight: 15,
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 40
-    },
-
-    itemText: {
-        fontSize: 18,
-        marginLeft: 15
-    }
-});

@@ -13,16 +13,19 @@ import LoginScreen from "./screens/Auth/LoginScreen";
 import ConversationListScreen from "./screens/Conversation/ConversationListScreen";
 import ConversationDetailScreen from "./screens/Conversation/ConversationDetailScreen";
 import ConversationAddScreen from "./screens/Conversation/ConversationAddScreen";
+import NotificationListScreen from "./screens/Notification/NotificationListScreen";
 
 const AppRootStack = createStackNavigator({
     Home: HomeScreen,
-    ThreadDetail: ThreadDetailScreen,
+    Thread: ThreadDetailScreen,
     Forum: ForumScreen,
     ThreadCreate: ThreadCreateScreen,
 
     ConversationList: ConversationListScreen,
     ConversationDetail: ConversationDetailScreen,
     ConversationAdd: ConversationAddScreen,
+
+    NotificationList: NotificationListScreen,
 
     // oauth screens
     Login: LoginScreen
