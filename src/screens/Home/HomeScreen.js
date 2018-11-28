@@ -108,11 +108,31 @@ export default class HomeScreen extends BaseScreen {
         show ? this._pageNav.show() : this._pageNav.hide();
     };
 
+    _onPullRefresh = () => this._doLoadData();
+
+    _doLoadData = () => {
+        this.setState({ isRefreshing: true });
+
+        BatchApi.addRequest('get', 'threads', {
+            order: 'thread_update_date_reverse'
+        });
+        BatchApi.dispatch()
+            .then((response) => {
+                const { threads, links } = response.threads;
+                const isRefreshing = false;
+
+                this._setLoadingState(LoadingState.Done, { threads, links, isRefreshing });
+                this._doTogglePageNav(true);
+            })
+            .catch(() => this._setLoadingState(LoadingState.Error, { isRefreshing: false}));
+    };
+
     constructor(props) {
         super(props);
 
         this.state = {
             ...this.state,
+            isRefreshing: false,
             threads: [],
             links: null
         };
@@ -121,21 +141,11 @@ export default class HomeScreen extends BaseScreen {
     }
 
     componentDidMount() {
-        BatchApi.addRequest('get', 'threads', {
-            order: 'thread_update_date_reverse'
-        });
-        BatchApi.dispatch()
-            .then((response) => {
-                const { threads, links } = response.threads;
-
-                this._setLoadingState(LoadingState.Done, { threads, links });
-                this._doTogglePageNav(true);
-            })
-            .catch(() => this._setLoadingState(LoadingState.Error));
+        this._doLoadData();
     }
 
     _doRender() {
-        const {threads, links} = this.state;
+        const {threads, links, isRefreshing} = this.state;
 
         return (
             <SafeAreaView style={Style.container}>
@@ -144,6 +154,8 @@ export default class HomeScreen extends BaseScreen {
                     navigation={this.props.navigation}
                     onMomentumScrollBegin={() => this._doTogglePageNav(false)}
                     onMomentumScrollEnd={() => this._doTogglePageNav(true)}
+                    refreshing={isRefreshing}
+                    onRefresh={this._onPullRefresh}
                 />
                 {links && <PageNav
                     ref={(c) => (this._pageNav = c)}
