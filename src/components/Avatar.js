@@ -1,10 +1,11 @@
 import React from 'react';
+import {View} from 'react-native'
 import FastImage from 'react-native-fast-image';
 import PropTypes from 'prop-types';
 
 export default class Avatar extends React.PureComponent {
     static propTypes = {
-        uri: PropTypes.string.isRequired,
+        uri: PropTypes.string,
         size: PropTypes.number,
         style: PropTypes.object
     };
@@ -23,6 +24,10 @@ export default class Avatar extends React.PureComponent {
             },
             style
         ];
+
+        if (!uri) {
+            return <View style={styles}/>;
+        }
 
         return <FastImage source={{ uri: uri }} style={styles} />;
     }

@@ -18,7 +18,7 @@ export default class ConversationList extends React.PureComponent<Props> {
             creatorUserId={item.creator_user_id}
             creatorName={item.creator_username}
             createdDate={item.conversation_create_date}
-            creatorAvatar={creatorUsers[0].avatar_small}
+            creatorAvatar={creatorUsers[0] ? creatorUsers[0].avatar_small : undefined}
             title={item.conversation_title}
             routeName={'ConversationDetail'}
             rowId={item.conversation_id}

@@ -15,11 +15,12 @@ export default class ThreadRow extends React.PureComponent {
         creatorUserId: PropTypes.number.isRequired,
         creatorName: PropTypes.string.isRequired,
         createdDate: PropTypes.number.isRequired,
-        creatorAvatar: PropTypes.string.isRequired,
         title: PropTypes.string.isRequired,
         routeName: PropTypes.string.isRequired,
         rowId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-        message: PropTypes.string
+
+        message: PropTypes.string,
+        creatorAvatar: PropTypes.string
     };
 
     _onItemPress = () => {
