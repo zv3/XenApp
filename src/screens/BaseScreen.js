@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, ActivityIndicator, Text } from 'react-native';
-import ButtonIcon from '../components/ButtonIcon';
 import { Style } from '../Style';
 import Button from '../components/Button';
 
@@ -78,8 +77,7 @@ export default class BaseScreen extends React.Component<Props> {
                     <Text style={style.loading}>
                         Whoops! Something went wrong. Please try again.
                     </Text>
-                    <ButtonIcon
-                        iconName={'chevrons-right'}
+                    <Button
                         title={'Reload'}
                         onPress={() => this._doReload()}
                     />
