@@ -87,6 +87,7 @@ export default class ConversationListScreen extends BaseScreen {
     }
 
     _doReload() {
+        this._setLoadingState(LoadingState.Begin);
         this._doLoadData();
     }
 

@@ -52,7 +52,8 @@ export default class BaseScreen extends React.Component<Props> {
         const style = {
             loading: {
                 marginTop: 10,
-                fontSize: 18
+                fontSize: 18,
+                textAlign: 'center'
             },
             container: {
                 flex: 1,
