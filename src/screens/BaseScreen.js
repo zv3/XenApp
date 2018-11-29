@@ -77,10 +77,7 @@ export default class BaseScreen extends React.Component<Props> {
                     <Text style={style.loading}>
                         Whoops! Something went wrong. Please try again.
                     </Text>
-                    <Button
-                        title={'Reload'}
-                        onPress={() => this._doReload()}
-                    />
+                    <Button title={'Reload'} onPress={() => this._doReload()} />
                 </View>
             );
         } else if (loadingState === LoadingState.Done) {

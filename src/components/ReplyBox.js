@@ -28,7 +28,7 @@ export default class ReplyBox extends React.PureComponent {
 
     setMessage(message) {
         this.setState({ message: message });
-        const {onTyping} = this.props;
+        const { onTyping } = this.props;
 
         if (onTyping) {
             onTyping(message);

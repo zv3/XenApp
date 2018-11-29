@@ -114,9 +114,7 @@ export default class PostCard extends React.PureComponent<Props> {
             bodyHtml = <HTML html={message} {...htmlConfig} />;
         }
 
-        return (
-            <View style={styles.body}>{bodyHtml}</View>
-        );
+        return <View style={styles.body}>{bodyHtml}</View>;
     };
 
     _onActionPressed = (icon) => {
