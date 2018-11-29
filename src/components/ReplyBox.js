@@ -10,13 +10,30 @@ export default class ReplyBox extends React.PureComponent {
         style: PropTypes.object
     };
 
+    _doSubmit = () => {
+        const message = this.message();
+        if (message.length === 0) {
+            return;
+        }
+
+        this.toggleEnabled(false);
+        this.props.onSubmit(message);
+    };
+
+    _presentFullScreen = () => {};
+
+    _onFocus = () => this.setState({ isTyping: true });
+
+    _onBlur = () => this.setState({ isTyping: false });
+
     constructor(props) {
         super(props);
 
         this.state = {
             message: '',
             quoteUser: '',
-            enabled: true
+            enabled: true,
+            isTyping: false
         };
 
         this._layoutHeight = 40;
@@ -54,20 +71,17 @@ export default class ReplyBox extends React.PureComponent {
         return this.state.message.replace(/^(\n|\s+)|(\n|\s+)$/g, '');
     }
 
-    _doSubmit = () => {
-        const message = this.message();
-        if (message.length === 0) {
-            return;
-        }
-
-        this.toggleEnabled(false);
-        this.props.onSubmit(message);
-    };
-
     _doRenderQuoteText() {}
 
     render() {
-        const { message, enabled } = this.state;
+        const { message, enabled, isTyping } = this.state;
+
+        const groupButtons = [styles.submit];
+        if (isTyping) {
+            groupButtons.push({
+                top: -25
+            });
+        }
 
         return (
             <View
@@ -83,8 +97,19 @@ export default class ReplyBox extends React.PureComponent {
                     value={message}
                     autoCorrect={false}
                     placeholder="Enter an message..."
+                    maxHeight={40}
+                    onFocus={this._onFocus}
+                    onBlur={this._onBlur}
                 />
-                <View style={styles.submit}>
+                <View style={groupButtons}>
+                    <ButtonIcon
+                        iconName={'maximize-2'}
+                        iconColor={'#FFF'}
+                        iconSize={20}
+                        style={styles.minMaxButton}
+                        disabled={!enabled}
+                        onPress={this._presentFullScreen}
+                    />
                     <ButtonIcon
                         iconName="send"
                         iconSize={20}
@@ -118,7 +143,18 @@ const styles = StyleSheet.create({
     submit: {
         position: 'absolute',
         top: -15,
-        right: 10
+        right: 10,
+        flexDirection: 'row'
+    },
+
+    minMaxButton: {
+        backgroundColor: 'purple',
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10
     },
 
     sendButton: {

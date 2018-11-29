@@ -12,6 +12,7 @@ export default class PostList extends React.Component<Props> {
     _keyExtractor = (item) => JSON.stringify(item.post_id);
     _renderItem = ({item}) => <PostCard
         isLiked={item.post_is_liked}
+        canLike={item.permissions.like}
         message={item.post_body_html}
         navigation={this.props.navigation}
         postedDate={item.post_create_date}

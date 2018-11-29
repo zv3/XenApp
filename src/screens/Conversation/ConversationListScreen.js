@@ -86,6 +86,10 @@ export default class ConversationListScreen extends BaseScreen {
         show ? this._pageNav.show() : this._pageNav.hide();
     }
 
+    _doReload() {
+        this._doLoadData();
+    }
+
     _doRender() {
         if (Visitor.isGuest()) {
             return this._doRenderRequireAuth();

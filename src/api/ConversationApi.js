@@ -19,4 +19,12 @@ export default class ConversationApi {
             options
         );
     }
+
+    static likeMessage(messageId: Number, options: Object = {}): Promise {
+        return Fetcher.post(`conversation-messages/${messageId}/likes`, {}, options);
+    }
+
+    static unlikeMessage(messageId: Number, options: Object = {}): Promise {
+        return Fetcher.del(`conversation-messages/${messageId}/likes`, {}, options);
+    }
 }

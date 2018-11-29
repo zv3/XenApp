@@ -24,12 +24,19 @@ type Props = {
     onShare?: ?PropTypes.func,
     onLike?: ?PropTypes.func,
 
+    canLike?: PropTypes.bool,
+    canShare?: PropTypes.bool,
     isLiked: PropTypes.bool,
     navigation: PropTypes.object
 };
 export default class PostCard extends React.PureComponent<Props> {
     state = {
         isLiked: null
+    };
+
+    static defaultProps = {
+        canLike: true,
+        canShare: true
     };
 
     static getDerivedStateFromProps(nextProps: Props, state) {
@@ -144,7 +151,7 @@ export default class PostCard extends React.PureComponent<Props> {
     };
 
     _doRenderFooter = () => {
-        const { onShare, onLike } = this.props;
+        const { onShare, onLike, canLike, canShare } = this.props;
 
         const renderButton = (icon, text, disabled = false) => {
             const iconColor = Platform.select({
@@ -168,14 +175,18 @@ export default class PostCard extends React.PureComponent<Props> {
             );
         };
 
+        const likeButton =
+            (onLike && canLike) ? renderButton(
+                'thumbs-up',
+                this.state.isLiked ? 'Unlike' : 'Like'
+            ) : <View />;
+            const shareButton =
+                (onShare && canShare) ? renderButton('share', 'Share') : <View />;
+
         return (
             <View style={styles.footer}>
-                {onLike &&
-                    renderButton(
-                        'thumbs-up',
-                        this.state.isLiked ? 'Unlike' : 'Like'
-                    )}
-                {onShare && renderButton('share', 'Share')}
+                {likeButton}
+                {shareButton}
             </View>
         );
     };
@@ -216,7 +227,7 @@ const styles = StyleSheet.create({
 
     footer: {
         paddingHorizontal: 10,
-        borderBottomWidth: 1,
+        // borderBottomWidth: 1,
         borderBottomColor: '#d8d8d8',
         flexDirection: 'row',
         alignItems: 'center',

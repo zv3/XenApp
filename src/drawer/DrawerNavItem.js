@@ -15,6 +15,12 @@ export default class DrawerNavItem extends React.PureComponent<Props> {
     };
 
     _onOAuthEvent = (user) => {
+        if (!user) {
+            this.setState({ counter: 0 });
+
+            return;
+        }
+
         const item = this.props.item;
         if (
             item.navigationId === 'NotificationList' ||

@@ -3,6 +3,7 @@ import {} from 'react-native'
 import {PostCardSeparator} from "../../components/PostCard";
 import {FlatList} from "react-native";
 import PostCard from "../../components/PostCard";
+import ConversationApi from "../../api/ConversationApi";
 
 type Props = {
     messages: Array,
@@ -11,15 +12,28 @@ type Props = {
 export default class MessageList extends React.PureComponent<Props> {
     _renderItem = ({item}) => {
         return <PostCard
-            isLiked={false}
+            isLiked={item.message_is_liked}
+            canLike={item.permissions.like}
             message={item.message_body_html}
-            onLike={null}
+            onLike={(isLiked, onSuccess, onFailure) => this._onLike(item, isLiked, onSuccess, onFailure)}
             postedDate={item.message_create_date}
             posterAvatar={item.links.creator_avatar}
             posterName={item.creator_username}
             posterUserId={item.creator_user_id}
             navigation={this.props.navigation}
         />;
+    };
+
+    _onLike = (item, isLiked, onSuccess, onFailure) => {
+        if (isLiked) {
+            ConversationApi.unlikeMessage(item.message_id)
+                .then(onSuccess)
+                .catch(onFailure);
+        } else {
+            ConversationApi.likeMessage(item.message_id)
+                .then(onSuccess)
+                .catch(onFailure);
+        }
     };
 
     _keyExtractor = (item) => JSON.stringify(item.message_id);

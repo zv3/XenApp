@@ -12,6 +12,7 @@ import Visitor from '../../utils/Visitor';
 import BatchApi from '../../api/BatchApi';
 import ThreadList from "../../components/ThreadList";
 import {Style} from "../../Style";
+import moment from "moment";
 
 class HomeHeaderRight extends React.PureComponent {
     static propTypes = {
@@ -116,7 +117,8 @@ export default class HomeScreen extends BaseScreen {
             BatchApi.addRequest('get', 'threads/recent');
         } else {
             BatchApi.addRequest('get', 'threads', {
-                order: 'thread_update_date_reverse'
+                order: 'thread_update_date_reverse',
+                thread_update_date: moment().format('X')
             });
         }
 

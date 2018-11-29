@@ -44,10 +44,6 @@ export default class ThreadDetailScreen extends BaseScreen {
                     ...prevState,
                     posts: [...prevState.posts, post]
                 }));
-
-                this._postList.scrollToEnd({
-                    animated: true
-                });
             })
             .catch((err) => {
                 Alert.alert('Whoops!', err.toString());
@@ -76,10 +72,14 @@ export default class ThreadDetailScreen extends BaseScreen {
     _onKeyboardDidShown = (ev) => {
         const { endCoordinates } = ev;
 
-        this._pageNav && this._pageNav.hide();
-        const maxViewHeight = this._viewHeight - endCoordinates.height - this._replyBox.getLayoutHeight();
+        this._togglePageShow(false);
+        let replyBoxHeight = 0;
+        if (this._replyBox) {
+            replyBoxHeight = this._replyBox.getLayoutHeight();
+        }
+        const maxViewHeight = this._viewHeight - endCoordinates.height - replyBoxHeight;
 
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
         this.setState({ maxViewHeight });
     };
     _onKeyboardDidHide = () => {
@@ -139,7 +139,7 @@ export default class ThreadDetailScreen extends BaseScreen {
             <SafeAreaView style={styles.container} onLayout={this._onTopViewLayout}>
                 <View style={postListStyles}>
                     <PostList
-                        ref={(c) => (this._postList = c)}
+                        ref={(c) => this._postList = c}
                         posts={posts}
                         navigation={this.props.navigation}
                         onMomentumScrollBegin={() => this._togglePageShow(false)}

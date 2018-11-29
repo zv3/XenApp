@@ -59,9 +59,14 @@ export default class ConversationDetailScreen extends BaseScreen {
         const { endCoordinates } = ev;
 
         this._pageNav && this._pageNav.hide();
-        const maxViewHeight = this._viewHeight - endCoordinates.height - this._replyBox.getLayoutHeight();
+        let replyBoxHeight = 0;
+        if (this._replyBox) {
+            replyBoxHeight = this._replyBox.getLayoutHeight();
+        }
 
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+        const maxViewHeight = this._viewHeight - endCoordinates.height - replyBoxHeight;
+
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.linear);
         this.setState({ maxViewHeight });
     };
     _onKeyboardDidHide = () => {
