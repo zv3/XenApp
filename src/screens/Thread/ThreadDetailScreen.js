@@ -31,9 +31,9 @@ export default class ThreadDetailScreen extends BaseScreen {
     };
 
     _doReply = (message) => {
-        const threadId = this.props.navigation.getParam('threadId');
+        const {thread} = this.state;
 
-        PostApi.create(threadId, message)
+        PostApi.create(thread.thread_id, message)
             .then((response) => {
                 if (this._replyBox !== null) {
                     this._replyBox.clear();
