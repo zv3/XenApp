@@ -60,7 +60,7 @@ export default class App extends Component<Props> {
             );
         }
 
-        return (<AppNavigator/>);
+        return <AppNavigator/>;
     }
 }
 

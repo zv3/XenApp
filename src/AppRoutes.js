@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+    createAppContainer,
     createStackNavigator,
     createDrawerNavigator
 } from "react-navigation";
@@ -36,7 +37,7 @@ const AppRootStack = createStackNavigator({
     initialRouteName: 'Home'
 });
 
-export const AppNavigator = createDrawerNavigator({
+const AppDrawerNavigator = createDrawerNavigator({
     AppRoot: AppRootStack
 }, {
     initialRouteName: 'AppRoot',
@@ -45,3 +46,5 @@ export const AppNavigator = createDrawerNavigator({
     /* eslint-enable */
     mode: Platform.OS === 'ios' ? 'modal' : 'card'
 });
+
+export const AppNavigator = createAppContainer(AppDrawerNavigator);
