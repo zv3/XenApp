@@ -244,7 +244,6 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         padding: 15,
-        backgroundColor: '#fafafa',
         alignItems: 'center'
     },
     iconText: {

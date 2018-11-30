@@ -84,58 +84,57 @@ const request = (method: String, uri: String, options: Object) => {
     }
 
     return new Promise((resolve, reject) => {
-        Token.get().then((token) => {
-            if (!opts.params || !opts.params.oauth_token) {
-                opts.params.oauth_token = token;
-            }
+        const token = Token.get();
+        if (!opts.params || !opts.params.oauth_token) {
+            opts.params.oauth_token = token;
+        }
 
-            const isFullUri =
-                uri.indexOf('http://') === 0 || uri.indexOf('https://') === 0;
-            opts.url = isFullUri ? uri : `api/index.php?${normalizeUri(uri)}`;
+        const isFullUri =
+            uri.indexOf('http://') === 0 || uri.indexOf('https://') === 0;
+        opts.url = isFullUri ? uri : `api/index.php?${normalizeUri(uri)}`;
 
-            const CancelToken = axios.CancelToken;
-            const source = CancelToken.source();
+        const CancelToken = axios.CancelToken;
+        const source = CancelToken.source();
 
-            if (typeof onCancelSetup === 'function') {
-                onCancelSetup(source);
-            }
+        if (typeof onCancelSetup === 'function') {
+            onCancelSetup(source);
+        }
 
-            const instance = axios.create({
-                cancelToken: source.token
-            });
-
-            instance
-                .request(opts)
-                .then((response) => {
-                    const data = response.data;
-
-                    if (skipDefaultHandler) {
-                        resolve(response);
-                    } else {
-                        if (
-                            data.hasOwnProperty('status') &&
-                            data.status === 'error'
-                        ) {
-                            if (Array.isArray(data.errors)) {
-                                reject([new Error(data.errors[0]), response]);
-                            } else {
-                                const errorKeys = Object.keys(data.errors);
-                                reject([
-                                    new Error(data.errors[errorKeys[0]]),
-                                    response
-                                ]);
-                            }
-                        } else {
-                            resolve(data);
-                        }
-                    }
-                })
-                .catch((error) => {
-                    axios.isCancel(error)
-                        ? reject([new Error('Request cancelled'), null])
-                        : reject([error, null]);
-                });
+        const instance = axios.create({
+            cancelToken: source.token
         });
+
+        instance
+            .request(opts)
+            .then((response) => {
+                const data = response.data;
+
+                if (skipDefaultHandler) {
+                    resolve(response);
+                } else {
+                    if (
+                        data.hasOwnProperty('status') &&
+                        data.status === 'error'
+                    ) {
+                        if (Array.isArray(data.errors)) {
+                            reject([new Error(data.errors[0]), response]);
+                        } else {
+                            const errorKeys = Object.keys(data.errors);
+                            reject([
+                                new Error(data.errors[errorKeys[0]]),
+                                response
+                            ]);
+                        }
+                    } else {
+                        resolve(data);
+                    }
+                }
+            })
+            .catch((error) => {
+                axios.isCancel(error)
+                    ? reject([new Error('Request cancelled'), null])
+                    : reject([error, null]);
+            });
     });
 };
 

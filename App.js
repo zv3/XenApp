@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {View, Text, ActivityIndicator, StyleSheet} from 'react-native';
+import {View, Text, ActivityIndicator, StyleSheet, AppState} from 'react-native';
 import {Token} from "./src/utils/Token";
 import BatchApi from "./src/api/BatchApi";
 import Visitor from "./src/utils/Visitor";
@@ -16,9 +16,19 @@ import {AppNavigator} from './src/AppRoutes'
 
 type Props = {};
 export default class App extends Component<Props> {
-    state = {
-        isLoading: true
+    _handleAppStateChange = (nextAppState) => {
+        if (nextAppState === 'active') {
+            // refresh token in background?
+        }
     };
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isLoading: true
+        };
+    }
 
     componentDidMount() {
         const loadDone = () => this.setState({ isLoading: false });
@@ -48,6 +58,12 @@ export default class App extends Component<Props> {
                     });
             })
             .catch(loadDone);
+
+        AppState.addEventListener('change', this._handleAppStateChange);
+    }
+
+    componentWillUnmount(): void {
+        AppState.removeEventListener('change', this._handleAppStateChange);
     }
 
     render() {
